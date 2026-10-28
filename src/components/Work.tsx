@@ -2,12 +2,12 @@
 
 import { useEffect, useRef } from "react";
 import { PROJECTS } from "@/content/site";
-import { MoreCard, ProjectCard } from "./work/ProjectCard";
+import { ProjectCard } from "./work/ProjectCard";
 
 // A fixed pool of cards, wrapped around the screen as the grid moves, so it never ends.
 // Tile (i, j) shows TILES[(i + 2j) % n], so side-by-side and stacked cards always differ.
 // The pool is sized so the cards that meet across each wrap differ too, whatever n is.
-const TILES = [...PROJECTS, null]; // null: the "more on the way" card
+const TILES = PROJECTS;
 const STEP = 2;
 const fits = (count: number, step: number) => ((count - 1) * step) % TILES.length !== 0;
 const COLS = [8, 10, 12].find((c) => fits(c, 1)) ?? 8; // even, so the half-card column offset lines up
@@ -196,7 +196,7 @@ export default function Work({
               }}
               className="absolute top-0 left-0 w-[var(--card-w)] will-change-transform"
             >
-              {tile ? <ProjectCard project={tile} /> : <MoreCard />}
+              <ProjectCard project={tile} />
             </div>
           );
         })}

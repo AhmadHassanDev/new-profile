@@ -12,7 +12,7 @@ const ROWS = SERVICES.map((service) => {
     service.type ? typeOf(p.kind) === service.type : service.tag ? p.disciplines.includes(service.tag) : false,
   );
   const query = service.type ? `type=${encodeURIComponent(service.type)}` : `tag=${encodeURIComponent(service.tag ?? "")}`;
-  return { ...service, projects, href: service.contact ? "#contact" : `/work?${query}#projects` };
+  return { ...service, projects, href: service.contact ? "/contact" : `/work?${query}#projects` };
 }).filter((row) => row.contact || row.projects.length);
 
 // Up to three covers fan out behind each other in the floating preview

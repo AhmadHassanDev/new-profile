@@ -199,8 +199,14 @@ export const CLIENTS: Client[] = [
 ];
 
 export const SOCIALS = [
-  { label: "LinkedIn", href: "https://www.linkedin.com/in/ahmed-hassan-30550b1b6/" },
-  { label: "Behance", href: "https://www.behance.net/ahdev" },
-  { label: "GitHub", href: "https://github.com/AhmadHassanDev" },
-  { label: "Instagram", href: "https://www.instagram.com/ahmaddhassan_/" },
+  { label: "LinkedIn", handle: "Ahmed Hassan", note: "Career & experience", href: "https://www.linkedin.com/in/ahmed-hassan-30550b1b6/" },
+  { label: "Behance", handle: "ahdev", note: "Case studies & visuals", href: "https://www.behance.net/ahdev" },
+  { label: "GitHub", handle: "AhmadHassanDev", note: "Code & side projects", href: "https://github.com/AhmadHassanDev" },
+  { label: "Instagram", handle: "@ahmaddhassan_", note: "Behind the scenes", href: "https://www.instagram.com/ahmaddhassan_/" },
 ];
+
+/** Direct lines, shown on the contact page. The form's inbox is set by CONTACT_TO (see .env.example). */
+export const CONTACT = {
+  email: "ahmad.hassan.abdelmoaty@gmail.com",
+  whatsapp: { number: "201119523790", display: "+20 111 952 3790" },
+};

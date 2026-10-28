@@ -163,11 +163,18 @@ body:has(.site-loader:not(.is-exiting)) .animate-rise {
   to { transform: translateY(100%); }
 }
 
+/* Text that rises into view: hidden below its line only, so tight tracking and full stops that
+   reach past the word's edge never get trimmed at the sides or top */
+.reveal {
+  clip-path: inset(-0.3em -0.3em 0 -0.3em);
+}
+
 /* Closing CTA: letters have two faces and flip over in a wave while the button is hovered */
 .roll {
   display: inline-block;
-  height: 0.9em;
-  line-height: 0.9;
+  /* Tall enough for the letters it holds: the caps headline is tight, text with descenders isn't */
+  height: var(--roll, 0.9em);
+  line-height: var(--roll, 0.9em);
   vertical-align: top;
   /* Clip top and bottom only: with tight tracking, glyphs reach past their box into the neighbours */
   clip-path: inset(0 -0.25em);
@@ -266,6 +273,20 @@ body:has(.nav-bar[data-tucked="true"]) .below-nav {
 .service-cover[data-show="true"] {
   opacity: 1;
   transform: var(--fan) scale(1);
+}
+
+/* Contact: direct lines and social tiles fill with their brand colour from the corner */
+.direct-flood {
+  clip-path: circle(0% at 100% 0%);
+  transition: clip-path 0.7s cubic-bezier(0.76, 0, 0.24, 1);
+}
+.group:hover > .direct-flood,
+.group:focus-visible > .direct-flood {
+  clip-path: circle(150% at 100% 0%);
+}
+.social-tile:hover,
+.social-tile:focus-visible {
+  color: var(--on-brand);
 }
 
 /* Mobile menu: colour sheets wipe in along a "/" edge (the logo's slash), the panel lands last.

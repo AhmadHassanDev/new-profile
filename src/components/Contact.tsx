@@ -3,7 +3,19 @@ import { SOCIALS } from "@/content/site";
 import MakeItReal from "./MakeItReal";
 import SocialIcon from "./SocialIcon";
 
-export default function Contact() {
+/** The closing call to action and footer. `minimal` keeps just the bottom bar (the contact page is the CTA). */
+export default function Contact({ minimal = false }: { minimal?: boolean }) {
+  const bar = (
+    <div className="flex items-center justify-between border-t border-line pt-6 text-sm text-muted">
+      <Image src="/logo.svg" alt="" width={40} height={31} />
+      <span>© 2019–2026 Ahmed Hassan</span>
+      <a href="#top" className="transition-colors hover:text-ink">
+        Back to top ↑
+      </a>
+    </div>
+  );
+  if (minimal) return <footer className="relative px-4 pb-10 md:px-10">{bar}</footer>;
+
   return (
     <footer id="contact" className="relative overflow-hidden px-4 pt-32 pb-10 md:px-10 md:pt-48">
       {/* The glow fades in from nothing at the top, so there's no hard line where the footer starts */}
@@ -16,7 +28,7 @@ export default function Contact() {
 
       <div className="relative">
         <p className="mb-8 text-sm font-semibold text-muted">Got a product in mind?</p>
-        <MakeItReal href={SOCIALS[0].href}>
+        <MakeItReal href="/contact">
           <ul className="flex gap-3">
             {SOCIALS.map((s) => (
               <li key={s.label}>
@@ -35,13 +47,7 @@ export default function Contact() {
           </ul>
         </MakeItReal>
 
-        <div className="mt-24 flex items-center justify-between border-t border-line pt-6 text-sm text-muted">
-          <Image src="/logo.svg" alt="" width={40} height={31} />
-          <span>© 2021–2026 Ahmed Hassan</span>
-          <a href="#top" className="transition-colors hover:text-ink">
-            Back to top ↑
-          </a>
-        </div>
+        <div className="mt-24">{bar}</div>
       </div>
     </footer>
   );

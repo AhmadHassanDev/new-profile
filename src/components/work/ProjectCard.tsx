@@ -84,14 +84,3 @@ export function ProjectCard({ project, full = false }: { project: Project; full?
   );
 }
 
-export function MoreCard() {
-  return (
-    <div className="w-full">
-      <div className="grid place-items-center rounded-[22px] border border-dashed border-line" style={FRAME}>
-        <span className="text-spectrum animate-shimmer font-display text-6xl font-bold tracking-[-0.04em] md:text-7xl">20+</span>
-      </div>
-      <Caption title="More work" detail="Case studies on the way" />
-    </div>
-  );
-}
-

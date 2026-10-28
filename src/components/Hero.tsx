@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import HeroCanvas, { EXCITE_EVENT } from "./hero/HeroCanvas";
 import LiquidName, { type Lit } from "./hero/LiquidName";
@@ -78,7 +79,7 @@ export default function Hero() {
               <span
                 key={verb.text}
                 data-line
-                className="block overflow-hidden portrait:text-[calc(13.2vw_-_0.3rem)] md:portrait:text-[calc(13.2vw_-_0.7rem)] landscape:text-[min(calc(7.5vw_-_0.35rem),calc((100svh_-_25rem)/2.6))]"
+                className="reveal block portrait:text-[calc(13.2vw_-_0.3rem)] md:portrait:text-[calc(13.2vw_-_0.7rem)] landscape:text-[min(calc(7.5vw_-_0.35rem),calc((100svh_-_25rem)/2.6))]"
               >
                 <span
                   className={`animate-rise block transition-colors duration-700 ${lit[i] ? verb.lit : ""}`}
@@ -114,8 +115,8 @@ export default function Hero() {
                   →
                 </span>
               </a>
-              <a
-                href="#contact"
+              <Link
+                href="/contact"
                 onPointerEnter={excite(true)}
                 onPointerLeave={excite(false)}
                 onFocus={excite(true)}
@@ -123,7 +124,7 @@ export default function Hero() {
                 className="inline-flex items-center rounded-full border border-line bg-bg/40 px-6 py-[15px] text-base font-semibold backdrop-blur-md transition-colors duration-300 hover:border-ink"
               >
                 Let&apos;s talk
-              </a>
+              </Link>
             </div>
           </div>
           <Stats />

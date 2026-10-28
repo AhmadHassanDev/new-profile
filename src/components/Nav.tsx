@@ -10,7 +10,7 @@ import { SCROLL_LOCK } from "@/lib/scroll";
 const LINKS = [
   { href: "/work", label: "Work", hover: "group-hover:text-cyan" },
   { href: "/about", label: "About", hover: "group-hover:text-violet" },
-  { href: "#contact", label: "Contact", hover: "group-hover:text-coral" },
+  { href: "/contact", label: "Contact", hover: "group-hover:text-coral" },
 ];
 
 export default function Nav() {
@@ -93,7 +93,7 @@ export default function Nav() {
           <nav aria-label="Main" className="relative my-auto">
             <ul className="flex flex-col gap-1">
               {LINKS.map((link, i) => (
-                <li key={link.href} className="overflow-hidden">
+                <li key={link.href} className="reveal">
                   <Link
                     ref={i === 0 ? firstLinkRef : undefined}
                     href={link.href}
@@ -146,9 +146,9 @@ export default function Nav() {
           <Link href="/about" className="rounded-full px-4 py-2 transition-colors hover:bg-white/10">
             About
           </Link>
-          <a href="#contact" className="rounded-full bg-ink px-4 py-2 text-bg transition-transform hover:scale-[1.04]">
+          <Link href="/contact" className="rounded-full bg-ink px-4 py-2 text-bg transition-transform hover:scale-[1.04]">
             Contact
-          </a>
+          </Link>
         </nav>
 
         <button

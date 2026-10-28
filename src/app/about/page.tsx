@@ -55,10 +55,10 @@ export default function AboutPage() {
 
           <Kicker>About</Kicker>
           <h1 className="relative mt-8 font-display leading-[0.84] font-bold tracking-[-0.055em] uppercase">
-            <span className="block overflow-hidden text-[17vw] md:text-[13.5vw]">
+            <span className="reveal block text-[17vw] md:text-[13.5vw]">
               <span className="animate-rise block">Hi, I&apos;m</span>
             </span>
-            <span className="block overflow-hidden text-[17vw] md:text-[13.5vw]">
+            <span className="reveal block text-[17vw] md:text-[13.5vw]">
               <span className="text-spectrum animate-shimmer animate-rise block" style={{ animationDelay: "110ms" }}>
                 Ahmed.
               </span>

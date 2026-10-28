@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useRef } from "react";
 
 const LINES = ["Let's make", "it real."];
@@ -102,18 +103,17 @@ export default function MakeItReal({ href, children }: { href: string; children?
       </h2>
 
       <div className="mt-14 flex flex-col gap-10 md:mt-16 md:flex-row md:items-center md:justify-between">
-        <a
+        <Link
           ref={ctaRef}
           href={href}
-          target="_blank"
-          rel="noreferrer"
           className="cta group relative inline-flex w-fit items-center gap-5 overflow-hidden rounded-full bg-ink py-3 pr-3 pl-9 text-xl font-semibold text-bg transition-transform duration-300 ease-out md:py-4 md:pr-4 md:pl-11 md:text-2xl"
         >
           {/* Floods in from where the cursor entered */}
           <span aria-hidden className="cta-fill absolute inset-0" style={{ background: "var(--spectrum)" }} />
           <span className="relative">
             <span className="sr-only">{LABEL}</span>
-            <span aria-hidden className="inline-flex">
+            {/* Taller letter frames than the headline's, so the y's tail stays hidden mid-flip */}
+            <span aria-hidden className="inline-flex" style={{ "--roll": "1.35em" } as React.CSSProperties}>
               {[...LABEL].map((letter, i) => (
                 <Roll key={i} letter={letter} index={i} />
               ))}
@@ -126,7 +126,7 @@ export default function MakeItReal({ href, children }: { href: string; children?
           >
             ↗
           </span>
-        </a>
+        </Link>
         {children}
       </div>
     </div>

@@ -42,3 +42,4 @@ next-env.d.ts
 
 # Raw project covers; `npm run covers` turns them into public/work/*.webp
 /covers/
+!.env.example

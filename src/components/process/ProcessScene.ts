@@ -208,11 +208,11 @@ export class ProcessScene {
     this.scene.environmentIntensity = 0.3;
     const key = new THREE.DirectionalLight("#ffffff", 0.9);
     key.position.set(4, 10, 12);
-    const cyanRim = new THREE.PointLight(CYAN, 140, 0, 1.6);
+    const cyanRim = new THREE.PointLight(CYAN, 70, 0, 1.6);
     cyanRim.position.set(-16, 9, 10);
-    const coralRim = new THREE.PointLight(CORAL, 140, 0, 1.6);
+    const coralRim = new THREE.PointLight(CORAL, 45, 0, 1.6);
     coralRim.position.set(16, -8, 9);
-    const violetFill = new THREE.PointLight(VIOLET, 60, 0, 1.6);
+    const violetFill = new THREE.PointLight(VIOLET, 35, 0, 1.6);
     violetFill.position.set(0, 12, -6);
     this.board.add(key, cyanRim, coralRim, violetFill);
 
@@ -441,7 +441,10 @@ export class ProcessScene {
       // One violet glass in the mock-up; each piece takes on its own colour on its own beat as
       // the page is built
       material.color.copy(frost).lerp(this.mockup, e2).lerp(color, e3);
-      material.opacity = mix(piece.layer === 0 ? 0.24 : 0.55, glass, e3) * Math.min(1, e2 * 1.6);
+      // Shipped, the page is solid: opaque pieces written to depth, so overlapping layers never
+      // draw in the wrong order as it turns
+      material.opacity = mix(mix(piece.layer === 0 ? 0.24 : 0.55, glass, e3), 1, e4) * Math.min(1, e2 * 1.6);
+      material.depthWrite = material.opacity > 0.97;
     });
 
     // Whole page: drifting while loose, square on as a wireframe, isometric exploded, then home
