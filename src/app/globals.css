@@ -112,6 +112,162 @@ body:has(.site-loader:not(.is-exiting)) .animate-rise {
   animation-play-state: paused;
 }
 
+/* Scroll-read copy: --p (0..1) comes from JS, each word lights up as progress passes its index */
+.scroll-word {
+  opacity: clamp(0.14, calc(var(--p, 0) * var(--n) * 1.15 - var(--i)), 1);
+  transition: opacity 0.25s linear;
+}
+
+/* About: passion cards fill with their colour from the corner */
+.passion-flood {
+  clip-path: circle(0% at 100% 100%);
+  transition: clip-path 0.7s cubic-bezier(0.76, 0, 0.24, 1);
+}
+.group:hover > .passion-flood {
+  clip-path: circle(150% at 100% 100%);
+}
+
+/* About: books slide up off the shelf and tilt when pointed at */
+.book {
+  transform-origin: bottom left;
+  box-shadow: inset -6px 0 10px -6px rgb(0 0 0 / 0.35), inset 3px 0 0 rgb(255 255 255 / 0.12);
+  transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.book:hover {
+  transform: translateY(-1.5rem) rotate(-4deg);
+}
+
+/* About: the 3D zone melts into the page at its edges */
+@media (orientation: landscape) {
+  .process-zone {
+    mask-image: linear-gradient(to right, transparent, #000 14%), linear-gradient(to bottom, transparent, #000 12%, #000 88%, transparent);
+    mask-composite: intersect;
+  }
+}
+@media (orientation: portrait) {
+  .process-zone {
+    mask-image: linear-gradient(to bottom, transparent, #000 8%, #000 88%, transparent);
+  }
+}
+
+/* "Scroll" cue: a drop of light running down a hairline */
+.scroll-cue::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--spectrum);
+  animation: scroll-cue 1.8s cubic-bezier(0.76, 0, 0.24, 1) infinite;
+}
+@keyframes scroll-cue {
+  from { transform: translateY(-100%); }
+  to { transform: translateY(100%); }
+}
+
+/* Closing CTA: letters have two faces and flip over in a wave while the button is hovered */
+.roll {
+  display: inline-block;
+  height: 0.9em;
+  line-height: 0.9;
+  vertical-align: top;
+  /* Clip top and bottom only: with tight tracking, glyphs reach past their box into the neighbours */
+  clip-path: inset(0 -0.25em);
+}
+.roll-face {
+  display: block;
+  transition: transform 0.6s cubic-bezier(0.76, 0, 0.24, 1) calc(var(--i) * 22ms);
+}
+.make-real:has(.cta:hover, .cta:focus-visible) .roll-face {
+  transform: translateY(-100%);
+}
+/* The button floods with the spectrum from where the cursor came in, and drains toward where it left */
+.cta-fill {
+  clip-path: circle(0% at var(--x, 50%) var(--y, 50%));
+  transition: clip-path 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.cta:hover .cta-fill,
+.cta:focus-visible .cta-fill {
+  clip-path: circle(150% at var(--x, 50%) var(--y, 50%));
+}
+.cta:hover .cta-arrow,
+.cta:focus-visible .cta-arrow {
+  transform: rotate(45deg);
+}
+
+/* Nav: a floating bar that turns to frosted glass once content slides under it, tucks away
+   while you scroll down and comes back the moment you scroll up */
+.nav-bar {
+  border: 1px solid transparent;
+  transition:
+    background-color 0.5s,
+    border-color 0.5s,
+    box-shadow 0.5s,
+    backdrop-filter 0.5s,
+    transform 0.6s cubic-bezier(0.76, 0, 0.24, 1);
+}
+.nav-bar[data-scrolled="true"] {
+  background: color-mix(in srgb, var(--bg) 55%, transparent);
+  border-color: var(--line);
+  box-shadow: 0 12px 40px -12px rgb(0 0 0 / 0.7), inset 0 1px 0 rgb(255 255 255 / 0.06);
+  backdrop-filter: blur(24px) saturate(160%); /* the build adds the -webkit- prefix */
+}
+/* The bar is the glass now, so the links and burger drop their own panes */
+.nav-bar[data-scrolled="true"] :is(.nav-links, .burger:not([data-open="true"])) {
+  border-color: transparent;
+  background: transparent;
+  backdrop-filter: none;
+}
+.nav-bar[data-tucked="true"]:not(:focus-within) {
+  transform: translateY(calc(-100% - 1.5rem));
+}
+.nav-bar[data-open="true"] {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+/* Sticky bars below the nav move up into its place while it's tucked away */
+.below-nav {
+  top: 6rem;
+  transition: top 0.6s cubic-bezier(0.76, 0, 0.24, 1);
+}
+body:has(.nav-bar[data-tucked="true"]) .below-nav {
+  top: 1rem;
+}
+
+/* Services: titles wipe into the spectrum on hover; the matching covers pop in beside the cursor */
+.service-title::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  background: var(--spectrum);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path 0.6s cubic-bezier(0.76, 0, 0.24, 1);
+}
+.service-row:hover .service-title::after,
+.service-row:focus-visible .service-title::after {
+  clip-path: inset(0 -0.1em 0 0);
+}
+.service-row .service-title {
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.service-row:hover .service-title {
+  transform: translateX(0.12em);
+}
+.service-cover {
+  opacity: 0;
+  transform: var(--fan) scale(0.6);
+  transition:
+    opacity 0.35s,
+    transform 0.6s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+.service-cover[data-show="true"] {
+  opacity: 1;
+  transform: var(--fan) scale(1);
+}
+
 /* Mobile menu: colour sheets wipe in along a "/" edge (the logo's slash), the panel lands last.
    Closing runs it backwards: links drop out, the panel lifts, the sheets peel away. */
 .menu {
@@ -190,6 +346,18 @@ body:has(.site-loader:not(.is-exiting)) .animate-rise {
 .burger[data-open="true"] .burger-bar { background: var(--bg); }
 .burger[data-open="true"] .burger-bar:first-child { transform: rotate(45deg); }
 .burger[data-open="true"] .burger-bar:last-child { transform: rotate(-45deg); transform-origin: center; }
+
+/* Smooth scrolling (from lenis/dist/lenis.css) */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-stopped {
+  overflow: clip;
+}
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
 
 /* Custom cursor only for real mice */
 @media (pointer: fine) {

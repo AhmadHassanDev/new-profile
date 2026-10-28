@@ -13,10 +13,34 @@ export type Project = {
   year: string;
   summary: string;
   disciplines: Discipline[];
+  /** Cover in /public/work, always COVER_WIDTH × COVER_HEIGHT */
+  cover?: string;
 };
 
-// Carried over from the old site. More projects to come.
-export const PROJECTS: Project[] = [
+// Every project cover shares this size, so cards can show it whole
+export const COVER_WIDTH = 2000;
+export const COVER_HEIGHT = 1565;
+
+// Every project, including ones still waiting on their cover
+const ALL_PROJECTS: Project[] = [
+  {
+    slug: "anubis",
+    name: "Anubis",
+    kind: "Mobile app · Martial arts",
+    year: "2025",
+    summary: "Class packages, sessions, coaches and QR check-in for Anubis Martial Arts across its branches.",
+    disciplines: ["UI design"],
+    cover: "/work/anubis.webp",
+  },
+  {
+    slug: "finsync",
+    name: "FinSync",
+    kind: "Landing page · Fintech",
+    year: "2025",
+    summary: "Connects banks with SMEs, simplifying loan access and financial services for faster, smarter funding.",
+    disciplines: ["UX research", "UI design"],
+    cover: "/work/finsync.webp",
+  },
   {
     slug: "ezeats",
     name: "EZeats",
@@ -34,6 +58,7 @@ export const PROJECTS: Project[] = [
     summary:
       "A new way to sell mortgage solutions for Beltone Mortgage Finance, regulated by the Financial Regulatory Authority.",
     disciplines: ["UX research", "UI design"],
+    cover: "/work/beltone.webp",
   },
   {
     slug: "swiftminis",
@@ -43,37 +68,83 @@ export const PROJECTS: Project[] = [
     summary:
       "Virtual greeting cards for every occasion. Clients add their people and let them design and share custom cards.",
     disciplines: ["UI design", "Front-end"],
+    cover: "/work/swiftminis.webp",
   },
 ];
 
-export const SKILLS: { name: Discipline; body: string }[] = [
+// A project goes live once it has a cover; until then it stays out of every grid and list
+export const PROJECTS = ALL_PROJECTS.filter((p) => p.cover);
+
+/** "Mobile app · Fintech" → "Mobile app" */
+export const typeOf = (kind: string) => kind.split(" · ")[0];
+
+/**
+ * What Ahmed does. Most are tied to the projects that show them and link to the work page filtered;
+ * one with no published project yet links straight to contact instead.
+ */
+export const SERVICES: { title: string; type?: string; tag?: Discipline; contact?: string }[] = [
+  { title: "Landing pages", type: "Landing page" },
+  { title: "Web apps", type: "Web app" },
+  { title: "UX research", tag: "UX research" },
+  { title: "Branding & logos", contact: "Ask for samples" },
+  { title: "Mobile apps", type: "Mobile app" },
+];
+
+/** The three steps of the process, named like the hero's verbs, each with what it uses. */
+export const PROCESS: { verb: string; name: Discipline; line: string; body: string; kit: string[] }[] = [
   {
+    verb: "Research",
     name: "UX research",
-    body: "No product wins without a real understanding of its users, its market and its competitors. I find out what people actually need, and what they think of what's already out there.",
+    line: "Find out what people actually need.",
+    body: "No product wins without understanding its users, its market and its competitors. I learn what people need, and what they think of what's already out there.",
+    kit: ["User interviews", "Market research", "Competitor audits"],
   },
   {
+    verb: "Design",
     name: "UI design",
-    body: "A good interface is the difference between a great experience and a forgettable one. People choose beautiful products over plain ones, even when both do the same job.",
+    line: "Make it the one they choose.",
+    body: "A good interface is the difference between a great experience and a forgettable one. People pick the beautiful product, even when both do the same job.",
+    kit: ["Figma", "Adobe XD", "Illustrator"],
   },
   {
+    verb: "Build",
     name: "Front-end",
-    body: "Turning designs into a fast, live product is the last mile. I build with modern frameworks so what ships matches what was designed.",
+    line: "Ship exactly what was designed.",
+    body: "Turning designs into a fast, live product is the last mile. I build it myself with modern frameworks, so nothing gets lost in hand-off.",
+    kit: ["React", "Next.js", "Vue", "Tailwind", "Bootstrap", "Node.js", "Flutter", "Git"],
   },
 ];
 
-export const TOOLS = [
-  "Figma",
-  "Adobe XD",
-  "Illustrator",
-  "React",
-  "Next.js",
-  "Vue",
-  "Tailwind",
-  "Bootstrap",
-  "Node.js",
-  "Flutter",
-  "Git",
-  "GitHub",
+/** The about page, from Ahmed's own words on the old site. */
+export const STORY = [
+  { when: "Early on", title: "Hooked on design", body: "Fell for design and creative coding before college, and kept taking every course and tutorial I could find." },
+  { when: "2021", title: "Computer science", body: "Graduated from Misr International University (MIU) with a CS degree, and the habit of caring how things work." },
+  { when: "Then", title: "Users first", body: "Freelance projects and internships taught me a product only works when it's planned around its users. So I learned research and design." },
+  { when: "Now", title: "60+ clients later", body: "Research, design and build for government authorities, funds, agencies and startups across 5+ regions." },
+];
+
+export const PASSIONS = [
+  { title: "Code", color: "var(--cyan)", body: "I genuinely love opening the IDE and watching it come alive. A new framework is a welcome challenge." },
+  { title: "UX & UI", color: "var(--violet)", body: "Good UX makes or breaks a product, and it goes hand in hand with a beautiful, seamless UI." },
+  { title: "Arsenal", color: "var(--coral)", body: "A Gooner, die-hard since the Invincibles' unbeaten 2003–04 season." },
+  { title: "Growth", color: "var(--ink)", body: "Always working on a better me: a new book, a new skill, a new hobby. Atomic Habits started it." },
+];
+
+export const QUOTE = { text: "It always seems impossible until it's done.", by: "Nelson Mandela" };
+
+/** Spine colours borrowed from each cover. */
+export const BOOKS = [
+  { title: "The User Experience Team of One", author: "Leah Buley", bg: "#d8434e", ink: "#fff4ea" },
+  { title: "Lean UX", author: "Jeff Gothelf", bg: "#f1f1ef", ink: "#1b7fc4" },
+  { title: "Hooked", author: "Nir Eyal", bg: "#f6dc35", ink: "#141414" },
+  { title: "Thinking, Fast and Slow", author: "Daniel Kahneman", bg: "#f3efe5", ink: "#1b1b1b" },
+  { title: "The 48 Laws of Power", author: "Robert Greene", bg: "#e0482b", ink: "#f2c94c" },
+  { title: "Sprint", author: "Jake Knapp", bg: "#4cb6e6", ink: "#f8d63b" },
+  { title: "Refactoring UI", author: "Adam Wathan & Steve Schoger", bg: "#1c2232", ink: "#e9eefc" },
+  { title: "Atomic Habits", author: "James Clear", bg: "#f4efe3", ink: "#b8923f" },
+  { title: "The Design of Everyday Things", author: "Don Norman", bg: "#f1d24a", ink: "#b3372a" },
+  { title: "Don't Make Me Think", author: "Steve Krug", bg: "#8e2522", ink: "#fbefe6" },
+  { title: "Ego Is the Enemy", author: "Ryan Holiday", bg: "#1f3b5b", ink: "#f4f1ea" },
 ];
 
 export const STATS = [

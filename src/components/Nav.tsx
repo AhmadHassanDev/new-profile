@@ -1,25 +1,54 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { SOCIALS } from "@/content/site";
+import { SCROLL_LOCK } from "@/lib/scroll";
 
 // Each link takes one of the hero's discipline colours in the mobile menu.
 const LINKS = [
-  { href: "#work", label: "Work", hover: "group-hover:text-cyan" },
-  { href: "#about", label: "About", hover: "group-hover:text-violet" },
+  { href: "/work", label: "Work", hover: "group-hover:text-cyan" },
+  { href: "/about", label: "About", hover: "group-hover:text-violet" },
   { href: "#contact", label: "Contact", hover: "group-hover:text-coral" },
 ];
 
 export default function Nav() {
   const [open, setOpen] = useState(false);
+  // Frosted once the page moves under it; tucked away while scrolling down, back on the way up
+  const [scrolled, setScrolled] = useState(false);
+  const [tucked, setTucked] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const firstLinkRef = useRef<HTMLAnchorElement>(null);
+
+  useEffect(() => {
+    let last = window.scrollY;
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      const y = window.scrollY;
+      setScrolled(y > 24);
+      if (Math.abs(y - last) > 6) {
+        setTucked(y > last && y > 240);
+        last = y;
+      }
+    };
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+    frame = requestAnimationFrame(update);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, []);
 
   useEffect(() => {
     if (!open) return;
     const root = document.documentElement;
     root.style.overflow = "hidden";
+    window.dispatchEvent(new CustomEvent(SCROLL_LOCK, { detail: true }));
     firstLinkRef.current?.focus({ preventScroll: true });
 
     const onKey = (e: KeyboardEvent) => {
@@ -35,13 +64,14 @@ export default function Nav() {
     wide.addEventListener("change", onWide);
     return () => {
       root.style.overflow = "";
+      window.dispatchEvent(new CustomEvent(SCROLL_LOCK, { detail: false }));
       window.removeEventListener("keydown", onKey);
       wide.removeEventListener("change", onWide);
     };
   }, [open]);
 
   return (
-    <header className="pointer-events-none fixed inset-x-0 top-0 z-50 flex items-center justify-between px-4 py-5 md:px-10 [&>*]:pointer-events-auto">
+    <header className="pointer-events-none fixed inset-x-0 top-0 z-50 [&>*]:pointer-events-auto">
       {/* Mobile menu: three colour sheets slash across the screen, then the panel lands on top */}
       <div id="mobile-menu" data-open={open} inert={!open} className="menu fixed inset-0 md:hidden">
         <div aria-hidden className="menu-layer bg-cyan" />
@@ -64,7 +94,7 @@ export default function Nav() {
             <ul className="flex flex-col gap-1">
               {LINKS.map((link, i) => (
                 <li key={link.href} className="overflow-hidden">
-                  <a
+                  <Link
                     ref={i === 0 ? firstLinkRef : undefined}
                     href={link.href}
                     onClick={() => setOpen(false)}
@@ -77,7 +107,7 @@ export default function Nav() {
                       {link.label}
                     </span>
                     <span className="mt-[0.4em] font-display text-xs font-semibold text-muted">0{i + 1}</span>
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -99,35 +129,42 @@ export default function Nav() {
         </div>
       </div>
 
-      <a href="#top" aria-label="Ahmed Hassan, home" className="relative" onClick={() => setOpen(false)}>
-        <Image src="/logo.svg" alt="" width={58} height={45} priority />
-      </a>
-
-      <nav className="hidden items-center gap-2 rounded-full border border-line bg-bg/60 p-1.5 text-sm font-medium backdrop-blur-xl md:flex">
-        <a href="#work" className="rounded-full px-4 py-2 transition-colors hover:bg-white/10">
-          Work
-        </a>
-        <a href="#about" className="rounded-full px-4 py-2 transition-colors hover:bg-white/10">
-          About
-        </a>
-        <a href="#contact" className="rounded-full bg-ink px-4 py-2 text-bg transition-transform hover:scale-[1.04]">
-          Contact
-        </a>
-      </nav>
-
-      <button
-        ref={buttonRef}
-        type="button"
-        aria-expanded={open}
-        aria-controls="mobile-menu"
-        aria-label={open ? "Close menu" : "Open menu"}
-        onClick={() => setOpen((o) => !o)}
+      <div
+        data-scrolled={scrolled}
+        data-tucked={tucked && !open}
         data-open={open}
-        className="burger relative grid size-12 place-items-center rounded-full border border-line bg-bg/60 backdrop-blur-xl transition-colors duration-500 data-[open=true]:border-transparent data-[open=true]:bg-ink md:hidden"
+        className="nav-bar relative mx-2 mt-3 flex items-center justify-between rounded-full py-2 pr-2 pl-2 md:mx-6 md:mt-4 md:pl-4"
       >
-        <span aria-hidden className="burger-bar" />
-        <span aria-hidden className="burger-bar" />
-      </button>
+        <Link href="/" aria-label="Ahmed Hassan, home" className="relative" onClick={() => setOpen(false)}>
+          <Image src="/logo.svg" alt="" width={58} height={45} priority />
+        </Link>
+
+        <nav className="nav-links hidden items-center gap-2 rounded-full border border-line bg-bg/60 p-1.5 text-sm font-medium backdrop-blur-xl transition-colors duration-500 md:flex">
+          <Link href="/work" className="rounded-full px-4 py-2 transition-colors hover:bg-white/10">
+            Work
+          </Link>
+          <Link href="/about" className="rounded-full px-4 py-2 transition-colors hover:bg-white/10">
+            About
+          </Link>
+          <a href="#contact" className="rounded-full bg-ink px-4 py-2 text-bg transition-transform hover:scale-[1.04]">
+            Contact
+          </a>
+        </nav>
+
+        <button
+          ref={buttonRef}
+          type="button"
+          aria-expanded={open}
+          aria-controls="mobile-menu"
+          aria-label={open ? "Close menu" : "Open menu"}
+          onClick={() => setOpen((o) => !o)}
+          data-open={open}
+          className="burger relative grid size-12 place-items-center rounded-full border border-line bg-bg/60 backdrop-blur-xl transition-colors duration-500 data-[open=true]:border-transparent data-[open=true]:bg-ink md:hidden"
+        >
+          <span aria-hidden className="burger-bar" />
+          <span aria-hidden className="burger-bar" />
+        </button>
+      </div>
     </header>
   );
 }

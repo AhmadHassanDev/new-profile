@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Figtree, Unbounded } from "next/font/google";
+import SmoothScroll from "@/components/SmoothScroll";
 import "./globals.css";
 
 const figtree = Figtree({
@@ -22,7 +23,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${figtree.variable} ${unbounded.variable} antialiased`}>
-      <body className="min-h-full">{children}</body>
+      <body className="min-h-full">
+        <SmoothScroll />
+        {children}
+      </body>
     </html>
   );
 }

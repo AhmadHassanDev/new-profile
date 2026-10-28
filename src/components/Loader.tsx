@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { LOADER_PROGRESS, markLoaderDone } from "@/lib/loader";
+import { isLoaderDone, LOADER_PROGRESS, markLoaderDone } from "@/lib/loader";
 
 const MIN_MS = 2400; // long enough to watch the logo gather
 const MAX_MS = 6500; // never hold the page hostage
@@ -15,11 +15,16 @@ type Phase = "loading" | "exiting" | "gone";
  * climbs, keeps the rest of the page hidden, and lets go at 100 so the logo bursts into the hero.
  */
 export default function Loader() {
-  const [phase, setPhase] = useState<Phase>("loading");
+  // Coming back from another page, the intro already played: skip it. (The server and the first
+  // load always start at "loading", so hydration still matches.)
+  const [phase, setPhase] = useState<Phase>(() =>
+    typeof window !== "undefined" && isLoaderDone() ? "gone" : "loading",
+  );
   const percentRef = useRef<HTMLSpanElement>(null);
   const barRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (isLoaderDone()) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       markLoaderDone();
       queueMicrotask(() => setPhase("gone"));
