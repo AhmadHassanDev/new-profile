@@ -1,26 +1,212 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: #0a0a0d;
+  --surface: #15151b;
+  --surface-2: #1c1c24;
+  --ink: #edecf2;
+  --muted: #8b8a97;
+  --line: rgb(255 255 255 / 0.1);
+  --cyan: #09c7fb;
+  --violet: #c471ed;
+  --coral: #f64f59;
+  --spectrum: linear-gradient(90deg, var(--cyan) 0%, var(--violet) 54%, var(--coral) 100%);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-cyan: var(--cyan);
+  --color-violet: var(--violet);
+  --color-coral: var(--coral);
+  --font-sans: var(--font-figtree);
+  --font-display: var(--font-unbounded);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  background: var(--bg);
+  color-scheme: dark;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-figtree), system-ui, sans-serif;
+}
+
+::selection {
+  background: var(--violet);
+  color: var(--bg);
+}
+
+/* Film grain over everything */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0.07;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.text-spectrum {
+  background: var(--spectrum);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@keyframes marquee {
+  to { transform: translateX(-50%); }
+}
+@keyframes marquee-reverse {
+  from { transform: translateX(-50%); }
+  to { transform: translateX(0); }
+}
+@keyframes shimmer {
+  to { background-position: -200% 0; }
+}
+@keyframes rise {
+  from { transform: translateY(110%); }
+}
+
+.animate-marquee { animation: marquee 28s linear infinite; }
+.animate-marquee-reverse { animation: marquee-reverse 34s linear infinite; }
+.animate-shimmer { animation: shimmer 6s linear infinite; }
+.animate-rise { animation: rise 1.1s cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+/* Client logos: a flashlight that follows the cursor (--x, --y and --r set from JS) */
+.logo-item {
+  --x: -999px;
+  --y: -999px;
+}
+.logo-reveal {
+  mask-image: radial-gradient(var(--r, 0px) circle at var(--x) var(--y), #000 35%, transparent 100%);
+}
+
+/* Page loader: the hero particles play it. Everything else waits, hidden, until they burst. */
+.site-loader {
+  transition: opacity 0.6s ease;
+}
+.site-loader.is-exiting {
+  opacity: 0;
+}
+header,
+[data-intro-hide] {
+  transition: opacity 0.9s ease 0.2s;
+}
+body:has(.site-loader:not(.is-exiting)) {
+  overflow: hidden;
+}
+body:has(.site-loader:not(.is-exiting)) :is(header, [data-intro-hide]) {
+  opacity: 0;
+}
+/* Hold the hero's entrance until the loader starts to lift */
+body:has(.site-loader:not(.is-exiting)) .animate-rise {
+  animation-play-state: paused;
+}
+
+/* Mobile menu: colour sheets wipe in along a "/" edge (the logo's slash), the panel lands last.
+   Closing runs it backwards: links drop out, the panel lifts, the sheets peel away. */
+.menu {
+  --ease: cubic-bezier(0.76, 0, 0.24, 1);
+  visibility: hidden;
+  transition: visibility 0s linear 1.3s;
+}
+.menu[data-open="true"] {
+  visibility: visible;
+  transition-delay: 0s;
+}
+.menu[data-open="false"] {
+  pointer-events: none;
+}
+.menu-layer {
+  position: absolute;
+  inset: 0;
+  /* Corners: top-left, top-right, bottom-right, bottom-left. Parked off the right edge. */
+  clip-path: polygon(130% 0, 130% 0, 130% 100%, 100% 100%);
+  transition: clip-path 0.85s var(--ease);
+}
+.menu[data-open="true"] .menu-layer {
+  clip-path: polygon(0 0, 100% 0, 100% 100%, -30% 100%);
+}
+.menu-layer:nth-child(1) { transition-delay: 0.42s; }
+.menu-layer:nth-child(2) { transition-delay: 0.34s; }
+.menu-layer:nth-child(3) { transition-delay: 0.26s; }
+.menu-layer:nth-child(4) { transition-delay: 0.14s; }
+.menu[data-open="true"] .menu-layer:nth-child(1) { transition-delay: 0s; }
+.menu[data-open="true"] .menu-layer:nth-child(2) { transition-delay: 0.07s; }
+.menu[data-open="true"] .menu-layer:nth-child(3) { transition-delay: 0.14s; }
+.menu[data-open="true"] .menu-layer:nth-child(4) { transition-delay: 0.22s; }
+
+.menu-item {
+  transform: translateY(110%) skewY(8deg);
+  transform-origin: left bottom;
+  transition: transform 0.35s var(--ease);
+}
+.menu[data-open="true"] .menu-item {
+  transform: none;
+  transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1) calc(0.55s + var(--i) * 0.08s);
+}
+.menu-foot,
+.menu-slash {
+  opacity: 0;
+  transition: opacity 0.25s, transform 0.25s;
+}
+.menu-foot {
+  transform: translateY(1rem);
+}
+.menu-slash {
+  transform: translateX(30%);
+}
+.menu[data-open="true"] .menu-foot {
+  opacity: 1;
+  transform: none;
+  transition: opacity 0.6s 0.85s, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.85s;
+}
+.menu[data-open="true"] .menu-slash {
+  opacity: 0.07;
+  transform: none;
+  transition: opacity 1s 0.4s, transform 1.4s cubic-bezier(0.16, 1, 0.3, 1) 0.3s;
+}
+
+/* Burger: two bars that cross into an X */
+.burger-bar {
+  grid-area: 1 / 1;
+  height: 2px;
+  width: 1.25rem;
+  border-radius: 2px;
+  background: var(--ink);
+  transition: transform 0.5s cubic-bezier(0.76, 0, 0.24, 1), background-color 0.5s;
+}
+.burger-bar:first-child { transform: translateY(-4px); }
+.burger-bar:last-child { transform: translateY(4px) scaleX(0.6); transform-origin: right; }
+.burger[data-open="true"] .burger-bar { background: var(--bg); }
+.burger[data-open="true"] .burger-bar:first-child { transform: rotate(45deg); }
+.burger[data-open="true"] .burger-bar:last-child { transform: rotate(-45deg); transform-origin: center; }
+
+/* Custom cursor only for real mice */
+@media (pointer: fine) {
+  html.has-cursor,
+  html.has-cursor a,
+  html.has-cursor button {
+    cursor: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0s !important;
+  }
 }
