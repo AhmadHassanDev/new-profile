@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import AvatarFrame from "@/components/about/AvatarFrame";
 import Contact from "@/components/Contact";
 import Cursor from "@/components/Cursor";
 import Nav from "@/components/Nav";
@@ -55,15 +56,18 @@ export default function AboutPage() {
 
           <Kicker>About</Kicker>
           <h1 className="relative mt-8 font-display leading-[0.84] font-bold tracking-[-0.055em] uppercase">
-            <span className="reveal block text-[17vw] md:text-[13.5vw]">
+            <span className="reveal block text-[17vw] md:text-[13vw] lg:text-[10vw]">
               <span className="animate-rise block">Hi, I&apos;m</span>
             </span>
-            <span className="reveal block text-[17vw] md:text-[13.5vw]">
+            <span className="reveal block text-[17vw] md:text-[13vw] lg:text-[10vw]">
               <span className="text-spectrum animate-shimmer animate-rise block" style={{ animationDelay: "110ms" }}>
                 Ahmed.
               </span>
             </span>
           </h1>
+
+          {/* The 3D me in its circle: between the name and the intro on phones, beside the name on wide screens */}
+          <AvatarFrame className="relative mx-auto mt-8 w-[min(84vw,26rem)] lg:absolute lg:top-[9vh] lg:right-[4vw] lg:mt-0 lg:w-[min(34vw,52vh)]" />
 
           <div className="relative mt-auto grid gap-10 pt-16 lg:grid-cols-12 lg:items-end">
             <p className="max-w-xl text-xl leading-snug font-medium text-muted md:text-2xl lg:col-span-5">
@@ -136,7 +140,7 @@ export default function AboutPage() {
             {PASSIONS.map((passion, i) => (
               <li
                 key={passion.title}
-                className="group relative flex min-h-[300px] flex-col overflow-hidden rounded-[32px] border border-line bg-surface p-6 transition-colors duration-500 hover:text-bg md:min-h-[380px] md:p-10"
+                className="group relative flex min-h-[300px] flex-col overflow-hidden rounded-[32px] bg-surface p-6 transition-colors duration-500 hover:text-bg md:min-h-[380px] md:p-10"
                 style={{ "--c": passion.color } as React.CSSProperties}
               >
                 {/* Floods the card with its colour from the corner on hover */}

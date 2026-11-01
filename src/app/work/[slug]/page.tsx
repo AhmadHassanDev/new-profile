@@ -1,0 +1,169 @@
+import type { Metadata } from "next";
+import Image from "next/image";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { Suspense } from "react";
+import CaseBlocks from "@/components/case/CaseBlocks";
+import DiveSignature from "@/components/case/DiveSignature";
+import ToolLogo from "@/components/case/ToolLogo";
+import Contact from "@/components/Contact";
+import Cursor from "@/components/Cursor";
+import Nav from "@/components/Nav";
+import { ProjectCard } from "@/components/work/ProjectCard";
+import WorkLink from "@/components/work/WorkLink";
+import { CASES, caseFor } from "@/content/cases";
+import { DISCIPLINE_COLOR, PROJECTS } from "@/content/site";
+
+export function generateStaticParams() {
+  return CASES.map(({ slug }) => ({ slug }));
+}
+
+type Props = { params: Promise<{ slug: string }> };
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+  const project = PROJECTS.find((p) => p.slug === slug);
+  return project ? { title: `${project.name} — Ahmed Hassan`, description: project.summary } : {};
+}
+
+// The frame (nav, footer) renders straight away; the case itself reads the URL, so it streams in
+// behind a boundary and page-to-page navigation stays instant.
+export default function CasePage({ params }: Props) {
+  return (
+    <>
+      <Cursor />
+      <Nav />
+      <Suspense fallback={<main id="top" className="min-h-[100svh]" />}>
+        <CaseStudy params={params} />
+      </Suspense>
+      <Contact />
+    </>
+  );
+}
+
+async function CaseStudy({ params }: Props) {
+  const { slug } = await params;
+  const study = caseFor(slug);
+  const index = PROJECTS.findIndex((p) => p.slug === slug);
+  const project = PROJECTS[index];
+  if (!study || !project) notFound();
+
+  // Keep exploring: the next few projects, wrapping around
+  const more = [1, 2, 3].map((k) => PROJECTS[(index + k) % PROJECTS.length]).filter((p) => p.slug !== slug);
+
+  return (
+    <main
+      id="top"
+      // On wide screens the right margin is kept clear for a signature's side instruments (e.g. the dive gauge)
+      className={`case relative isolate ${study.signature ? "md:pr-14" : ""}`}
+      style={{ "--accent": study.accent[0], "--accent-2": study.accent[1] } as React.CSSProperties}
+    >
+      {study.signature === "dive" ? <DiveSignature /> : null}
+
+      {/* Opener */}
+      <section className="relative px-4 pt-32 pb-16 md:px-10 md:pt-40 md:pb-24">
+        <Link href="/work" className="text-sm font-semibold text-muted transition-colors hover:text-ink">
+          ← All work
+        </Link>
+        <p className="mt-10 flex flex-wrap items-center gap-3 text-sm font-semibold text-muted">
+          <span aria-hidden className="h-px w-10" style={{ background: "var(--accent-2)" }} />
+          {project.kind} · {project.year}
+        </p>
+        <h1 className="mt-6 font-display text-[15.5vw] leading-[0.84] font-bold tracking-[-0.055em] uppercase md:text-[13vw]">
+          <span className="reveal block">
+            <span className="animate-rise block">{project.name}</span>
+          </span>
+        </h1>
+        <div className="mt-8 flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
+          <p className="max-w-2xl text-xl leading-snug font-medium text-muted md:text-2xl">{project.summary}</p>
+          {study.site ? (
+            <a
+              href={study.site}
+              target="_blank"
+              rel="noreferrer"
+              className="group inline-flex w-fit shrink-0 items-center gap-3 rounded-full bg-ink py-2 pr-2 pl-6 text-base font-semibold text-bg transition-transform duration-300 hover:scale-[1.04]"
+            >
+              Visit website
+              <span
+                aria-hidden
+                className="grid size-10 place-items-center rounded-full text-white transition-transform duration-500 group-hover:rotate-45"
+                style={{ background: "linear-gradient(135deg, var(--accent), var(--accent-2))" }}
+              >
+                ↗
+              </span>
+            </a>
+          ) : null}
+        </div>
+
+        {/* Snapshot */}
+        <dl className="mt-14 grid grid-cols-2 gap-x-6 gap-y-8 border-t border-line pt-8 md:mt-20 md:grid-cols-4">
+          {study.facts.map((fact) => (
+            <div key={fact.label}>
+              <dt className="text-sm font-semibold text-muted">{fact.label}</dt>
+              <dd className="mt-3 text-lg font-semibold md:text-xl">
+                {fact.tools ? (
+                  // The stack as its own logos, with the names kept for screen readers and tooltips
+                  <span className="flex flex-wrap gap-2">
+                    <span className="sr-only">{fact.value}</span>
+                    {fact.tools.map((tool) => (
+                      <span key={tool} title={tool}>
+                        <ToolLogo name={tool} className="size-11 rounded-xl" />
+                      </span>
+                    ))}
+                  </span>
+                ) : fact.logo ? (
+                  <span className="flex items-center gap-3">
+                    {/* White, as in the clients carousel */}
+                    <Image
+                      src={fact.logo.src}
+                      alt=""
+                      width={fact.logo.width}
+                      height={fact.logo.height}
+                      unoptimized
+                      className="h-9 w-auto brightness-0 invert"
+                    />
+                    {fact.value}
+                  </span>
+                ) : (
+                  fact.value
+                )}
+              </dd>
+            </div>
+          ))}
+        </dl>
+        <ul className="mt-8 flex flex-wrap gap-2">
+          {project.disciplines.map((d) => (
+            <li
+              key={d}
+              className="rounded-full border px-4 py-1.5 text-sm font-semibold"
+              style={{ color: DISCIPLINE_COLOR[d], borderColor: `color-mix(in srgb, ${DISCIPLINE_COLOR[d]} 40%, transparent)` }}
+            >
+              {d}
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <CaseBlocks blocks={study.blocks} />
+
+      {/* Keep exploring */}
+      <section aria-labelledby="more-title" className="px-4 pt-24 pb-8 md:px-10 md:pt-40">
+        <div className="mb-10 flex flex-col gap-6 md:mb-14 md:flex-row md:items-end md:justify-between">
+          <h2 id="more-title" className="font-display text-5xl leading-[0.9] font-bold tracking-[-0.04em] uppercase md:text-7xl">
+            Keep
+            <br />
+            <span className="text-spectrum animate-shimmer">exploring</span>
+          </h2>
+          <WorkLink href="/work">All work</WorkLink>
+        </div>
+        <ul className="grid gap-x-6 gap-y-12 sm:grid-cols-2 xl:grid-cols-3">
+          {more.map((p) => (
+            <li key={p.slug}>
+              <ProjectCard project={p} />
+            </li>
+          ))}
+        </ul>
+      </section>
+    </main>
+  );
+}

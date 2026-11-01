@@ -123,7 +123,7 @@ export default function Services() {
             <div
               key={row.title}
               data-show={active === i}
-              className="service-cover absolute inset-0 overflow-hidden rounded-[18px] shadow-[0_30px_60px_-15px_rgb(0_0_0/0.8)] ring-1 ring-white/10"
+              className="service-cover absolute inset-0 overflow-hidden rounded-[18px] shadow-[0_30px_60px_-15px_rgb(0_0_0/0.8)]"
               style={{ ...FRAME, "--fan": "none" } as React.CSSProperties}
             >
               <BrandCard />
@@ -134,7 +134,7 @@ export default function Services() {
               <div
                 key={`${row.title}-${project.slug}`}
                 data-show={active === i}
-                className="service-cover absolute inset-0 overflow-hidden rounded-[18px] shadow-[0_30px_60px_-15px_rgb(0_0_0/0.8)] ring-1 ring-white/10"
+                className="service-cover absolute inset-0 overflow-hidden rounded-[18px] shadow-[0_30px_60px_-15px_rgb(0_0_0/0.8)]"
                 style={
                   {
                     ...FRAME,

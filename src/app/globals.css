@@ -289,6 +289,97 @@ body:has(.nav-bar[data-tucked="true"]) .below-nav {
   color: var(--on-brand);
 }
 
+/* Case studies: each page takes its accent colours from the project */
+.case ::selection {
+  background: var(--accent);
+  color: #fff;
+}
+.pipeline-line {
+  overflow: hidden;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--accent-2) 18%, transparent);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--accent-2) 30%, transparent);
+}
+.pipeline-line::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  height: 35%;
+  background: linear-gradient(to bottom, transparent, var(--accent-2), var(--accent), transparent);
+  animation: pipeline-flow-y 2.6s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+@media (min-width: 768px) {
+  .pipeline-line::after {
+    height: 100%;
+    width: 28%;
+    background: linear-gradient(to right, transparent, var(--accent-2), var(--accent), transparent);
+    animation-name: pipeline-flow-x;
+  }
+}
+@keyframes pipeline-flow-x {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(360%); }
+}
+@keyframes pipeline-flow-y {
+  from { transform: translateY(-100%); }
+  to { transform: translateY(300%); }
+}
+/* The cards light up one after another when the section comes into view */
+.pipeline-step {
+  opacity: 0;
+  transform: translateY(2rem);
+  transition:
+    opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1) calc(var(--i) * 140ms),
+    transform 0.8s cubic-bezier(0.22, 1, 0.36, 1) calc(var(--i) * 140ms);
+}
+.pipeline[data-inview="true"] .pipeline-step {
+  opacity: 1;
+  transform: none;
+}
+
+/* SlyDive: the page is a dive. --depth (0..1) comes from scroll */
+.dive-water {
+  --depth: 0;
+  background:
+    radial-gradient(60% 40% at 50% 0%, color-mix(in oklab, #3c7fa8 calc((1 - var(--depth)) * 35%), transparent), transparent 70%),
+    linear-gradient(
+      to bottom,
+      color-mix(in oklab, #2b1631 calc((1 - var(--depth)) * 100%), #052640),
+      color-mix(in oklab, #120c1a calc((1 - var(--depth)) * 100%), #020b18)
+    );
+}
+/* Sun on the surface: soft patches of light drifting slowly, gone by the time you're deep */
+.dive-light {
+  opacity: calc(0.9 - var(--depth) * 1.4);
+  background:
+    radial-gradient(28% 18% at 22% 8%, rgb(150 215 255 / 0.12), transparent 70%),
+    radial-gradient(22% 14% at 68% 4%, rgb(196 140 255 / 0.1), transparent 70%),
+    radial-gradient(30% 16% at 50% 14%, rgb(120 230 220 / 0.07), transparent 70%);
+  filter: blur(18px);
+  animation: dive-light 16s ease-in-out infinite alternate;
+}
+@keyframes dive-light {
+  from { transform: translate3d(-3%, 0, 0) scale(1); }
+  to { transform: translate3d(3%, 1.5%, 0) scale(1.08); }
+}
+.dive-rays {
+  opacity: calc(0.6 - var(--depth) * 1.2);
+  background: repeating-linear-gradient(
+    100deg,
+    transparent 0 9%,
+    rgb(170 225 255 / 0.035) 10% 11%,
+    transparent 12% 21%
+  );
+  mask-image: linear-gradient(to bottom, #000, transparent 55%);
+  filter: blur(8px);
+  transform-origin: 50% 0;
+  animation: dive-rays 14s ease-in-out infinite alternate;
+}
+@keyframes dive-rays {
+  from { transform: skewX(-4deg); }
+  to { transform: skewX(4deg); }
+}
+
 /* Mobile menu: colour sheets wipe in along a "/" edge (the logo's slash), the panel lands last.
    Closing runs it backwards: links drop out, the panel lifts, the sheets peel away. */
 .menu {
@@ -398,4 +489,35 @@ html.lenis body {
     transition-duration: 0.01ms !important;
     transition-delay: 0s !important;
   }
+}
+
+/* Case study screens: hovering a browser window scrolls the page inside it from top to bottom */
+.screen-window {
+  container-type: size;
+}
+.screen-page {
+  transition: transform var(--scroll-time, 4s) cubic-bezier(0.45, 0, 0.55, 1);
+}
+.screen-window:hover .screen-page {
+  transform: translateY(calc(-100% + 100cqh));
+}
+@media (prefers-reduced-motion: reduce) {
+  .screen-page {
+    transition-duration: 0s;
+  }
+}
+
+/* About: the 3D me stands in a circle. Below the circle's middle the canvas only shows inside it, which
+   rounds off the bust's shoulders; above, the head is free to rise over the edge. The frame is 4:5, so
+   the circle (its full width) is centred 60% of the way down. */
+.avatar-circle {
+  background:
+    radial-gradient(90% 90% at 30% 20%, color-mix(in srgb, var(--violet) 30%, var(--surface-2)), transparent 70%),
+    radial-gradient(80% 80% at 80% 90%, color-mix(in srgb, var(--cyan) 22%, var(--surface-2)), transparent 70%),
+    var(--surface-2);
+}
+.avatar-frame {
+  mask:
+    linear-gradient(#000 0 0) top / 100% 60% no-repeat,
+    radial-gradient(closest-side circle at 50% 60%, #000 99.4%, transparent 100%);
 }

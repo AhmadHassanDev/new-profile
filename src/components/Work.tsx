@@ -196,7 +196,7 @@ export default function Work({
               }}
               className="absolute top-0 left-0 w-[var(--card-w)] will-change-transform"
             >
-              <ProjectCard project={tile} />
+              <ProjectCard project={tile} decorative />
             </div>
           );
         })}
@@ -216,7 +216,7 @@ export default function Work({
           {/* A pane of frosted glass so the title stays readable over whatever slides beneath */}
           <Heading
             id="work-title"
-            className="rounded-[28px] border border-line bg-bg/55 px-5 py-4 font-display text-5xl leading-[0.9] font-bold tracking-[-0.04em] uppercase backdrop-blur-xl md:px-7 md:py-6 md:text-7xl"
+            className="rounded-[28px] bg-bg/55 px-5 py-4 font-display text-5xl leading-[0.9] font-bold tracking-[-0.04em] uppercase backdrop-blur-xl md:px-7 md:py-6 md:text-7xl"
           >
             {title[0]}
             <br />

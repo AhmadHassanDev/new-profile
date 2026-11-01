@@ -1,9 +1,10 @@
-export type Discipline = "UX research" | "UI design" | "Front-end";
+export type Discipline = "UX research" | "UI design" | "Front-end" | "Branding";
 
 export const DISCIPLINE_COLOR: Record<Discipline, string> = {
   "UX research": "var(--cyan)",
   "UI design": "var(--violet)",
   "Front-end": "var(--coral)",
+  Branding: "var(--ink)",
 };
 
 export type Project = {
@@ -23,6 +24,25 @@ export const COVER_HEIGHT = 1565;
 
 // Every project, including ones still waiting on their cover
 const ALL_PROJECTS: Project[] = [
+  {
+    slug: "slydive",
+    name: "SlyDive",
+    kind: "Website · Diving",
+    year: "2026",
+    summary:
+      "Website redesign for SlyDive, Dahab's dive centre: PADI courses, TDI technical training, guided dives and Red Sea boat trips in one place.",
+    disciplines: ["UI design", "Front-end"],
+    cover: "/work/slydive.webp",
+  },
+  {
+    slug: "prime-hills",
+    name: "Prime Hills",
+    kind: "Branding · Real estate",
+    year: "2026",
+    summary: "Logo and brand mark for Prime Hills Properties.",
+    disciplines: ["Branding"],
+    cover: "/work/primehills.webp",
+  },
   {
     slug: "anubis",
     name: "Anubis",
@@ -86,7 +106,7 @@ export const SERVICES: { title: string; type?: string; tag?: Discipline; contact
   { title: "Landing pages", type: "Landing page" },
   { title: "Web apps", type: "Web app" },
   { title: "UX research", tag: "UX research" },
-  { title: "Branding & logos", contact: "Ask for samples" },
+  { title: "Branding & logos", type: "Branding" },
   { title: "Mobile apps", type: "Mobile app" },
 ];
 

@@ -23,7 +23,7 @@ export default function DirectLines() {
         href={`https://wa.me/${CONTACT.whatsapp.number}`}
         target="_blank"
         rel="noreferrer"
-        className="group relative flex items-center gap-4 overflow-hidden rounded-[28px] border border-line bg-surface/50 p-5 backdrop-blur-xl transition-colors duration-500 hover:border-[#25d366]/60 sm:gap-5 sm:p-6 md:p-7"
+        className="group relative flex items-center gap-4 overflow-hidden rounded-[28px] bg-surface/50 p-5 backdrop-blur-xl transition-colors duration-500 sm:gap-5 sm:p-6 md:p-7"
       >
         {/* A soft green glow spreads from behind the icon; the text stays as it is */}
         <span
@@ -45,7 +45,7 @@ export default function DirectLines() {
         </span>
       </a>
 
-      <div className="flex items-center gap-4 rounded-[28px] border border-line bg-surface/50 p-5 sm:gap-5 sm:p-6 backdrop-blur-xl md:p-7">
+      <div className="flex items-center gap-4 rounded-[28px] bg-surface/50 p-5 sm:gap-5 sm:p-6 backdrop-blur-xl md:p-7">
         <span className="grid size-12 shrink-0 place-items-center rounded-full bg-ink text-bg sm:size-14">
           <SocialIcon name="Email" className="size-7" />
         </span>

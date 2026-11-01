@@ -38,7 +38,7 @@ export default function ContactPage() {
 
         {/* Form and direct lines */}
         <section id="message" aria-label="Send a message" className="relative grid scroll-mt-28 gap-6 px-4 pt-16 pb-24 md:px-10 md:pt-24 lg:grid-cols-12 lg:gap-8">
-          <div className="rounded-[32px] border border-line bg-surface/50 p-6 backdrop-blur-xl md:p-10 lg:col-span-7">
+          <div className="rounded-[32px] bg-surface/50 p-6 backdrop-blur-xl md:p-10 lg:col-span-7">
             <ContactForm />
           </div>
           <div className="lg:col-span-5">
@@ -60,7 +60,7 @@ export default function ContactPage() {
                   href={social.href}
                   target="_blank"
                   rel="noreferrer"
-                  className="social-tile group relative flex aspect-[16/9] flex-col sm:aspect-[4/3] justify-between overflow-hidden rounded-[28px] border border-line bg-surface/50 p-6 backdrop-blur-xl transition-[color,border-color] duration-500 hover:border-transparent md:p-8"
+                  className="social-tile group relative flex aspect-[16/9] flex-col sm:aspect-[4/3] justify-between overflow-hidden rounded-[28px] bg-surface/50 p-6 backdrop-blur-xl transition-colors duration-500 md:p-8"
                   style={{ "--brand": BRAND[social.label].fill, "--on-brand": BRAND[social.label].text } as React.CSSProperties}
                 >
                   <span aria-hidden className="direct-flood absolute inset-0 [background:var(--brand)]" />

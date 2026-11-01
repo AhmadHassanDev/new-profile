@@ -1,4 +1,6 @@
 import Image from "next/image";
+import Link from "next/link";
+import { caseFor } from "@/content/cases";
 import previews from "@/content/covers.json";
 import { COVER_HEIGHT, COVER_WIDTH, DISCIPLINE_COLOR, type Project } from "@/content/site";
 
@@ -22,13 +24,17 @@ function Caption({ title, detail, children }: { title: string; detail: string; c
   );
 }
 
-/** `full` adds the summary and discipline names, for the browsable list on the work page. */
-export function ProjectCard({ project, full = false }: { project: Project; full?: boolean }) {
+/**
+ * `full` adds the summary and discipline names, for the browsable list on the work page. Projects
+ * with a case study link to it; `decorative` keeps copies (in the drag grids) out of the tab order.
+ */
+export function ProjectCard({ project, full = false, decorative = false }: { project: Project; full?: boolean; decorative?: boolean }) {
   const [first, second = first] = project.disciplines.map((d) => DISCIPLINE_COLOR[d]);
-  return (
-    <article data-cursor="View" className="group w-full transition-transform duration-500 ease-out hover:-translate-y-1.5">
+  const href = caseFor(project.slug) ? `/work/${project.slug}` : undefined;
+  const card = (
+    <article data-cursor={href ? "View" : undefined} className="group w-full transition-transform duration-500 ease-out hover:-translate-y-1.5">
       <div
-        className="relative overflow-hidden rounded-[22px] bg-surface ring-1 ring-line transition-shadow duration-500 group-hover:ring-ink/40 group-hover:shadow-[0_30px_60px_-20px_rgb(0_0_0/0.8)]"
+        className="relative overflow-hidden rounded-[22px] bg-surface transition-shadow duration-500 group-hover:shadow-[0_30px_60px_-20px_rgb(0_0_0/0.8)]"
         style={FRAME}
       >
         {project.cover ? (
@@ -81,6 +87,13 @@ export function ProjectCard({ project, full = false }: { project: Project; full?
         </div>
       ) : null}
     </article>
+  );
+  return href ? (
+    <Link href={href} tabIndex={decorative ? -1 : undefined} draggable={false} className="block">
+      {card}
+    </Link>
+  ) : (
+    card
   );
 }
 

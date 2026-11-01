@@ -186,7 +186,7 @@ export default function WorkIndex() {
           ))}
         </ul>
       ) : (
-        <div className="mt-16 flex flex-col items-start gap-5 rounded-[28px] border border-dashed border-line p-10">
+        <div className="mt-16 flex flex-col items-start gap-5 rounded-[28px] bg-surface/40 p-10">
           <p className="font-display text-2xl font-semibold tracking-[-0.02em] md:text-3xl">Nothing matches those filters yet.</p>
           <button
             type="button"
