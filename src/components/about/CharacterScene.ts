@@ -22,14 +22,18 @@ type Character = {
    * above `neck` (a share of the model's height) from a joint there
    */
   head: { bones: [string, string] } | { neck: number };
-  /** The camera's view: how tall, and where its bottom edge sits (shares of the model's height) */
+  /**
+   * The camera's view: how tall, and where its bottom edge sits (shares of the model's height). The circle
+   * fills the lower 80% of the view, so its top sits at `bottom + height * 0.8`: just above the head, the
+   * whole head sits inside it, as the bust does
+   */
   view: { height: number; bottom: number };
   /** A turn about the vertical, for a model built facing away from the camera */
   turn?: number;
 };
 export const CHARACTERS = {
-  father: { model: "/about/character.glb", eyes: ["Sphere003", "Sphere004"], brows: ["Plane046"], head: { neck: 0.5 }, view: { height: 0.78, bottom: 0.3 } },
-  student: { model: "/about/student.glb", eyes: ["Sphere"], brows: ["Cube"], head: { bones: ["Bone018", "Bone019"] }, view: { height: 0.62, bottom: 0.42 } },
+  father: { model: "/about/character.glb", eyes: ["Sphere003", "Sphere004"], brows: ["Plane046"], head: { neck: 0.5 }, view: { height: 0.86, bottom: 0.32 } },
+  student: { model: "/about/student.glb", eyes: ["Sphere"], brows: ["Cube"], head: { bones: ["Bone018", "Bone019"] }, view: { height: 0.76, bottom: 0.42 } },
 } satisfies Record<string, Character>;
 const BROW_LIFT = 0.012;
 const UP = new THREE.Vector3(0, 1, 0);
