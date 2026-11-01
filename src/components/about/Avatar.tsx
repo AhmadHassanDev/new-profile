@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { freshCanvas } from "@/lib/canvas";
 
 type Scene = import("./BustScene").BustScene | import("./CharacterScene").CharacterScene;
 
@@ -28,8 +29,10 @@ export default function Avatar({ variant = "bust", className = "" }: { variant?:
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+    const placeholder = canvasRef.current;
+    if (!placeholder) return;
+    // A new canvas each time, never one whose context a previous run already gave back
+    const { canvas, release } = freshCanvas(placeholder);
     let disposed = false;
     let cleanup = () => {};
 
@@ -98,6 +101,7 @@ export default function Avatar({ variant = "bust", className = "" }: { variant?:
     return () => {
       disposed = true;
       cleanup();
+      release();
     };
   }, [variant]);
 

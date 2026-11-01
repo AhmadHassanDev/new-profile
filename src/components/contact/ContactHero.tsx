@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { CONTACT } from "@/content/site";
 import SocialIcon from "../SocialIcon";
+import { freshCanvas } from "@/lib/canvas";
 
 type Scene = import("./HandsScene").HandsScene;
 
@@ -20,8 +21,10 @@ export default function ContactHero() {
 
   useEffect(() => {
     const section = sectionRef.current;
-    const canvas = canvasRef.current;
-    if (!section || !canvas) return;
+    const placeholder = canvasRef.current;
+    if (!section || !placeholder) return;
+    // A new canvas each time, never one whose context a previous run already gave back
+    const { canvas, release } = freshCanvas(placeholder);
     let disposed = false;
     let cleanup = () => {};
 
@@ -45,6 +48,9 @@ export default function ContactHero() {
       window.addEventListener("scroll", onScroll, { passive: true });
       window.addEventListener("pointermove", onPointer);
       window.addEventListener(TOUCH_EVENT, onTouch);
+      // If the browser ever drops the GPU context, fade the band out rather than show a dead canvas
+      const onLost = () => (canvas.dataset.ready = "false");
+      canvas.addEventListener("webglcontextlost", onLost);
       size();
       onScroll();
       canvas.dataset.ready = "true";
@@ -55,6 +61,7 @@ export default function ContactHero() {
         window.removeEventListener("scroll", onScroll);
         window.removeEventListener("pointermove", onPointer);
         window.removeEventListener(TOUCH_EVENT, onTouch);
+        canvas.removeEventListener("webglcontextlost", onLost);
         scene.dispose();
       };
     });
@@ -62,6 +69,7 @@ export default function ContactHero() {
     return () => {
       disposed = true;
       cleanup();
+      release();
     };
   }, []);
 
@@ -76,7 +84,8 @@ export default function ContactHero() {
           <span className="animate-rise block">Let&apos;s&nbsp;</span>
         </span>
         <span className="reveal block md:inline-block">
-          <span className="text-spectrum animate-shimmer animate-rise block" style={{ animationDelay: "110ms" }}>
+          {/* Padded so the full stop, which the tight tracking pushes past the word, still gets its colour */}
+          <span className="text-spectrum animate-shimmer animate-rise block pr-[0.08em]" style={{ animationDelay: "110ms" }}>
             talk.
           </span>
         </span>

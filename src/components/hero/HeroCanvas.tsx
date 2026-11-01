@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { isLoaderDone, LOADER_PROGRESS, whenLoaderDone } from "@/lib/loader";
+import { freshCanvas } from "@/lib/canvas";
 
 export const EXCITE_EVENT = "hero:excite";
 
@@ -11,8 +12,10 @@ export default function HeroCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+    const placeholder = canvasRef.current;
+    if (!placeholder) return;
+    // A new canvas each time, never one whose context a previous run already gave back
+    const { canvas, release } = freshCanvas(placeholder);
     let disposed = false;
     let cleanup = () => {};
 
@@ -73,6 +76,7 @@ export default function HeroCanvas() {
     return () => {
       disposed = true;
       cleanup();
+      release();
     };
   }, []);
 

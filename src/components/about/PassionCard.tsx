@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { PassionObject, PassionScene } from "./PassionScene";
+import { freshCanvas } from "@/lib/canvas";
 
 /**
  * An Off the clock card. On hover it floods with its colour and its 3D object springs up out of the
@@ -30,8 +31,10 @@ export default function PassionCard({
   // Build the scene once the card is close, so the first hover is instant
   useEffect(() => {
     const card = cardRef.current;
-    const canvas = canvasRef.current;
-    if (!card || !canvas) return;
+    const placeholder = canvasRef.current;
+    if (!card || !placeholder) return;
+    // A new canvas each time, never one whose context a previous run already gave back
+    const { canvas, release } = freshCanvas(placeholder);
     let disposed = false;
     let resize: ResizeObserver | undefined;
     const near = new IntersectionObserver(
@@ -59,6 +62,7 @@ export default function PassionCard({
       resize?.disconnect();
       sceneRef.current?.dispose();
       sceneRef.current = null;
+      release();
     };
   }, [object]);
 

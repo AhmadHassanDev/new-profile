@@ -3,6 +3,7 @@
 import { useEffect, useRef, type RefObject } from "react";
 import { whenLoaderDone } from "@/lib/loader";
 import type { TextLine, TextStyle } from "./LiquidText";
+import { freshCanvas } from "@/lib/canvas";
 
 type Liquid = import("./LiquidText").LiquidText;
 
@@ -51,9 +52,11 @@ export default function LiquidName({ heading, lit }: { heading: RefObject<HTMLHe
   }, [lit]);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
+    const placeholder = canvasRef.current;
     const title = heading.current;
-    if (!canvas || !title || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (!placeholder || !title || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    // A new canvas each time, never one whose context a previous run already gave back
+    const { canvas, release } = freshCanvas(placeholder);
     let disposed = false;
     let cleanup = () => {};
 
@@ -112,6 +115,7 @@ export default function LiquidName({ heading, lit }: { heading: RefObject<HTMLHe
     return () => {
       disposed = true;
       cleanup();
+      release();
     };
   }, [heading]);
 

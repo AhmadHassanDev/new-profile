@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { DISCIPLINE_COLOR, PROCESS } from "@/content/site";
+import { freshCanvas } from "@/lib/canvas";
 
 type Scene = import("./process/ProcessScene").ProcessScene;
 
@@ -36,8 +37,10 @@ export default function About() {
 
   useEffect(() => {
     const section = sectionRef.current;
-    const canvas = canvasRef.current;
-    if (!section || !canvas) return;
+    const placeholder = canvasRef.current;
+    if (!section || !placeholder) return;
+    // A new canvas each time, never one whose context a previous run already gave back
+    const { canvas, release } = freshCanvas(placeholder);
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let scene: Scene | null = null;
     let disposed = false;
@@ -112,6 +115,7 @@ export default function About() {
       resizeObserver?.disconnect();
       visibility?.disconnect();
       scene?.dispose();
+      release();
     };
   }, []);
 

@@ -423,5 +423,7 @@ export class CharacterScene {
     this.scene.environment?.dispose();
     this.timer.dispose();
     this.renderer.dispose();
+    // Hands the GPU context back now; browsers only allow a handful per tab
+    this.renderer.forceContextLoss();
   }
 }
