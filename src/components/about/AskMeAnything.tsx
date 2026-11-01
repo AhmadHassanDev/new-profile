@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type Reaction = "nod" | "wink" | "laugh" | "doubletake";
 
@@ -75,6 +75,14 @@ const QUESTIONS: { q: string; a: string; react: Reaction }[] = [
  */
 export default function AskMeAnything() {
   const [asked, setAsked] = useState<number | null>(null);
+  const answerRef = useRef<HTMLParagraphElement>(null);
+
+  // On phones the answer shows under the questions, so bring it into view (clear of the docked avatar)
+  useEffect(() => {
+    if (asked === null || window.matchMedia("(min-width: 1024px)").matches) return;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    answerRef.current?.scrollIntoView({ block: "nearest", behavior: reduced ? "auto" : "smooth" });
+  }, [asked]);
 
   const ask = (i: number) => {
     setAsked(i);
@@ -101,7 +109,7 @@ export default function AskMeAnything() {
         ))}
       </ul>
       {/* Read out for screen readers, shown on phones */}
-      <p aria-live="polite" className={`mt-8 rounded-[24px] bg-surface/70 px-6 py-5 text-xl leading-snug font-medium backdrop-blur-xl lg:sr-only ${asked === null ? "hidden" : ""}`}>
+      <p ref={answerRef} aria-live="polite" className={`mt-8 scroll-mb-32 rounded-[24px] bg-surface/70 px-6 py-5 text-xl leading-snug font-medium backdrop-blur-xl lg:sr-only ${asked === null ? "hidden" : ""}`}>
         {asked !== null ? QUESTIONS[asked].a : ""}
       </p>
       <p className="mt-8 hidden text-sm text-muted lg:block">Pick one. I&apos;ll answer on the left.</p>

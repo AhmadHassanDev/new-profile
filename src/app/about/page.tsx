@@ -86,7 +86,7 @@ export default function AboutPage() {
         {/* Hello */}
         {/* On wide screens the hero pins in place and the page rises over it like a sheet, while the hero
             shrinks, dims and splits its headline apart (driven by HeroRecede) */}
-        <section className="hero-recede relative flex min-h-[100svh] flex-col overflow-hidden px-4 pt-32 pb-10 md:px-10 md:pb-12 lg:sticky lg:top-0 lg:h-[100svh]">
+        <section className="hero-recede relative flex min-h-[100svh] flex-col overflow-hidden px-4 pt-32 pb-20 md:px-10 md:pb-28 lg:sticky lg:top-0 lg:h-[100svh] lg:pb-12">
           <div
             aria-hidden
             className="pointer-events-none absolute -top-1/4 -right-1/4 h-[90vmax] w-[90vmax] rounded-full opacity-25 blur-[140px]"
@@ -94,7 +94,7 @@ export default function AboutPage() {
           />
           <span
             aria-hidden
-            className="text-spectrum animate-shimmer pointer-events-none absolute -top-[8vh] right-[-12vw] font-display text-[120vh] leading-none font-bold opacity-[0.08] md:right-[2vw]"
+            className="text-spectrum animate-shimmer pointer-events-none absolute -top-[8vh] right-[2vw] hidden font-display text-[120vh] leading-none font-bold opacity-[0.08] md:block"
           >
             /
           </span>
@@ -119,7 +119,7 @@ export default function AboutPage() {
           <div
             data-avatar-slot="hero"
             aria-hidden
-            className="relative mx-auto mt-8 aspect-[4/5] w-[min(84vw,26rem)] lg:absolute lg:top-[9vh] lg:right-[4vw] lg:mt-0 lg:w-[min(34vw,52vh)]"
+            className="relative mx-auto -mt-2 aspect-[4/5] w-[min(84vw,26rem)] lg:absolute lg:top-[9vh] lg:right-[4vw] lg:mt-0 lg:w-[min(34vw,52vh)]"
           />
 
           <div className="relative mt-auto grid gap-10 pt-16 lg:grid-cols-12 lg:items-end">
