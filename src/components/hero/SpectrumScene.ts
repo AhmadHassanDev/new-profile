@@ -50,7 +50,8 @@ export class SpectrumScene {
     const compact = window.matchMedia("(max-width: 767px)").matches;
 
     this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: "high-performance" });
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75));
+    // Phones get closer to their full sharpness (they have fewer particles to draw); big screens cap lower
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, compact ? 2.5 : 1.75));
     this.renderer.setClearColor(0x000000, 0);
 
     this.camera.position.set(0, 0, 7.5);

@@ -29,7 +29,7 @@ export default function Contact({ minimal = false }: { minimal?: boolean }) {
       <div className="relative">
         <p className="mb-8 text-sm font-semibold text-muted">Got a product in mind?</p>
         <MakeItReal href="/contact">
-          <ul className="flex gap-3">
+          <ul className="flex flex-wrap gap-3">
             {[...SOCIALS, { label: "WhatsApp", href: `https://wa.me/${CONTACT.whatsapp.number}` }].map((s) => (
               <li key={s.label}>
                 <a
@@ -38,7 +38,7 @@ export default function Contact({ minimal = false }: { minimal?: boolean }) {
                   rel="noreferrer"
                   aria-label={s.label}
                   title={s.label}
-                  className="grid size-14 place-items-center rounded-full border border-line bg-bg/40 text-ink backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:border-transparent hover:bg-ink hover:text-bg md:size-16"
+                  className="grid size-12 place-items-center rounded-full border border-line bg-bg/40 text-ink backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:border-transparent hover:bg-ink hover:text-bg sm:size-14 md:size-16"
                 >
                   <SocialIcon name={s.label} className="size-5 md:size-6" />
                 </a>

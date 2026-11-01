@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef } from "react";
+import { Fragment, useEffect, useRef } from "react";
 
 const LINES = ["Let's make", "it real."];
 const LABEL = "Say hello";
@@ -85,19 +85,32 @@ export default function MakeItReal({ href, children }: { href: string; children?
   let count = 0;
   return (
     <div className="make-real">
-      <h2 aria-label={LINES.join(" ")} className="font-display text-[13vw] leading-[0.85] font-bold tracking-[-0.05em] uppercase md:text-[10vw]">
+      <h2 aria-label={LINES.join(" ")} className="font-display text-[11.5vw] leading-[0.85] font-bold tracking-[-0.05em] uppercase md:text-[10vw]">
         {LINES.map((line, row) => (
           <span key={line} aria-hidden className="block">
-            {[...line].map((letter) => {
-              const index = count++;
-              // The second line rests in the spectrum and flips to white; the first does the opposite
-              const tint = spectrumAt(index / (total - 1));
-              return row === 0 ? (
-                <Roll key={index} letter={letter} index={index} twin={tint} />
-              ) : (
-                <Roll key={index} letter={letter} index={index} face={tint} />
-              );
-            })}
+            {/* Word by word, so a narrow screen wraps between words, never inside one */}
+            {line.split(" ").map((word, w) => (
+              <Fragment key={w}>
+                {w > 0 && (
+                  <>
+                    <Roll letter=" " index={count++} />
+                    <wbr />
+                  </>
+                )}
+                <span className="whitespace-nowrap">
+                  {[...word].map((letter) => {
+                    const index = count++;
+                    // The second line rests in the spectrum and flips to white; the first does the opposite
+                    const tint = spectrumAt(index / (total - 1));
+                    return row === 0 ? (
+                      <Roll key={index} letter={letter} index={index} twin={tint} />
+                    ) : (
+                      <Roll key={index} letter={letter} index={index} face={tint} />
+                    );
+                  })}
+                </span>
+              </Fragment>
+            ))}
           </span>
         ))}
       </h2>

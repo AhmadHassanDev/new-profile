@@ -54,7 +54,10 @@ export default function LiquidName({ heading, lit }: { heading: RefObject<HTMLHe
   useEffect(() => {
     const placeholder = canvasRef.current;
     const title = heading.current;
-    if (!placeholder || !title || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    // Phones have no pointer to stir it, and its always-on ripple and colour split only soften the
+    // letters there, so they keep the crisp page text
+    const still = window.matchMedia("(prefers-reduced-motion: reduce), (hover: none)").matches;
+    if (!placeholder || !title || still) return;
     // A new canvas each time, never one whose context a previous run already gave back
     const { canvas, release } = freshCanvas(placeholder);
     let disposed = false;

@@ -60,11 +60,12 @@ void main() {
 `;
 
 const fragment = /* glsl */ `
+uniform float uCore;
 varying vec3 vColor;
 varying float vAlpha;
 void main() {
   float d = length(gl_PointCoord - 0.5);
-  float a = smoothstep(0.5, 0.05, d) * vAlpha;
+  float a = smoothstep(0.5, uCore, d) * vAlpha;
   gl_FragColor = vec4(vColor * a, a);
 }
 `;
@@ -147,7 +148,9 @@ export function createParticleMorph(
     uMorph: { value: 0 },
     uExcite: { value: 0 },
     uBurst: { value: 0 },
-    uSize: { value: compact ? 30 : 27 },
+    // Phones draw the shapes much smaller, so their dots are smaller and crisper too, or they'd blur together
+    uSize: { value: compact ? 17 : 27 },
+    uCore: { value: compact ? 0.3 : 0.05 },
     uPixelRatio: { value: pixelRatio },
     uTintFrom: { value: tintOf(SHAPES[intro ? MARK : 0]) },
     uTintTo: { value: tintOf(SHAPES[intro ? MARK : 0]) },
