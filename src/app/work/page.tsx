@@ -20,6 +20,8 @@ export default function WorkPage() {
         <Work
           as="h1"
           title={["All", "work"]}
+          vignette
+          scrollCue
           action={
             <WorkLink href="#projects" arrow="↓">
               Browse &amp; filter

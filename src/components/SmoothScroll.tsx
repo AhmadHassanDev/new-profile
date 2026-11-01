@@ -3,13 +3,15 @@
 import Lenis from "lenis";
 import { useEffect } from "react";
 import { whenLoaderDone } from "@/lib/loader";
-import { SCROLL_LOCK } from "@/lib/scroll";
+import { SCROLL_LOCK, SMOOTH_SCROLL } from "@/lib/scroll";
 
 /** Eased, weighty wheel scrolling for the whole site. Touch keeps the phone's native scroll. */
 export default function SmoothScroll() {
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const lenis = new Lenis({ autoRaf: true, anchors: true, lerp: 0.09 });
+    // Lets anything pinned to the scroll position move in the same frame as the page
+    lenis.on("scroll", () => window.dispatchEvent(new Event(SMOOTH_SCROLL)));
 
     // The page holds still while the loader plays and while the menu is open.
     if (document.querySelector(".site-loader")) {

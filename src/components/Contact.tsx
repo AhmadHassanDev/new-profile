@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { SOCIALS } from "@/content/site";
+import { CONTACT, SOCIALS } from "@/content/site";
 import MakeItReal from "./MakeItReal";
 import SocialIcon from "./SocialIcon";
 
@@ -30,7 +30,7 @@ export default function Contact({ minimal = false }: { minimal?: boolean }) {
         <p className="mb-8 text-sm font-semibold text-muted">Got a product in mind?</p>
         <MakeItReal href="/contact">
           <ul className="flex gap-3">
-            {SOCIALS.map((s) => (
+            {[...SOCIALS, { label: "WhatsApp", href: `https://wa.me/${CONTACT.whatsapp.number}` }].map((s) => (
               <li key={s.label}>
                 <a
                   href={s.href}

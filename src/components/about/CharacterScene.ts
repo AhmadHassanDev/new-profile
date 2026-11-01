@@ -261,6 +261,7 @@ export class CharacterScene {
 
   /** Do the next trick: a wink, a laugh, a double take, or a nod. */
   react(which?: Reaction) {
+    if (which && !REACTIONS.includes(which)) return;
     if (this.time < INTRO) return;
     if (this.reaction && this.reactionTime / DURATION[this.reaction] < 0.7) return;
     this.reaction = which ?? REACTIONS[this.nextReaction++ % REACTIONS.length];

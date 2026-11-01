@@ -25,12 +25,18 @@ export default function Work({
   as: Heading = "h2",
   title = ["Selected", "work"],
   action,
+  vignette = false,
+  scrollCue = false,
 }: {
   /** The work page uses the grid as its opening, so there it is the page's h1 */
   as?: "h1" | "h2";
   title?: [string, string];
   /** A call to action under the title, e.g. to the full list */
   action?: React.ReactNode;
+  /** Dim the edges hard and fade the bottom fully into the page, so as an opening it reads as more to come */
+  vignette?: boolean;
+  /** A "scroll" cue at the bottom centre, for when the grid opens the page */
+  scrollCue?: boolean;
 }) {
   const sectionRef = useRef<HTMLElement>(null);
   const planeRef = useRef<HTMLDivElement>(null);
@@ -207,10 +213,24 @@ export default function Work({
         aria-hidden
         className="pointer-events-none absolute inset-0"
         style={{
-          background:
-            "linear-gradient(to bottom, color-mix(in srgb, var(--bg) 70%, transparent), transparent 22%, transparent 78%, var(--bg))",
+          background: vignette
+            ? // The opening: corners and sides sink into the dark, and the bottom melts into the page below
+              "radial-gradient(120% 95% at 50% 40%, transparent 42%, color-mix(in srgb, var(--bg) 75%, transparent) 78%, var(--bg) 100%), linear-gradient(to bottom, color-mix(in srgb, var(--bg) 70%, transparent), transparent 22%, transparent 55%, color-mix(in srgb, var(--bg) 85%, transparent) 85%, var(--bg))"
+            : "linear-gradient(to bottom, color-mix(in srgb, var(--bg) 70%, transparent), transparent 22%, transparent 78%, var(--bg))",
         }}
       />
+      {scrollCue ? (
+        <a
+          href="#projects"
+          className="absolute bottom-6 left-1/2 z-10 flex -translate-x-1/2 items-center gap-2.5 rounded-full bg-surface-2/80 px-6 py-3 text-base font-semibold whitespace-nowrap text-ink shadow-[0_12px_30px_-10px_rgb(0_0_0/0.8)] backdrop-blur-md transition-transform duration-300 hover:scale-[1.04] md:bottom-10"
+        >
+          <span className="md:hidden">Swipe to explore, or scroll to continue</span>
+          <span className="hidden md:inline">Drag to explore, or scroll to continue</span>
+          <span aria-hidden className="scroll-cue-arrow">
+            ↓
+          </span>
+        </a>
+      ) : null}
       <header className="pointer-events-none absolute inset-x-0 top-0 flex flex-col items-start gap-3 px-4 pt-24 md:flex-row md:items-start md:justify-between md:px-10 md:pt-28">
         <div className="flex flex-col items-start gap-3">
           {/* A pane of frosted glass so the title stays readable over whatever slides beneath */}

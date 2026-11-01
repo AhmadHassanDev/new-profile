@@ -58,6 +58,9 @@ export default function Avatar({ variant = "bust", className = "" }: { variant?:
         scene.setPointer(x, y);
         if (scene.hit(x, y)) scene.react();
       };
+      // Chapters cue a reaction as they arrive (see AboutGuide)
+      const onCue = (e: Event) => scene.react((e as CustomEvent<Parameters<typeof scene.react>[0]>).detail);
+      window.addEventListener("avatar:react", onCue);
       let lastY = window.scrollY;
       const onScroll = () => {
         const max = document.documentElement.scrollHeight - window.innerHeight;
@@ -87,6 +90,7 @@ export default function Avatar({ variant = "bust", className = "" }: { variant?:
         window.removeEventListener("pointermove", onMove);
         canvas.removeEventListener("pointerdown", onDown);
         window.removeEventListener("scroll", onScroll);
+        window.removeEventListener("avatar:react", onCue);
         scene.dispose();
       };
     });

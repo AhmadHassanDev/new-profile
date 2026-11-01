@@ -2,19 +2,22 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { SOCIALS } from "@/content/site";
 import { SCROLL_LOCK } from "@/lib/scroll";
 
-// Each link takes one of the hero's discipline colours in the mobile menu.
+// Each link takes one of the hero's discipline colours in the mobile menu, on hover and while you're on its page.
 const LINKS = [
-  { href: "/work", label: "Work", hover: "group-hover:text-cyan" },
-  { href: "/about", label: "About", hover: "group-hover:text-violet" },
-  { href: "/contact", label: "Contact", hover: "group-hover:text-coral" },
+  { href: "/work", label: "Work", hover: "group-hover:text-cyan", here: "text-cyan" },
+  { href: "/about", label: "About", hover: "group-hover:text-violet", here: "text-violet" },
+  { href: "/contact", label: "Contact", hover: "group-hover:text-coral", here: "text-coral" },
 ];
 
 export default function Nav() {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
+  const current = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
   // Frosted once the page moves under it; tucked away while scrolling down, back on the way up
   const [scrolled, setScrolled] = useState(false);
   const [tucked, setTucked] = useState(false);
@@ -97,12 +100,13 @@ export default function Nav() {
                   <Link
                     ref={i === 0 ? firstLinkRef : undefined}
                     href={link.href}
+                    aria-current={current(link.href) ? "page" : undefined}
                     onClick={() => setOpen(false)}
                     className="menu-item group flex items-start gap-2 py-1"
                     style={{ "--i": i } as React.CSSProperties}
                   >
                     <span
-                      className={`font-display text-[13.5vw] leading-[0.95] font-bold tracking-[-0.05em] uppercase transition-colors duration-300 ${link.hover}`}
+                      className={`font-display text-[13.5vw] leading-[0.95] font-bold tracking-[-0.05em] uppercase transition-colors duration-300 ${current(link.href) ? link.here : link.hover}`}
                     >
                       {link.label}
                     </span>
@@ -140,15 +144,27 @@ export default function Nav() {
         </Link>
 
         <nav className="nav-links hidden items-center gap-2 rounded-full border border-line bg-bg/60 p-1.5 text-sm font-medium backdrop-blur-xl transition-colors duration-500 md:flex">
-          <Link href="/work" className="rounded-full px-4 py-2 transition-colors hover:bg-white/10">
-            Work
-          </Link>
-          <Link href="/about" className="rounded-full px-4 py-2 transition-colors hover:bg-white/10">
-            About
-          </Link>
-          <Link href="/contact" className="rounded-full bg-ink px-4 py-2 text-bg transition-transform hover:scale-[1.04]">
-            Contact
-          </Link>
+          {/* The filled pill marks the page you're on; Contact stands out on its own with a dot and an arrow */}
+          {LINKS.map((link) => {
+            const here = current(link.href);
+            const cta = link.href === "/contact";
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                aria-current={here ? "page" : undefined}
+                className={`group flex items-center gap-2 rounded-full px-4 py-2 transition-colors duration-300 ${here ? "bg-ink text-bg" : "hover:bg-white/10"}`}
+              >
+                {cta && !here && <span aria-hidden className="size-1.5 rounded-full" style={{ background: "var(--spectrum)" }} />}
+                {link.label}
+                {cta && !here && (
+                  <span aria-hidden className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5">
+                    ↗
+                  </span>
+                )}
+              </Link>
+            );
+          })}
         </nav>
 
         <button

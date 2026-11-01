@@ -123,18 +123,8 @@ body:has(.site-loader:not(.is-exiting)) .animate-rise {
   clip-path: circle(0% at 100% 100%);
   transition: clip-path 0.7s cubic-bezier(0.76, 0, 0.24, 1);
 }
-.group:hover > .passion-flood {
+.group[data-active] .passion-flood {
   clip-path: circle(150% at 100% 100%);
-}
-
-/* About: books slide up off the shelf and tilt when pointed at */
-.book {
-  transform-origin: bottom left;
-  box-shadow: inset -6px 0 10px -6px rgb(0 0 0 / 0.35), inset 3px 0 0 rgb(255 255 255 / 0.12);
-  transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-.book:hover {
-  transform: translateY(-1.5rem) rotate(-4deg);
 }
 
 /* About: the 3D zone melts into the page at its edges */
@@ -520,4 +510,46 @@ html.lenis body {
   mask:
     linear-gradient(#000 0 0) top / 100% 60% no-repeat,
     radial-gradient(closest-side circle at 50% 60%, #000 99.4%, transparent 100%);
+}
+
+/* About: as the page rises over the pinned hero (wide screens), the hero shrinks a touch, dims, and its
+   headline splits apart; --recede runs 0..1 over the first screen of scroll (see HeroRecede) */
+.hero-dim {
+  opacity: 0;
+}
+@media (min-width: 1024px) {
+  .hero-recede {
+    transform: scale(calc(1 - var(--recede, 0) * 0.08));
+    transform-origin: 50% 30%;
+    will-change: transform;
+  }
+  .hero-dim {
+    opacity: calc(var(--recede, 0) * 0.7);
+  }
+  .hero-split-left {
+    transform: translateX(calc(var(--recede, 0) * -12vw));
+  }
+  .hero-split-right {
+    transform: translateX(calc(var(--recede, 0) * 12vw));
+  }
+}
+
+/* Work: the scroll cue's arrow bobs gently downward */
+.scroll-cue-arrow {
+  display: inline-block;
+  animation: scroll-cue 1.6s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+@keyframes scroll-cue {
+  0%,
+  100% {
+    transform: translateY(-2px);
+  }
+  50% {
+    transform: translateY(4px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .scroll-cue-arrow {
+    animation: none;
+  }
 }

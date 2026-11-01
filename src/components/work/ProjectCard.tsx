@@ -32,7 +32,7 @@ export function ProjectCard({ project, full = false, decorative = false }: { pro
   const [first, second = first] = project.disciplines.map((d) => DISCIPLINE_COLOR[d]);
   const href = caseFor(project.slug) ? `/work/${project.slug}` : undefined;
   const card = (
-    <article data-cursor={href ? "View" : undefined} className="group w-full transition-transform duration-500 ease-out hover:-translate-y-1.5">
+    <article data-cursor={href ? "View" : "Case study soon"} data-cursor-style={href ? undefined : "orbit"} className="group w-full transition-transform duration-500 ease-out hover:-translate-y-1.5">
       <div
         className="relative overflow-hidden rounded-[22px] bg-surface transition-shadow duration-500 group-hover:shadow-[0_30px_60px_-20px_rgb(0_0_0/0.8)]"
         style={FRAME}

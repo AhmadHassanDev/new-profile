@@ -143,30 +143,15 @@ export const STORY = [
   { when: "Now", title: "60+ clients later", body: "Research, design and build for government authorities, funds, agencies and startups across 5+ regions." },
 ];
 
-export const PASSIONS = [
-  { title: "Code", color: "var(--cyan)", body: "I genuinely love opening the IDE and watching it come alive. A new framework is a welcome challenge." },
-  { title: "UX & UI", color: "var(--violet)", body: "Good UX makes or breaks a product, and it goes hand in hand with a beautiful, seamless UI." },
-  { title: "Arsenal", color: "var(--coral)", body: "A Gooner, die-hard since the Invincibles' unbeaten 2003–04 season." },
-  { title: "Growth", color: "var(--ink)", body: "Always working on a better me: a new book, a new skill, a new hobby. Atomic Habits started it." },
+/** What I love outside work; each pops up its own little 3D object on hover (see PassionCard) */
+export const PASSIONS: { title: string; color: string; body: string; object: "controller" | "pencil" | "ball" | "sprout" }[] = [
+  { title: "Gaming", color: "var(--cyan)", object: "controller", body: "Where I unwind, and where I study how great interactions feel." },
+  { title: "Design", color: "var(--violet)", object: "pencil", body: "Good UX makes or breaks a product, and it goes hand in hand with a beautiful, seamless UI." },
+  { title: "Arsenal", color: "var(--coral)", object: "ball", body: "A Gooner, die-hard since the Invincibles' unbeaten 2003–04 season." },
+  { title: "Growth", color: "var(--ink)", object: "sprout", body: "Always working on a better me: a new book, a new skill, a new hobby. Atomic Habits started it." },
 ];
 
 export const QUOTE = { text: "It always seems impossible until it's done.", by: "Nelson Mandela" };
-
-/** Spine colours borrowed from each cover. */
-export const BOOKS = [
-  { title: "The User Experience Team of One", author: "Leah Buley", bg: "#d8434e", ink: "#fff4ea" },
-  { title: "Lean UX", author: "Jeff Gothelf", bg: "#f1f1ef", ink: "#1b7fc4" },
-  { title: "Hooked", author: "Nir Eyal", bg: "#f6dc35", ink: "#141414" },
-  { title: "Thinking, Fast and Slow", author: "Daniel Kahneman", bg: "#f3efe5", ink: "#1b1b1b" },
-  { title: "The 48 Laws of Power", author: "Robert Greene", bg: "#e0482b", ink: "#f2c94c" },
-  { title: "Sprint", author: "Jake Knapp", bg: "#4cb6e6", ink: "#f8d63b" },
-  { title: "Refactoring UI", author: "Adam Wathan & Steve Schoger", bg: "#1c2232", ink: "#e9eefc" },
-  { title: "Atomic Habits", author: "James Clear", bg: "#f4efe3", ink: "#b8923f" },
-  { title: "The Design of Everyday Things", author: "Don Norman", bg: "#f1d24a", ink: "#b3372a" },
-  { title: "Don't Make Me Think", author: "Steve Krug", bg: "#8e2522", ink: "#fbefe6" },
-  { title: "Ego Is the Enemy", author: "Ryan Holiday", bg: "#1f3b5b", ink: "#f4f1ea" },
-];
-
 export const STATS = [
   { value: 6, suffix: "+", label: "Years of experience" },
   { value: 5, suffix: "+", label: "Regions" },
