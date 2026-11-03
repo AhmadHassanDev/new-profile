@@ -57,7 +57,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <script dangerouslySetInnerHTML={{ __html: LOW_POWER_CHECK }} />
         {/* Without JavaScript, copy that scrolling would reveal shows straight away */}
         <noscript>
-          <style>{`.scroll-word{opacity:1!important;color:var(--word,inherit)!important}.pipeline-step{opacity:1!important;transform:none!important}`}</style>
+          <style>{`.scroll-word{opacity:1!important;color:var(--word,inherit)!important}.pipeline-step{opacity:1!important;transform:none!important}.timeline-fill{transform:none!important}.timeline-copy{opacity:1!important}`}</style>
         </noscript>
         <a href="#top" className="skip-link rounded-full bg-ink px-5 py-3 text-base font-semibold text-bg">
           Skip to content

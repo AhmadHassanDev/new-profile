@@ -1,6 +1,8 @@
 import Image from "next/image";
 import type { Block, Screen, Source } from "@/content/cases";
+import Evolution from "./Evolution";
 import Pipeline from "./Pipeline";
+import Timeline from "./Timeline";
 import { COVER_HEIGHT, COVER_WIDTH, DISCIPLINE_COLOR, type Discipline } from "@/content/site";
 
 // Each chapter is labelled with the step of the process it covers
@@ -344,6 +346,10 @@ export default function CaseBlocks({ blocks }: { blocks: Block[] }) {
             return <Results key={i} {...block} />;
           case "screens":
             return <Screens key={i} title={block.title} screens={block.screens} />;
+          case "timeline":
+            return <Timeline key={i} title={block.title} body={block.body} unit={block.unit} steps={block.steps} />;
+          case "evolution":
+            return <Evolution key={i} title={block.title} body={block.body} pairs={block.pairs} />;
           case "phones":
             return <Phones key={i} title={block.title} screens={block.screens} />;
         }

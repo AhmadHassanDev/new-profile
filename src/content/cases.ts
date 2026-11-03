@@ -29,6 +29,10 @@ export type Block =
   | { kind: "image"; src: string; alt: string; caption?: string; full?: boolean; width?: number; height?: number }
   /** Full pages in browser windows that scroll on hover; a screen without `src` holds its place until it lands */
   | { kind: "screens"; title: string; screens: Screen[] }
+  /** How the project ran, step by step (`unit` names a step: "Week", "Sprint") */
+  | { kind: "timeline"; title: string; body?: string; unit: string; steps: { title: string; items: string[] }[] }
+  /** Wireframes against the finished screens, compared in one handset with a split */
+  | { kind: "evolution"; title: string; body?: string; pairs: { label: string; wire: string; final: string }[] }
   /** The same pages on phones, each in a handset that scrolls on hover */
   | { kind: "phones"; title: string; screens: Screen[] }
   /**
@@ -267,20 +271,32 @@ export const CASES: CaseStudy[] = [
         ],
       },
       {
-        kind: "image",
-        src: "/work/anubis/timeline.webp",
-        alt: "The six-week timeline: research and benchmarking, UX definition, wireframes, design system, high-fidelity design, then prototype and handoff",
-        width: 1255,
-        height: 700,
+        kind: "timeline",
+        title: "Six weeks, research to handoff",
+        body: "One structured run from the first benchmark to files a developer can build from, each week ending in something the academy could see.",
+        unit: "Week",
+        steps: [
+          { title: "Research & benchmarking", items: ["Competitor benchmarks", "Feature comparisons", "Opportunity notes"] },
+          { title: "UX definition", items: ["Member journey maps", "Key experience flows"] },
+          { title: "Wireframes & structure", items: ["App sitemap", "Wireframes for every flow"] },
+          { title: "Design system", items: ["Colour, type and spacing", "Component library"] },
+          { title: "High-fidelity design", items: ["Every screen and state", "Final layouts"] },
+          { title: "Prototype & handoff", items: ["Clickable prototype", "Dev-ready files"] },
+        ],
       },
       { kind: "statement", text: "Every member should see their progress, not have to ask for it." },
       {
-        kind: "image",
-        src: "/work/anubis/wireframes.webp",
-        alt: "Medium-fidelity wireframes of the login, verification, profile setup, home and profile screens",
-        caption: "Medium-fidelity wireframes settled the layout, hierarchy and navigation before any styling.",
-        width: 1115,
-        height: 580,
+        kind: "evolution",
+        title: "From wireframe to final",
+        body: "Every flow was settled in grey first: layout, hierarchy and navigation, before a single colour. Drag across the phone to see what each screen became.",
+        pairs: [
+          { label: "Login", wire: "/work/anubis/wire-login.webp", final: "/work/anubis/login.webp" },
+          { label: "Verification", wire: "/work/anubis/wire-otp.webp", final: "/work/anubis/otp.webp" },
+          { label: "Your details", wire: "/work/anubis/wire-details.webp", final: "/work/anubis/details.webp" },
+          { label: "Your photo", wire: "/work/anubis/wire-photo.webp", final: "/work/anubis/photo.webp" },
+          { label: "Home", wire: "/work/anubis/wire-home.webp", final: "/work/anubis/home.webp" },
+          { label: "Profile", wire: "/work/anubis/wire-profile.webp", final: "/work/anubis/profile.webp" },
+        ],
       },
       {
         kind: "chapter",

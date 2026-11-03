@@ -96,8 +96,9 @@ async function CaseStudy({ params }: Props) {
   return (
     <main
       id="top"
-      // On wide screens the right margin is kept clear for a signature's side instruments (e.g. the dive gauge)
-      className={`case relative isolate ${study.signature ? "md:pr-14" : ""}`}
+      // On wide screens the right margin is kept clear for a signature's side instruments (e.g. the dive gauge;
+      // the belt and its upright rank card need a little more)
+      className={`case relative isolate ${study.signature === "belt" ? "md:pr-20" : study.signature ? "md:pr-14" : ""}`}
       style={{ "--accent": study.accent[0], "--accent-2": study.accent[1] } as React.CSSProperties}
     >
       <JsonLd graph={caseJsonLd(project)} />
