@@ -267,7 +267,9 @@ export class PassionScene {
     kind: PassionObject,
     private reducedMotion: boolean,
   ) {
-    this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    // No 3D where the browser can only draw it in software (no GPU): there it would stall the whole page,
+    // so the constructor throws and the page shows its plain fallback instead
+    this.renderer = new THREE.WebGLRenderer({ canvas, failIfMajorPerformanceCaveat: true, antialias: true, alpha: true });
     this.renderer.setPixelRatio(Math.max(1.5, Math.min(window.devicePixelRatio, 2)));
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     const pmrem = new THREE.PMREMGenerator(this.renderer);

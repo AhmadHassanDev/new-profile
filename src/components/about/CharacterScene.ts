@@ -134,7 +134,9 @@ export class CharacterScene {
     private reducedMotion: boolean,
     private character: Character = CHARACTERS.student,
   ) {
-    this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: "high-performance" });
+    // No 3D where the browser can only draw it in software (no GPU): there it would stall the whole page,
+    // so the constructor throws and the page shows its plain fallback instead
+    this.renderer = new THREE.WebGLRenderer({ canvas, failIfMajorPerformanceCaveat: true, antialias: true, alpha: true, powerPreference: "high-performance" });
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     this.renderer.setClearColor(0x000000, 0);
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;

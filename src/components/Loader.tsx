@@ -55,7 +55,8 @@ export default function Loader() {
       const elapsed = now - start;
       const dt = Math.min((now - last) / 1000, 0.1);
       last = now;
-      ready.scene ||= !!document.querySelector("canvas[data-ready='true']");
+      // The 3D scene counts once it's drawn, or once it's settled there won't be one
+      ready.scene ||= !!document.querySelector("canvas[data-ready]");
       const milestones = 0.25 + 0.25 * Number(ready.fonts) + 0.25 * Number(ready.page) + 0.25 * Number(ready.scene);
       // Real progress, paced so the gathering is watchable; forced to finish at `max`. Eased by time, not frames,
       // so a 120Hz screen doesn't finish early and a busy phone doesn't drag on.

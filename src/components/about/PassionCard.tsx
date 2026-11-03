@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { PassionObject, PassionScene } from "./PassionScene";
 import { freshCanvas } from "@/lib/canvas";
+import { lowPower } from "@/lib/motion";
 
 /**
  * An Off the clock card. On hover it floods with its colour and its 3D object springs up out of the
@@ -32,7 +33,8 @@ export default function PassionCard({
   useEffect(() => {
     const card = cardRef.current;
     const placeholder = canvasRef.current;
-    if (!card || !placeholder) return;
+    // No GPU: the card floods with its colour, without its object
+    if (!card || !placeholder || lowPower()) return;
     // A new canvas each time, never one whose context a previous run already gave back
     const { canvas, release } = freshCanvas(placeholder);
     let disposed = false;

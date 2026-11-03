@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { isLoaderDone, LOADER_PROGRESS, whenLoaderDone } from "@/lib/loader";
 import { freshCanvas } from "@/lib/canvas";
+import { lowPower } from "@/lib/motion";
 
 export const EXCITE_EVENT = "hero:excite";
 
@@ -14,6 +15,11 @@ export default function HeroCanvas() {
   useEffect(() => {
     const placeholder = canvasRef.current;
     if (!placeholder) return;
+    // No GPU: the CSS glow behind the canvas is the visual, and the loader needn't wait for a scene
+    if (lowPower()) {
+      placeholder.dataset.ready = "none";
+      return;
+    }
     // A new canvas each time, never one whose context a previous run already gave back
     const { canvas, release } = freshCanvas(placeholder);
     let disposed = false;
@@ -29,7 +35,9 @@ export default function HeroCanvas() {
       try {
         scene = new SpectrumScene(canvas, reduced, intro);
       } catch {
-        return; // No WebGL: the CSS glow behind the canvas stays as the visual.
+        // No (fast) WebGL: the CSS glow behind the canvas stays as the visual, and the loader stops waiting for it
+        canvas.dataset.ready = "none";
+        return;
       }
 
       // The hero reserves a box for the particles (beside the headline, or above it in portrait);

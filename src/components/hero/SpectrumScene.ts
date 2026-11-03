@@ -50,7 +50,9 @@ export class SpectrumScene {
   ) {
     const compact = window.matchMedia("(max-width: 767px)").matches;
 
-    this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: "high-performance" });
+    // No 3D where the browser can only draw it in software (no GPU): there it would stall the whole page,
+    // so the constructor throws and the page shows its plain fallback instead
+    this.renderer = new THREE.WebGLRenderer({ canvas, failIfMajorPerformanceCaveat: true, antialias: true, alpha: true, powerPreference: "high-performance" });
     // Phones get closer to their full sharpness (they have fewer particles to draw); big screens cap lower
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, compact ? 2.5 : 1.75));
     this.renderer.setClearColor(0x000000, 0);

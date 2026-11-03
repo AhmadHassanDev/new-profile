@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { DISCIPLINE_COLOR, PROCESS } from "@/content/site";
 import { freshCanvas } from "@/lib/canvas";
+import { lowPower } from "@/lib/motion";
 
 type Scene = import("./process/ProcessScene").ProcessScene;
 
@@ -111,7 +112,8 @@ export default function About() {
 
     let resizeObserver: ResizeObserver | undefined;
     let visibility: IntersectionObserver | undefined;
-    import("./process/ProcessScene").then(({ ProcessScene }) => {
+    // No GPU: the copy still plays, over the glow
+    if (!lowPower()) import("./process/ProcessScene").then(({ ProcessScene }) => {
       if (disposed) return;
       try {
         scene = new ProcessScene(canvas, reduced);

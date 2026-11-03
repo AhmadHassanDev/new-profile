@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Figtree, Unbounded } from "next/font/google";
+import { LOW_POWER_CHECK } from "@/lib/motion";
 import JsonLd from "@/components/JsonLd";
 import SmoothScroll from "@/components/SmoothScroll";
 import { JOB_TITLE, KNOWS_ABOUT, NAME, OPEN_GRAPH, PERSON, SITE_DESCRIPTION, SITE_TITLE, SITE_URL, WEBSITE } from "@/lib/seo";
@@ -50,8 +51,10 @@ export const viewport: Viewport = { themeColor: "#0a0a0d" };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${figtree.variable} ${unbounded.variable} antialiased`}>
+    // The low-power check below may mark <html> before React takes over
+    <html lang="en" className={`${figtree.variable} ${unbounded.variable} antialiased`} suppressHydrationWarning>
       <body className="min-h-full">
+        <script dangerouslySetInnerHTML={{ __html: LOW_POWER_CHECK }} />
         {/* Without JavaScript, copy that scrolling would reveal shows straight away */}
         <noscript>
           <style>{`.scroll-word{opacity:1!important;color:var(--word,inherit)!important}.pipeline-step{opacity:1!important;transform:none!important}`}</style>

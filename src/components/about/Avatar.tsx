@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { freshCanvas } from "@/lib/canvas";
+import { lowPower } from "@/lib/motion";
 
 type Scene = import("./CharacterScene").CharacterScene;
 
@@ -24,7 +25,8 @@ export default function Avatar({ className = "" }: { className?: string }) {
 
   useEffect(() => {
     const placeholder = canvasRef.current;
-    if (!placeholder) return;
+    // No GPU: the circle stays on its own
+    if (!placeholder || lowPower()) return;
     // A new canvas each time, never one whose context a previous run already gave back
     const { canvas, release } = freshCanvas(placeholder);
     let disposed = false;

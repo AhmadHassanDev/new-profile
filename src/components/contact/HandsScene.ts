@@ -186,7 +186,9 @@ export class HandsScene {
     private reducedMotion: boolean,
   ) {
     const compact = window.matchMedia("(max-width: 767px)").matches;
-    this.renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: true, powerPreference: "high-performance" });
+    // No 3D where the browser can only draw it in software (no GPU): there it would stall the whole page,
+    // so the constructor throws and the page shows its plain fallback instead
+    this.renderer = new THREE.WebGLRenderer({ canvas, failIfMajorPerformanceCaveat: true, antialias: false, alpha: true, powerPreference: "high-performance" });
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, compact ? 1.5 : 1.75));
     this.renderer.setClearColor(0x000000, 0);
     this.scene.add(this.group);

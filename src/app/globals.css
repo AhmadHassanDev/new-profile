@@ -112,6 +112,13 @@ body:has(.site-loader:not(.is-exiting)) .animate-rise {
   animation-play-state: paused;
 }
 
+/* No GPU (see src/lib/motion.ts): every frame of an endless animation is repainted in software and keeps
+   the page from ever going idle, so the decorative loops rest */
+:root[data-low-power] :is(.animate-shimmer, .animate-marquee, .animate-marquee-reverse, .dive-light, .dive-rays, .scroll-cue-arrow),
+:root[data-low-power] :is(.scroll-cue, .pipeline-line)::after {
+  animation: none;
+}
+
 /* Keyboard focus: a clear ring, offset so it reads on filled pills too */
 :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
   outline: 2px solid var(--ink);

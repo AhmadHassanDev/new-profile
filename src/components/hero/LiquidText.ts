@@ -97,7 +97,9 @@ export class LiquidText {
   private running = false;
 
   constructor(canvas: HTMLCanvasElement) {
-    this.renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: false, premultipliedAlpha: true });
+    // No 3D where the browser can only draw it in software (no GPU): there it would stall the whole page,
+    // so the constructor throws and the page shows its plain fallback instead
+    this.renderer = new THREE.WebGLRenderer({ canvas, failIfMajorPerformanceCaveat: true, alpha: true, antialias: false, premultipliedAlpha: true });
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     this.renderer.setClearColor(0x000000, 0);
 

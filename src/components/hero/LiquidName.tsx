@@ -4,6 +4,7 @@ import { useEffect, useRef, type RefObject } from "react";
 import { whenLoaderDone } from "@/lib/loader";
 import type { TextLine, TextStyle } from "./LiquidText";
 import { freshCanvas } from "@/lib/canvas";
+import { lowPower } from "@/lib/motion";
 
 type Liquid = import("./LiquidText").LiquidText;
 
@@ -57,7 +58,7 @@ export default function LiquidName({ heading, lit }: { heading: RefObject<HTMLHe
     // Phones have no pointer to stir it, and its always-on ripple and colour split only soften the
     // letters there, so they keep the crisp page text
     const still = window.matchMedia("(prefers-reduced-motion: reduce), (hover: none)").matches;
-    if (!placeholder || !title || still) return;
+    if (!placeholder || !title || still || lowPower()) return;
     // A new canvas each time, never one whose context a previous run already gave back
     const { canvas, release } = freshCanvas(placeholder);
     let disposed = false;

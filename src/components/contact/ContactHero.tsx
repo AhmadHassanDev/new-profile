@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { CONTACT } from "@/content/site";
 import SocialIcon from "../SocialIcon";
 import { freshCanvas } from "@/lib/canvas";
+import { lowPower } from "@/lib/motion";
 
 type Scene = import("./HandsScene").HandsScene;
 
@@ -22,7 +23,8 @@ export default function ContactHero() {
   useEffect(() => {
     const section = sectionRef.current;
     const placeholder = canvasRef.current;
-    if (!section || !placeholder) return;
+    // No GPU: the headline and buttons stand on their own
+    if (!section || !placeholder || lowPower()) return;
     // A new canvas each time, never one whose context a previous run already gave back
     const { canvas, release } = freshCanvas(placeholder);
     let disposed = false;
