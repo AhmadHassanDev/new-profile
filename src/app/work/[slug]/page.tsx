@@ -3,6 +3,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import BeltSignature from "@/components/case/BeltSignature";
+import BlipSignature from "@/components/case/BlipSignature";
 import CaseBlocks from "@/components/case/CaseBlocks";
 import DiveSignature from "@/components/case/DiveSignature";
 import PulseSignature from "@/components/case/PulseSignature";
@@ -99,7 +101,15 @@ async function CaseStudy({ params }: Props) {
       style={{ "--accent": study.accent[0], "--accent-2": study.accent[1] } as React.CSSProperties}
     >
       <JsonLd graph={caseJsonLd(project)} />
-      {study.signature === "dive" ? <DiveSignature /> : study.signature === "pulse" ? <PulseSignature /> : null}
+      {study.signature === "dive" ? (
+        <DiveSignature />
+      ) : study.signature === "pulse" ? (
+        <PulseSignature />
+      ) : study.signature === "blip" ? (
+        <BlipSignature />
+      ) : study.signature === "belt" ? (
+        <BeltSignature />
+      ) : null}
 
       {/* Opener */}
       <section className="relative px-4 pt-32 pb-16 md:px-10 md:pt-40 md:pb-24">

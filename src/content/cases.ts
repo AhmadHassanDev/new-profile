@@ -25,10 +25,12 @@ export type Block =
     }
   /** The journey from first sketch to live site, tool by tool */
   | { kind: "pipeline"; title: string; steps: { tool: string; does: string }[] }
-  /** A single image; `full` runs it edge to edge */
-  | { kind: "image"; src: string; alt: string; caption?: string; full?: boolean }
+  /** A single image; `full` runs it edge to edge. Without a size it's cropped to the cover's shape */
+  | { kind: "image"; src: string; alt: string; caption?: string; full?: boolean; width?: number; height?: number }
   /** Full pages in browser windows that scroll on hover; a screen without `src` holds its place until it lands */
   | { kind: "screens"; title: string; screens: Screen[] }
+  /** The same pages on phones, each in a handset that scrolls on hover */
+  | { kind: "phones"; title: string; screens: Screen[] }
   /**
    * Outcomes as big numbers, each optionally against where it started; with no items yet, three empty
    * slots hold the space. `body` tells the story behind them and `sources` back them up.
@@ -55,7 +57,7 @@ export type CaseStudy = {
   /** The live site, for projects that shipped as a website */
   site?: string;
   /** A bespoke interaction, loaded on this page only */
-  signature?: "dive" | "pulse";
+  signature?: "dive" | "pulse" | "blip" | "belt";
   /** Quick facts; a fact can show a logo (the client's) or a row of tool logos instead of plain text */
   facts: { label: string; value: string; logo?: { src: string; width: number; height: number }; tools?: string[] }[];
   blocks: Block[];
@@ -154,6 +156,168 @@ export const CASES: CaseStudy[] = [
           detail: "Lighthouse 13.6 audit, mobile and desktop",
         },
       },
+    ],
+  },
+  {
+    slug: "bliphub",
+    accent: ["#3557e8", "#6ee35f"],
+    signature: "blip",
+    facts: [
+      { label: "Client", value: "Bliphub", logo: { src: "/logos/bliphub.svg", width: 984, height: 230 } },
+      { label: "Role", value: "Research & UI design" },
+      { label: "Scope", value: "Website design" },
+      { label: "Tools", value: "Figma", tools: ["Figma"] },
+    ],
+    blocks: [
+      {
+        kind: "feature",
+        text: "An agency's site is its first pitch: before a brand reads a word, the page itself has to prove Bliphub can make something people stop scrolling for.",
+        src: "/work/bliphub.webp",
+        alt: "The Bliphub homepage on a laptop and a phone",
+      },
+      {
+        kind: "chapter",
+        discipline: "UX research",
+        title: "Research",
+        body: "Bliphub's clients are brands in Egypt and across MENA: fashion, wellness, food, jewellery, solar, sport. Their audience lives on social media, with 51.6 million social media users in Egypt alone, and their budgets are following it there. Digital ad spend across MENA reached $8.2 billion in 2025, up 17.8% in a year, and Egypt grew fastest in the region.\n\nReach can be bought, but trust can't: people trust recommendations from people they know above any ad. That gap is what Bliphub sells, with UGC, content and production that feel human, and media buying to carry them. So the site had to show work before words: real campaigns, the service behind each one, and what it achieved.",
+        findings: [
+          { value: "51.6m", label: "Social media users in Egypt" },
+          { value: "$8.2bn", label: "MENA digital ad spend, 2025" },
+          { value: "23.1%", label: "Egypt's ad growth, the region's fastest" },
+          { value: "88%", label: "Trust word of mouth most" },
+        ],
+        sources: [
+          { label: "DataReportal", href: "https://datareportal.com/reports/digital-2026-egypt" },
+          { label: "IAB MENA via Campaign Middle East", href: "https://campaignme.com/digital-ad-spend-in-mena-reaches-8b-in-2025-iab-report-reveals/" },
+          {
+            label: "Nielsen via Research Live",
+            href: "https://www.research-live.com/article/news/nielsen-study-reveals-top-attributes-for-successful-adverts-/id/5093662",
+          },
+        ],
+      },
+      { kind: "statement", text: "Lead with the work. Let the numbers do the talking." },
+      {
+        kind: "chapter",
+        discipline: "UI design",
+        title: "Designed in Figma",
+        body: "The look comes straight from the brand: a deep navy that melts into teal, liquid-glass forms drifting behind the type, and the logo's lime pixel picked out on every figure and call to action. It reads as a studio with taste, not a template.\n\nSeven services sit in one numbered list that opens in place, with a sheet for each on the services page. The portfolio tags every campaign by the service behind it, and each project page opens on its results before its gallery, so a brand sees what the work achieved, then how it looked. Clients, process and testimonials follow, and every page closes on the same invitation: ready to create something truly awesome?",
+      },
+      {
+        kind: "screens",
+        title: "The pages",
+        screens: [
+          { label: "Home", src: "/work/bliphub/home.webp", width: 1200, height: 6547 },
+          { label: "About", src: "/work/bliphub/about.webp", width: 1200, height: 4068 },
+          { label: "Services", src: "/work/bliphub/services.webp", width: 1200, height: 2477 },
+          { label: "Portfolio", src: "/work/bliphub/projects.webp", width: 1200, height: 3865 },
+          { label: "Project", src: "/work/bliphub/project.webp", width: 1200, height: 3444 },
+          { label: "Contact", src: "/work/bliphub/contact.webp", width: 1200, height: 1872 },
+        ],
+      },
+      {
+        kind: "phones",
+        title: "On phones",
+        screens: [
+          { label: "Home", src: "/work/bliphub/phone-home.webp", width: 393, height: 7320 },
+          { label: "About", src: "/work/bliphub/phone-about.webp", width: 393, height: 4410 },
+          { label: "Services", src: "/work/bliphub/phone-services.webp", width: 393, height: 3290 },
+          { label: "Portfolio", src: "/work/bliphub/phone-projects.webp", width: 393, height: 3854 },
+          { label: "Project", src: "/work/bliphub/phone-project.webp", width: 393, height: 3206 },
+          { label: "Contact", src: "/work/bliphub/phone-contact.webp", width: 393, height: 2340 },
+        ],
+      },
+      {
+        kind: "results",
+        title: "Handed over",
+        body: "The work ended at a complete Figma file, ready to build: every page on desktop and on phones, with the service sheets and a project template the team can fill for each new campaign.",
+        items: [
+          { value: "6", label: "Pages on desktop" },
+          { value: "6", label: "Layouts for phones" },
+          { value: "7", label: "Services, each with a sheet" },
+          { value: "1", label: "Template for every campaign" },
+        ],
+      },
+    ],
+  },
+  {
+    slug: "anubis",
+    accent: ["#8f121d", "#e5323f"],
+    signature: "belt",
+    facts: [
+      { label: "Client", value: "Anubis Martial Arts, Egypt", logo: { src: "/logos/anubis.svg", width: 199, height: 329 } },
+      { label: "Role", value: "Research & UI design" },
+      { label: "Scope", value: "Mobile app" },
+      { label: "Tools", value: "Figma", tools: ["Figma"] },
+    ],
+    blocks: [
+      {
+        kind: "feature",
+        text: "Members train hard and want to see it: what they've attended, what's left on their package and which class is next. Anubis needed one app that shows them, and takes the admin off the front desk.",
+        src: "/work/anubis.webp",
+        alt: "The Anubis app's home screen on a phone",
+      },
+      {
+        kind: "chapter",
+        discipline: "UX research",
+        title: "Research",
+        body: "Anubis Martial Arts Academy trains Brazilian Jiu-Jitsu, submission grappling, MMA and Muay Thai in Egypt. Its head coach, Mohamed Omar, holds his black belt under world champion Roberto \"Cyborg\" Abreu and helped build the country's BJJ scene.\n\nBehind the mats, attendance, packages, private coaching requests and merch all ran by hand or across scattered chats, so members couldn't see where they stood and the academy did the same work twice. I benchmarked five fitness and gym apps for what they get right and what they miss, then mapped the member's journey and the flows that matter most: booking, checking in and tracking progress.",
+        findings: [
+          { value: "5", label: "Fitness apps benchmarked" },
+          { value: "4", label: "Jobs pulled into one app" },
+        ],
+      },
+      {
+        kind: "image",
+        src: "/work/anubis/timeline.webp",
+        alt: "The six-week timeline: research and benchmarking, UX definition, wireframes, design system, high-fidelity design, then prototype and handoff",
+        width: 1255,
+        height: 700,
+      },
+      { kind: "statement", text: "Every member should see their progress, not have to ask for it." },
+      {
+        kind: "image",
+        src: "/work/anubis/wireframes.webp",
+        alt: "Medium-fidelity wireframes of the login, verification, profile setup, home and profile screens",
+        caption: "Medium-fidelity wireframes settled the layout, hierarchy and navigation before any styling.",
+        width: 1115,
+        height: 580,
+      },
+      {
+        kind: "chapter",
+        discipline: "UI design",
+        title: "Designed in Figma",
+        body: "The app lives in the academy's colours: near-black, with Anubis red for every action and Helvetica Neue's extended cuts giving the titles a fighter's stance. The home screen answers a member's three questions at a glance: how long is left on their package, which class is next and with which coach, and what else is on this week.\n\nCheck-in is a QR code in the middle of the tab bar, one tap from anywhere. Belts unlock as achievements, discipline by discipline, so progress shows on the mat and in the app. Merch can be browsed and asked about, but not bought: checkout was kept out on purpose, so the first release stays focused on running the academy. Every screen is built from one component library, with variants for each state.",
+      },
+      {
+        kind: "phones",
+        title: "The app",
+        screens: [
+          { label: "Onboarding", src: "/work/anubis/onboarding.webp", width: 393, height: 852 },
+          { label: "Login", src: "/work/anubis/login.webp", width: 393, height: 852 },
+          { label: "Home", src: "/work/anubis/home.webp", width: 393, height: 1861 },
+          { label: "Sessions", src: "/work/anubis/sessions.webp", width: 393, height: 852 },
+          { label: "Calendar", src: "/work/anubis/calendar.webp", width: 393, height: 852 },
+          { label: "Session", src: "/work/anubis/session.webp", width: 393, height: 852 },
+          { label: "Packages", src: "/work/anubis/packages.webp", width: 393, height: 852 },
+          { label: "Package", src: "/work/anubis/package.webp", width: 393, height: 852 },
+          { label: "Coach", src: "/work/anubis/coach.webp", width: 393, height: 852 },
+          { label: "Achievements", src: "/work/anubis/achievements.webp", width: 393, height: 852 },
+          { label: "Merch", src: "/work/anubis/merch.webp", width: 393, height: 852 },
+          { label: "Profile", src: "/work/anubis/profile.webp", width: 393, height: 852 },
+        ],
+      },
+      {
+        kind: "results",
+        title: "Handed over",
+        body: "Six weeks after the first benchmark, the academy had a clickable prototype and dev-ready files: every screen and every state, from signing up to a suspended account.",
+        items: [
+          { value: "46", label: "Screens, designed end to end" },
+          { value: "6", label: "Weeks, research to handoff" },
+          { value: "1", label: "Component library" },
+          { value: "1", label: "Clickable prototype" },
+        ],
+      },
+      { kind: "statement", text: "Scope is a design decision. Leaving checkout out made the first release sharper." },
     ],
   },
   {

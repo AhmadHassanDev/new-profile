@@ -54,12 +54,22 @@ const ALL_PROJECTS: Project[] = [
     cover: "/work/primehills.webp",
   },
   {
+    slug: "bliphub",
+    name: "Bliphub",
+    kind: "Website · Marketing agency",
+    year: "2025",
+    summary:
+      "Website design for Bliphub, a full-service digital creative agency: UGC, social media, content, media production and buying, branding and consultancy.",
+    disciplines: ["UX research", "UI design"],
+    cover: "/work/bliphub.webp",
+  },
+  {
     slug: "anubis",
     name: "Anubis",
     kind: "Mobile app · Martial arts",
     year: "2025",
     summary: "Class packages, sessions, coaches and QR check-in for Anubis Martial Arts across its branches.",
-    disciplines: ["UI design"],
+    disciplines: ["UX research", "UI design"],
     cover: "/work/anubis.webp",
   },
   {

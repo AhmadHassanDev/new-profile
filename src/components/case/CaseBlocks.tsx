@@ -48,8 +48,8 @@ function Chapter({ discipline, title, body, findings, sources, index }: ChapterP
           <Pending className="mt-6">Write-up coming soon</Pending>
         )}
         {findings?.length ? (
-          // Two by two until the column is wide enough for four figures in a row
-          <dl className="mt-10 grid grid-cols-2 gap-3 md:gap-4 xl:grid-cols-4">
+          // Two by two until the column is wide enough for four figures in a row (a pair stays a pair)
+          <dl className={`mt-10 grid grid-cols-2 gap-3 md:gap-4 ${findings.length === 4 ? "xl:grid-cols-4" : ""}`}>
             {findings.map((f) => (
               // Numbers line up along the top whatever their labels' length (reversed, so the label follows in reading order)
               <div key={f.label} className="flex flex-col-reverse justify-end gap-2 rounded-[22px] bg-surface/60 p-5 backdrop-blur-xl md:p-6">
@@ -199,11 +199,14 @@ function Feature({ text, src, alt }: { text: string; src: string; alt: string })
   );
 }
 
-/** An image held to a comfortable reading width; `full` lets it run wider for a showpiece. */
-function Picture({ src, alt, caption, full }: { src: string; alt: string; caption?: string; full?: boolean }) {
+/**
+ * An image held to a comfortable reading width; `full` lets it run wider for a showpiece. With its own
+ * size it keeps its shape (a process board, say); without, it takes the cover's.
+ */
+function Picture({ src, alt, caption, full, width = COVER_WIDTH, height = COVER_HEIGHT }: Omit<Extract<Block, { kind: "image" }>, "kind">) {
   return (
     <figure className={`mx-auto px-4 py-8 md:px-10 md:py-12 ${full ? "max-w-[1400px]" : "max-w-[980px]"}`}>
-      <div className="relative overflow-hidden rounded-[24px]" style={{ aspectRatio: `${COVER_WIDTH} / ${COVER_HEIGHT}` }}>
+      <div className="relative overflow-hidden rounded-[24px]" style={{ aspectRatio: `${width} / ${height}` }}>
         <Image
           src={src}
           alt={alt}
@@ -274,6 +277,52 @@ function Screens({ title, screens }: { title: string; screens: Screen[] }) {
   );
 }
 
+/**
+ * The pages on phones, each in a handset (a dark bezel with a dynamic island). Like the browser windows,
+ * hovering a phone, or focusing the strip, scrolls the page inside it from top to bottom.
+ */
+function Phones({ title, screens }: { title: string; screens: Screen[] }) {
+  return (
+    <section className="py-8 md:py-12">
+      <h2 className="mb-6 px-4 font-display text-sm font-semibold tracking-wide text-muted uppercase md:mb-8 md:px-10">{title}</h2>
+      <div
+        role="region"
+        aria-label={title}
+        tabIndex={0}
+        className="screens overflow-x-auto rounded-[24px] [scrollbar-width:none] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[var(--accent-2)]"
+      >
+        <ul className="flex w-max gap-4 px-4 pb-4 md:gap-6 md:px-10">
+          {screens.map((screen) => (
+            <li key={screen.label} className="w-[58vw] max-w-[300px] shrink-0 sm:w-[32vw] lg:w-[19vw]">
+              <div className="rounded-[clamp(30px,4vw,44px)] bg-[#050507] p-[clamp(6px,0.7vw,9px)] shadow-[0_30px_60px_-25px_rgb(0_0_0/0.8)]">
+                {screen.src && screen.width && screen.height ? (
+                  <div
+                    className="screen-window relative aspect-[393/852] overflow-hidden rounded-[clamp(24px,3.3vw,36px)] bg-surface"
+                    style={{ "--scroll-time": `${((screen.height / screen.width) * 0.9).toFixed(1)}s` } as React.CSSProperties}
+                  >
+                    <Image
+                      src={screen.src}
+                      alt={`The ${screen.label} page on a phone`}
+                      width={screen.width}
+                      height={screen.height}
+                      sizes="(min-width: 1580px) 300px, (min-width: 1024px) 19vw, (min-width: 640px) 32vw, 58vw"
+                      className="screen-page block h-auto w-full"
+                    />
+                    <span aria-hidden className="absolute top-[2.2%] left-1/2 h-[3.4%] w-[30%] -translate-x-1/2 rounded-full bg-[#050507]" />
+                  </div>
+                ) : (
+                  <div className="grid aspect-[393/852] place-items-center rounded-[36px] bg-surface/30 text-sm text-muted">Screen coming soon</div>
+                )}
+              </div>
+              <p className="mt-4 px-1 font-display text-lg font-bold tracking-[-0.02em] uppercase">{screen.label}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  );
+}
+
 /** Renders a case study's blocks in the order the project chose them. */
 export default function CaseBlocks({ blocks }: { blocks: Block[] }) {
   let chapter = 0;
@@ -290,11 +339,13 @@ export default function CaseBlocks({ blocks }: { blocks: Block[] }) {
           case "feature":
             return <Feature key={i} text={block.text} src={block.src} alt={block.alt} />;
           case "image":
-            return <Picture key={i} src={block.src} alt={block.alt} caption={block.caption} full={block.full} />;
+            return <Picture key={i} {...block} />;
           case "results":
             return <Results key={i} {...block} />;
           case "screens":
             return <Screens key={i} title={block.title} screens={block.screens} />;
+          case "phones":
+            return <Phones key={i} title={block.title} screens={block.screens} />;
         }
       })}
     </>

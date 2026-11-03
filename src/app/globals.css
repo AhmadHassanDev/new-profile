@@ -426,6 +426,72 @@ body:has(.nav-bar[data-tucked="true"]) .below-nav {
   35%, 100% { scale: 1; }
 }
 
+/* Bliphub: the brand's navy, washed in blue near the top that gives way to teal further down
+   (--reach runs 0 to 1 over the page); two fixed layers cross-fade, so scrolling only changes opacity */
+.blip-ground {
+  background: linear-gradient(to bottom, #0b0d22, #090b12);
+}
+.blip-blue {
+  background:
+    radial-gradient(75% 55% at 12% 0%, rgb(53 87 232 / 0.42), transparent 70%),
+    radial-gradient(50% 40% at 100% 30%, rgb(39 58 160 / 0.22), transparent 70%);
+  opacity: calc(1 - var(--reach, 0) * 0.8);
+}
+.blip-teal {
+  background:
+    radial-gradient(70% 50% at 90% 100%, rgb(18 138 105 / 0.3), transparent 70%),
+    radial-gradient(45% 40% at 0% 70%, rgb(110 227 95 / 0.08), transparent 70%);
+  opacity: calc(0.15 + var(--reach, 0) * 0.85);
+}
+/* The meter's pixels: dim until the read reaches them, then lit in the logo's lime with a small pop */
+.blip-pixel {
+  background: rgb(110 227 95 / 0.14);
+  transition: background-color 0.3s ease;
+}
+.blip-pixel[data-lit="true"] {
+  background: var(--accent-2);
+  animation: blip-pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes blip-pop {
+  from { scale: 1.9; }
+}
+
+/* Anubis: the academy after hours. Near-black, with Anubis red glowing up from the floor the further
+   you read (--trained runs 0 to 1), under a faint jackal mark cut from the logo */
+.belt-ground {
+  background: linear-gradient(to bottom, #0f0d0e, #0b0909);
+}
+.belt-heat {
+  background:
+    radial-gradient(80% 55% at 50% 110%, rgb(209 31 47 / 0.32), transparent 70%),
+    radial-gradient(45% 40% at 100% 60%, rgb(143 18 29 / 0.22), transparent 70%);
+  opacity: calc(0.25 + var(--trained, 0) * 0.75);
+}
+.belt-mark {
+  background: rgb(209 31 47 / 0.045);
+  mask: url(/logos/anubis.svg) center / contain no-repeat;
+}
+/* The belt: its rank colour with a soft fabric sheen, and the bar where the stripes go (red on a black belt) */
+.belt {
+  background-color: var(--belt, #ecebe6);
+  background-image: linear-gradient(90deg, rgb(255 255 255 / 0.22), transparent 45%, rgb(0 0 0 / 0.28));
+  transition: background-color 0.6s ease;
+}
+.belt-bar {
+  background: #0a0a0a;
+  transition: background-color 0.6s ease;
+}
+.belt[data-black] .belt-bar {
+  background: #d11f2f;
+}
+.belt-stripe {
+  background: rgb(255 255 255 / 0.12);
+  transition: background-color 0.3s ease;
+}
+.belt-stripe[data-earned="true"] {
+  background: #fff;
+}
+
 /* Mobile menu: colour sheets wipe in along a "/" edge (the logo's slash), the panel lands last.
    Closing runs it backwards. Everything moves by transform and opacity only, which phones animate on
    the GPU: sheets wider than the screen, skewed into the slash, slide across. */
