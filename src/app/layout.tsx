@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Figtree, Unbounded } from "next/font/google";
+import { Suspense } from "react";
 import { LOW_POWER_CHECK } from "@/lib/motion";
 import JsonLd from "@/components/JsonLd";
 import SmoothScroll from "@/components/SmoothScroll";
@@ -63,7 +64,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           Skip to content
         </a>
         <JsonLd graph={[PERSON, WEBSITE]} />
-        <SmoothScroll />
+        {/* It reads the pathname, which can't always be known while prerendering; it renders nothing anyway */}
+        <Suspense fallback={null}>
+          <SmoothScroll />
+        </Suspense>
         {children}
       </body>
     </html>
