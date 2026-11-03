@@ -37,7 +37,7 @@ export const metadata: Metadata = {
   // Google uses in search results), the logo as an SVG for browser tabs, and the iOS home-screen icon
   icons: {
     icon: [
-      { url: "/icon", sizes: "192x192", type: "image/png" },
+      { url: "/icon", sizes: "480x480", type: "image/png" },
       { url: "/logo.svg", type: "image/svg+xml" },
     ],
     apple: { url: "/apple-icon", sizes: "180x180", type: "image/png" },
