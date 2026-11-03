@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import CaseBlocks from "@/components/case/CaseBlocks";
 import DiveSignature from "@/components/case/DiveSignature";
+import PulseSignature from "@/components/case/PulseSignature";
 import ToolLogo from "@/components/case/ToolLogo";
 import Contact from "@/components/Contact";
 import Cursor from "@/components/Cursor";
@@ -15,6 +16,8 @@ import WorkLink from "@/components/work/WorkLink";
 import { CASES, caseFor } from "@/content/cases";
 import { COVER_HEIGHT, COVER_WIDTH, DISCIPLINE_COLOR, type Project, PROJECTS } from "@/content/site";
 import { absoluteUrl, breadcrumbs, PERSON_ID, pageMetadata, WEBSITE_ID } from "@/lib/seo";
+
+const longestWord = (name: string) => Math.max(...name.split(/\s+/).map((word) => word.length));
 
 export function generateStaticParams() {
   return CASES.map(({ slug }) => ({ slug }));
@@ -96,7 +99,7 @@ async function CaseStudy({ params }: Props) {
       style={{ "--accent": study.accent[0], "--accent-2": study.accent[1] } as React.CSSProperties}
     >
       <JsonLd graph={caseJsonLd(project)} />
-      {study.signature === "dive" ? <DiveSignature /> : null}
+      {study.signature === "dive" ? <DiveSignature /> : study.signature === "pulse" ? <PulseSignature /> : null}
 
       {/* Opener */}
       <section className="relative px-4 pt-32 pb-16 md:px-10 md:pt-40 md:pb-24">
@@ -107,7 +110,11 @@ async function CaseStudy({ params }: Props) {
           <span aria-hidden className="h-px w-10" style={{ background: "var(--accent-2)" }} />
           {project.kind} · {project.year}
         </p>
-        <h1 className="mt-6 font-display text-[15.5vw] leading-[0.84] font-bold tracking-[-0.055em] uppercase md:text-[13vw]">
+        {/* A name with a long word shrinks until that word fits the width (the display face runs ~0.9em a letter) */}
+        <h1
+          className="mt-6 font-display text-[15.5vw] leading-[0.84] font-bold tracking-[-0.055em] uppercase md:text-[13vw]"
+          style={longestWord(project.name) > 7 ? { fontSize: `min(13vw, calc((100vw - 2rem) / ${(longestWord(project.name) * 0.9).toFixed(2)}))` } : undefined}
+        >
           <span className="reveal block">
             <span className="animate-rise block">{project.name}</span>
           </span>
@@ -152,7 +159,8 @@ async function CaseStudy({ params }: Props) {
                     ))}
                   </span>
                 ) : fact.logo ? (
-                  <span className="flex items-center gap-3">
+                  // Stacked on phones, so a wide logo never pushes the name into the next column
+                  <span className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:gap-3">
                     {/* White, as in the clients carousel */}
                     <Image
                       src={fact.logo.src}
@@ -160,7 +168,7 @@ async function CaseStudy({ params }: Props) {
                       width={fact.logo.width}
                       height={fact.logo.height}
                       unoptimized
-                      className="h-9 w-auto brightness-0 invert"
+                      className="h-9 w-auto max-w-full brightness-0 invert"
                     />
                     {fact.value}
                   </span>

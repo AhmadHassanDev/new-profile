@@ -25,6 +25,16 @@ export const COVER_HEIGHT = 1565;
 // Every project, including ones still waiting on their cover
 const ALL_PROJECTS: Project[] = [
   {
+    slug: "pmg",
+    name: "PMG",
+    kind: "Website · Healthcare",
+    year: "2026",
+    summary:
+      "Website and Sanity CMS for PMG, practice management for independent consultants across the UK: billing and collections, medical coding, embassy registration and more.",
+    disciplines: ["UX research", "UI design", "Front-end"],
+    cover: "/work/pmg.webp",
+  },
+  {
     slug: "slydive",
     name: "SlyDive",
     kind: "Website · Diving",

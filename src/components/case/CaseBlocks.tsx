@@ -48,11 +48,14 @@ function Chapter({ discipline, title, body, findings, sources, index }: ChapterP
           <Pending className="mt-6">Write-up coming soon</Pending>
         )}
         {findings?.length ? (
-          <dl className="mt-10 grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
+          // Two by two until the column is wide enough for four figures in a row
+          <dl className="mt-10 grid grid-cols-2 gap-3 md:gap-4 xl:grid-cols-4">
             {findings.map((f) => (
-              <div key={f.label} className="flex flex-col-reverse gap-2 rounded-[22px] bg-surface/60 p-5 backdrop-blur-xl md:p-6">
+              // Numbers line up along the top whatever their labels' length (reversed, so the label follows in reading order)
+              <div key={f.label} className="flex flex-col-reverse justify-end gap-2 rounded-[22px] bg-surface/60 p-5 backdrop-blur-xl md:p-6">
                 <dt className="text-sm text-muted">{f.label}</dt>
-                <dd className="font-display text-4xl font-bold tracking-[-0.04em] md:text-5xl">
+                {/* Sized to the card, so a long figure like "£337m" never spills out */}
+                <dd className="font-display text-[clamp(1.75rem,8vw,2.25rem)] leading-none font-bold tracking-[-0.04em] md:text-4xl xl:text-[clamp(1.75rem,2.2vw,3rem)]">
                   {f.value}
                 </dd>
               </div>

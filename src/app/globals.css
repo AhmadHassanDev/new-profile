@@ -114,7 +114,7 @@ body:has(.site-loader:not(.is-exiting)) .animate-rise {
 
 /* No GPU (see src/lib/motion.ts): every frame of an endless animation is repainted in software and keeps
    the page from ever going idle, so the decorative loops rest */
-:root[data-low-power] :is(.animate-shimmer, .animate-marquee, .animate-marquee-reverse, .dive-light, .dive-rays, .scroll-cue-arrow),
+:root[data-low-power] :is(.animate-shimmer, .animate-marquee, .animate-marquee-reverse, .dive-light, .dive-rays, .pulse-tip, .scroll-cue-arrow),
 :root[data-low-power] :is(.scroll-cue, .pipeline-line)::after {
   animation: none;
 }
@@ -398,6 +398,32 @@ body:has(.nav-bar[data-tucked="true"]) .below-nav {
 @keyframes dive-rays {
   from { transform: skewX(-4deg); }
   to { transform: skewX(4deg); }
+}
+
+/* PMG: a calm clinic. A sage wash in PMG's greens, and a faint ECG-paper grid (big and small squares)
+   that shows near the top and fades away down the page */
+.pulse-ground {
+  background:
+    radial-gradient(70% 45% at 78% 0%, rgb(78 127 122 / 0.3), transparent 70%),
+    radial-gradient(55% 45% at 0% 100%, rgb(36 65 62 / 0.45), transparent 70%),
+    linear-gradient(to bottom, #0c1514, #0a0d0d);
+}
+.pulse-grid {
+  background-image:
+    linear-gradient(rgb(92 199 141 / 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(92 199 141 / 0.08) 1px, transparent 1px),
+    linear-gradient(rgb(92 199 141 / 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(92 199 141 / 0.035) 1px, transparent 1px);
+  background-size: 120px 120px, 120px 120px, 24px 24px, 24px 24px;
+  mask-image: radial-gradient(85% 65% at 65% 0%, #000, transparent 75%);
+}
+/* The trace's tip beats at the live heart rate (--beat is one beat's length) */
+.pulse-tip {
+  animation: pulse-beat var(--beat, 0.88s) ease-out infinite;
+}
+@keyframes pulse-beat {
+  0% { scale: 1.7; }
+  35%, 100% { scale: 1; }
 }
 
 /* Mobile menu: colour sheets wipe in along a "/" edge (the logo's slash), the panel lands last.
