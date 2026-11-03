@@ -1,25 +1,44 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { PROJECTS } from "@/content/site";
+import { lowPower } from "@/lib/motion";
 import { ProjectCard } from "./work/ProjectCard";
 
-// A fixed pool of cards, wrapped around the screen as the grid moves, so it never ends.
-// Tile (i, j) shows TILES[(i + 2j) % n], so side-by-side and stacked cards always differ.
-// The pool is sized so the cards that meet across each wrap differ too, whatever n is.
+// A pool of cards, wrapped around the screen as the wall moves, so it never ends. Tile (i, j) shows
+// TILES[(i + 2j) % n], so side-by-side and stacked cards always differ, and the pool is sized so the
+// cards that meet across each wrap differ too.
 const TILES = PROJECTS;
 const STEP = 2;
 const fits = (count: number, step: number) => ((count - 1) * step) % TILES.length !== 0;
-const COLS = [8, 10, 12].find((c) => fits(c, 1)) ?? 8; // even, so the half-card column offset lines up
-const ROWS = [7, 8, 9, 10].find((r) => fits(r, STEP)) ?? 7;
 const DRIFT = { x: -14, y: -9 }; // px per second when left alone
+const ZOOM_SLACK = 1.07; // a drag zooms the wall out to 0.94, which shows a little more of it
 const mod = (n: number, m: number) => ((n % m) + m) % m;
 
 /**
+ * Just enough tiles to cover the screen, with a spare row and column to wrap round out of sight.
+ * Columns are even, so the half-card offset of every other column lines up across the wrap.
+ */
+function poolFor(width: number, height: number, cell: { w: number; h: number }) {
+  let cols = Math.ceil((width * ZOOM_SLACK) / cell.w) + 1;
+  if (cols % 2) cols++;
+  while (!fits(cols, 1)) cols += 2;
+  // Odd columns sit half a card lower, so they need half a card more
+  let rows = Math.ceil((height * ZOOM_SLACK) / cell.h + 1.5);
+  while (!fits(rows, STEP)) rows++;
+  return { cols, rows };
+}
+
+/**
  * Selected work as an endless wall of cards filling the screen. It drifts on its own; drag to
- * fling it around (it eases back out of a slight zoom when you let go). Scrolling the page past
- * it nudges it along too (not with reduced motion). On touch screens, sideways swipes move the grid
+ * fling it around (it eases out of a slight zoom when you let go). Scrolling the page past it
+ * nudges it along too (not with reduced motion). On touch screens, sideways swipes move the grid
  * and vertical ones still scroll the page.
+ *
+ * Built to stay smooth: the whole wall moves as one layer by less than a card each frame, and a
+ * card is only repositioned when it wraps from one edge to the other, so a frame costs one
+ * transform. The zoom is a CSS transition the compositor runs, and nothing on the moving cards
+ * blurs what's behind it.
  */
 export default function Work({
   as: Heading = "h2",
@@ -44,19 +63,25 @@ export default function Work({
   const sectionRef = useRef<HTMLElement>(null);
   const planeRef = useRef<HTMLDivElement>(null);
   const tileRefs = useRef<(HTMLDivElement | null)[]>([]);
+  // Sized for a laptop until the first measure; a phone or a big screen adjusts it
+  const [pool, setPool] = useState({ cols: 6, rows: 4 });
 
   useEffect(() => {
     const section = sectionRef.current;
     const plane = planeRef.current;
     if (!section || !plane) return;
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const tiles = tileRefs.current;
+    // Without a GPU every moving frame is drawn in software, so the wall holds still until it's dragged
+    const still = reduced || lowPower();
+    const tiles = tileRefs.current.slice(0, pool.cols * pool.rows);
+    const { cols, rows } = pool;
 
     const offset = { x: 0, y: 0 };
     const velocity = { x: 0, y: 0 };
     const cell = { w: 1, h: 1 };
     const drag = { active: false, id: -1, x: 0, y: 0, moved: 0, lastT: 0 };
-    let zoom = 1;
+    // Which whole cards the wall has moved by, so tiles are only placed again when that changes
+    let placed = "";
     // The scroll position is kept by a scroll listener (and taken fresh in measure, which runs from the
     // ResizeObserver after layout), so the frame loop only writes and never forces a reflow
     let scroll = 0;
@@ -71,26 +96,42 @@ export default function Work({
       const gap = parseFloat(getComputedStyle(plane).getPropertyValue("--gap")) || 0;
       cell.w = first.offsetWidth + gap;
       cell.h = first.offsetHeight + gap;
+      const need = poolFor(section.clientWidth, section.clientHeight, cell);
+      if (need.cols !== cols || need.rows !== rows) {
+        // A different screen needs a different pool; the effect runs again with it
+        setPool(need);
+        return;
+      }
       // Start with a card's centre roughly in the middle of the screen
       offset.x = section.clientWidth / 2 - cell.w * 1.5;
       offset.y = section.clientHeight / 2 - cell.h * 1.5;
       scroll = lastScroll = window.scrollY;
+      placed = "";
       place();
     };
 
     const place = () => {
-      const width = COLS * cell.w;
-      const height = ROWS * cell.h;
-      tiles.forEach((tile, k) => {
-        if (!tile) return;
-        const i = k % COLS;
-        const j = Math.floor(k / COLS);
-        // Every other column sits half a card lower
-        const x = mod(i * cell.w + offset.x, width) - cell.w;
-        const y = mod(j * cell.h + offset.y + (i % 2) * cell.h * 0.5, height) - cell.h;
-        tile.style.transform = `translate3d(${x}px, ${y}px, 0)`;
-      });
-      plane.style.transform = `scale(${zoom})`;
+      // The offset in whole cards (qx, qy) and what's left over (rx, ry): the plane moves by the
+      // remainder, and the tiles only move when a whole card has gone by
+      const qx = Math.floor(offset.x / cell.w);
+      const qy = Math.floor(offset.y / cell.h);
+      const rx = offset.x - qx * cell.w;
+      const ry = offset.y - qy * cell.h;
+      // Every other column sits half a card lower, so its own count turns over half a card later
+      const half = ry >= cell.h / 2 ? 1 : 0;
+      const key = `${qx},${qy},${half}`;
+      if (key !== placed) {
+        placed = key;
+        tiles.forEach((tile, k) => {
+          if (!tile) return;
+          const i = k % cols;
+          const j = Math.floor(k / cols);
+          const x = mod(i + qx, cols) * cell.w - cell.w;
+          const y = i % 2 ? mod(j + qy + half, rows) * cell.h - cell.h + cell.h / 2 - half * cell.h : mod(j + qy, rows) * cell.h - cell.h;
+          tile.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+        });
+      }
+      plane.style.transform = `translate3d(${rx}px, ${ry}px, 0)`;
     };
 
     const tick = (now: number) => {
@@ -99,14 +140,13 @@ export default function Work({
       if (!drag.active) {
         // Let go: the fling decays back into the idle drift
         const ease = 1 - Math.exp(-dt * 2.2);
-        velocity.x += ((reduced ? 0 : DRIFT.x) - velocity.x) * ease;
-        velocity.y += ((reduced ? 0 : DRIFT.y) - velocity.y) * ease;
+        velocity.x += ((still ? 0 : DRIFT.x) - velocity.x) * ease;
+        velocity.y += ((still ? 0 : DRIFT.y) - velocity.y) * ease;
         offset.x += velocity.x * dt;
         // Scrolling past nudges the wall along, unless motion is reduced
         offset.y += velocity.y * dt - (reduced ? 0 : (scroll - lastScroll) * 0.35);
       }
       lastScroll = scroll;
-      zoom += ((drag.active && drag.moved > 6 ? 0.93 : 1) - zoom) * (1 - Math.exp(-dt * 8));
       place();
       if (visible) frame = requestAnimationFrame(tick);
     };
@@ -128,7 +168,11 @@ export default function Work({
       const now = performance.now();
       const dt = Math.max((now - drag.lastT) / 1000, 1 / 240);
       drag.moved += Math.abs(dx) + Math.abs(dy);
-      if (drag.moved > 6 && !section.hasPointerCapture(e.pointerId)) section.setPointerCapture(e.pointerId);
+      if (drag.moved > 6 && !section.hasPointerCapture(e.pointerId)) {
+        section.setPointerCapture(e.pointerId);
+        // Zooms the wall out a touch (a CSS transition) and stops cards reacting to the pointer mid-drag
+        section.dataset.dragging = "";
+      }
       offset.x += dx;
       offset.y += dy;
       velocity.x = velocity.x * 0.6 + (dx / dt) * 0.4;
@@ -139,6 +183,7 @@ export default function Work({
     const onUp = (e: PointerEvent) => {
       if (e.pointerId !== drag.id) return;
       drag.active = false;
+      delete section.dataset.dragging;
       if (reduced) place();
     };
     // A drag shouldn't also count as a click on whatever card it started on
@@ -180,14 +225,16 @@ export default function Work({
       window.removeEventListener("pointercancel", onUp);
       section.removeEventListener("click", onClick, true);
     };
-  }, []);
+  }, [pool]);
 
+  // The first copy of each project; on the work page those covers are what's seen first (one is the LCP)
+  const firstOf = new Set<number>();
   return (
     <section
       id="work"
       ref={sectionRef}
       aria-labelledby="work-title"
-      className="relative h-[100svh] cursor-grab touch-pan-y overflow-hidden select-none active:cursor-grabbing"
+      className="wall relative h-[100svh] cursor-grab touch-pan-y overflow-hidden select-none active:cursor-grabbing"
     >
       {/* The real list, for screen readers; the wall below is decoration made of copies */}
       {listedBelow ? null : (
@@ -200,29 +247,32 @@ export default function Work({
         </ul>
       )}
 
-      <div
-        ref={planeRef}
-        aria-hidden
-        className="absolute inset-0 origin-center will-change-transform [--card-w:78vw] [--gap:20px] md:[--card-w:clamp(320px,28vw,520px)] md:[--gap:32px]"
-      >
-        {Array.from({ length: COLS * ROWS }, (_, k) => {
-          const i = k % COLS;
-          const j = Math.floor(k / COLS);
-          const tile = TILES[(i + j * STEP) % TILES.length];
-          return (
-            <div
-              key={k}
-              ref={(el) => {
-                tileRefs.current[k] = el;
-              }}
-              className="absolute top-0 left-0 w-[var(--card-w)] will-change-transform"
-            >
-              {/* Opening the page, the wall's covers are what's seen first (one is the LCP): the first copy of
-                  each fetches straight away at high priority, and the rest reuse it */}
-              <ProjectCard project={tile} decorative eager={Heading === "h1" && k < TILES.length} />
-            </div>
-          );
-        })}
+      {/* The zoom while dragging is a CSS transition on this wrapper; the plane inside moves every frame */}
+      <div aria-hidden className="wall-zoom absolute inset-0 origin-center">
+        <div
+          ref={planeRef}
+          className="wall-plane absolute inset-0 will-change-transform [--card-w:78vw] [--gap:20px] md:[--card-w:clamp(320px,28vw,520px)] md:[--gap:32px]"
+        >
+          {Array.from({ length: pool.cols * pool.rows }, (_, k) => {
+            const i = k % pool.cols;
+            const j = Math.floor(k / pool.cols);
+            const index = (i + j * STEP) % TILES.length;
+            const first = !firstOf.has(index);
+            firstOf.add(index);
+            return (
+              <div
+                key={k}
+                ref={(el) => {
+                  tileRefs.current[k] = el;
+                }}
+                className="absolute top-0 left-0 w-[var(--card-w)]"
+              >
+                {/* Opening the page, the first copy of each cover fetches straight away at high priority, and the rest reuse it */}
+                <ProjectCard project={TILES[index]} decorative eager={Heading === "h1" && first} />
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       {/* Top and bottom edges fade into the page */}
@@ -250,10 +300,10 @@ export default function Work({
       ) : null}
       <header className="pointer-events-none absolute inset-x-0 top-0 flex flex-col items-start gap-3 px-4 pt-24 md:flex-row md:items-start md:justify-between md:px-10 md:pt-28">
         <div className="flex flex-col items-start gap-3">
-          {/* A pane of frosted glass so the title stays readable over whatever slides beneath */}
+          {/* A pane of frosted glass so the title stays readable over whatever slides beneath (a light blur: it's redone every frame the wall moves) */}
           <Heading
             id="work-title"
-            className="rounded-[28px] bg-bg/55 px-5 py-4 font-display text-5xl leading-[0.9] font-bold tracking-[-0.04em] uppercase backdrop-blur-xl md:px-7 md:py-6 md:text-7xl"
+            className="rounded-[28px] bg-bg/65 px-5 py-4 font-display text-5xl leading-[0.9] font-bold tracking-[-0.04em] uppercase backdrop-blur-md md:px-7 md:py-6 md:text-7xl"
           >
             {title[0]}
             <br />
@@ -261,7 +311,7 @@ export default function Work({
           </Heading>
           {action}
         </div>
-        <p className="flex items-center gap-2 rounded-full border border-line bg-bg/60 px-4 py-2 text-xs font-semibold text-muted backdrop-blur-md md:text-sm">
+        <p className="flex items-center gap-2 rounded-full bg-bg/80 px-4 py-2 text-xs font-semibold text-muted md:text-sm">
           <span aria-hidden className="text-ink">
             ✥
           </span>

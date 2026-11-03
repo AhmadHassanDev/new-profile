@@ -101,8 +101,13 @@ export function ProjectCard({
         </div>
       ) : null}
       {href ? null : (
-        // Last in the markup so it's read after the name, but it sits on the cover's corner
-        <p className="absolute top-3 left-3 rounded-full bg-surface/70 px-3 py-1.5 text-xs font-semibold text-ink backdrop-blur-md md:top-4 md:left-4">
+        // Last in the markup so it's read after the name, but it sits on the cover's corner. On the moving
+        // wall it's solid: a blur there would be redone for every badge on every frame.
+        <p
+          className={`absolute top-3 left-3 rounded-full px-3 py-1.5 text-xs font-semibold text-ink md:top-4 md:left-4 ${
+            decorative ? "bg-surface/90" : "bg-surface/70 backdrop-blur-md"
+          }`}
+        >
           Case study soon
         </p>
       )}

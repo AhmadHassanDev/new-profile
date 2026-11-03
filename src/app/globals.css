@@ -657,6 +657,23 @@ html.lenis body {
   }
 }
 
+/* The work wall: grabbing it zooms it out a touch. A transition the compositor runs (no repainting the
+   cards at every step of the zoom), and cards don't react to the pointer passing over them mid-drag. */
+.wall-zoom {
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.wall[data-dragging] .wall-zoom {
+  transform: scale(0.94);
+}
+.wall[data-dragging] .wall-plane {
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .wall-zoom {
+    transition: none;
+  }
+}
+
 /* Case study screens: hovering a browser window scrolls the page inside it from top to bottom */
 .screen-window {
   container-type: size;
