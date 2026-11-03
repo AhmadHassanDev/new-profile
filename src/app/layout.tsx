@@ -33,8 +33,15 @@ export const metadata: Metadata = {
     follow: true,
     googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1, "max-video-preview": -1 },
   },
-  // Setting icons here turns off the file-based apple-icon, so it's named alongside the favicon
-  icons: { icon: "/logo.svg", apple: { url: "/apple-icon", sizes: "180x180", type: "image/png" } },
+  // Setting icons here turns off the file-based icons, so each is named: the square PNG first (the one
+  // Google uses in search results), the logo as an SVG for browser tabs, and the iOS home-screen icon
+  icons: {
+    icon: [
+      { url: "/icon", sizes: "192x192", type: "image/png" },
+      { url: "/logo.svg", type: "image/svg+xml" },
+    ],
+    apple: { url: "/apple-icon", sizes: "180x180", type: "image/png" },
+  },
   // Keep iOS from turning the phone number and email into its own blue links
   formatDetection: { telephone: false, email: false, address: false },
 };
