@@ -93,7 +93,7 @@ const ALL_PROJECTS: Project[] = [
 ];
 
 // A project goes live once it has a cover; until then it stays out of every grid and list
-export const PROJECTS = ALL_PROJECTS.filter((p) => p.cover);
+export const PROJECTS = ALL_PROJECTS.filter((p): p is Project & { cover: string } => !!p.cover);
 
 /** "Mobile app · Fintech" → "Mobile app" */
 export const typeOf = (kind: string) => kind.split(" · ")[0];

@@ -22,6 +22,9 @@ export default function DiveSignature() {
     let target = 0;
     let shown = 0;
     let frame = 0;
+    // How far the page scrolls, measured only when its size changes (from a ResizeObserver, after layout),
+    // so a scroll reads just scrollY and never forces a reflow
+    let scrollable = 0;
 
     const paint = () => {
       water.style.setProperty("--depth", shown.toFixed(4));
@@ -35,7 +38,6 @@ export default function DiveSignature() {
       frame = Math.abs(target - shown) > 0.0005 ? requestAnimationFrame(tick) : 0;
     };
     const onScroll = () => {
-      const scrollable = document.documentElement.scrollHeight - window.innerHeight;
       target = scrollable > 0 ? Math.min(1, Math.max(0, window.scrollY / scrollable)) : 0;
       if (reduced) {
         shown = target;
@@ -43,13 +45,21 @@ export default function DiveSignature() {
       } else if (!frame) frame = requestAnimationFrame(tick);
     };
 
-    onScroll();
+    const measure = () => {
+      scrollable = document.documentElement.scrollHeight - window.innerHeight;
+      onScroll();
+    };
+
+    // The page grows as images load and blocks stream in; its first callback is the initial reading
+    const resize = new ResizeObserver(measure);
+    resize.observe(document.body);
     window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
+    window.addEventListener("resize", measure); // the viewport's height alone doesn't resize the body
     return () => {
       cancelAnimationFrame(frame);
+      resize.disconnect();
       window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
+      window.removeEventListener("resize", measure);
     };
   }, []);
 
@@ -70,7 +80,7 @@ export default function DiveSignature() {
               className="absolute right-0 flex -translate-y-1/2 items-center gap-2"
               style={{ top: `${(m / MAX_DEPTH) * 100}%` }}
             >
-              <span className="font-display text-[10px] font-semibold text-muted/70">{m}</span>
+              <span className="font-display text-[10px] font-semibold text-ink/60">{m}</span>
               <span className="h-px w-2 bg-line" />
             </span>
           ))}

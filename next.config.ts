@@ -4,8 +4,14 @@ const nextConfig: NextConfig = {
   /* config options here */
   cacheComponents: true,
   images: {
-    // Covers rarely change: keep the resized WebPs cached for a month
+    // AVIF where the browser takes it (about a quarter smaller than WebP), WebP everywhere else
+    formats: ["image/avif", "image/webp"],
+    // Covers rarely change: keep the resized images cached for a month
     minimumCacheTTL: 2678400,
+  },
+  experimental: {
+    // The Tailwind CSS is small, so it ships inside the page: the first paint doesn't wait on a stylesheet
+    inlineCss: true,
   },
   partialPrefetching: true,
   turbopack: {

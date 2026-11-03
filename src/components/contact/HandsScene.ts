@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { damp } from "@/lib/math";
 
 /**
  * Two hands of glowing particles reaching for each other, index fingers almost touching, with a
@@ -155,7 +156,6 @@ const ringFragment = /* glsl */ `
   }
 `;
 
-const damp = (from: number, to: number, rate: number, dt: number) => from + (to - from) * (1 - Math.exp(-rate * dt));
 
 export class HandsScene {
   private renderer: THREE.WebGLRenderer;
@@ -168,6 +168,7 @@ export class HandsScene {
   private dust: THREE.Points<THREE.BufferGeometry, THREE.ShaderMaterial>;
   private timer = new THREE.Timer();
   private running = false;
+  private warm?: Promise<unknown>;
 
   private time = 0;
   private intro = 0;
@@ -349,10 +350,15 @@ export class HandsScene {
   start() {
     if (this.running) return;
     this.running = true;
-    this.timer.reset();
-    this.renderer.setAnimationLoop((t) => {
-      this.timer.update(t);
-      this.render(Math.min(this.timer.getDelta(), 0.05));
+    // Shaders compile in the background first (where the browser can), so the first frame doesn't stall the page
+    this.warm ??= this.renderer.compileAsync(this.scene, this.camera);
+    this.warm.then(() => {
+      if (!this.running) return;
+      this.timer.reset();
+      this.renderer.setAnimationLoop((t) => {
+        this.timer.update(t);
+        this.render(Math.min(this.timer.getDelta(), 0.05));
+      });
     });
   }
 

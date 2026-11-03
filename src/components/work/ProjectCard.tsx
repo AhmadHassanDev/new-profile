@@ -24,49 +24,63 @@ function Caption({ title, detail, children }: { title: string; detail: string; c
   );
 }
 
+// Each cover is fetched at the width it's actually drawn, so phones never pull a desktop-sized file.
+// Wall: the tile's --card-w in Work.tsx (78vw, then clamp(320px, 28vw, 520px) from md). Grid: the
+// one/two/three-column lists (px-4/md:px-10 gutters, gap-x-6), on the work page and under a case study.
+const SIZES = {
+  wall: "(min-width: 1857px) 520px, (min-width: 1143px) 28vw, (min-width: 768px) 320px, 78vw",
+  grid: "(min-width: 1280px) calc((100vw - 128px) / 3), (min-width: 768px) calc((100vw - 104px) / 2), (min-width: 640px) calc((100vw - 56px) / 2), calc(100vw - 32px)",
+};
+
 /**
  * `full` adds the summary and discipline names, for the browsable list on the work page. Projects
- * with a case study link to it; `decorative` keeps copies (in the drag grids) out of the tab order.
+ * with a case study link to it; the rest say a case study is coming, on the card itself so touch,
+ * keyboard and screen-reader visitors get it too. `decorative` marks the copies in the drag wall: out
+ * of the tab order and sized for the wall's tiles. `eager` is for covers seen on arrival (the LCP).
  */
-export function ProjectCard({ project, full = false, decorative = false }: { project: Project; full?: boolean; decorative?: boolean }) {
-  const [first, second = first] = project.disciplines.map((d) => DISCIPLINE_COLOR[d]);
+export function ProjectCard({
+  project,
+  full = false,
+  decorative = false,
+  eager = false,
+}: {
+  project: Project;
+  full?: boolean;
+  decorative?: boolean;
+  eager?: boolean;
+}) {
   const href = caseFor(project.slug) ? `/work/${project.slug}` : undefined;
   const card = (
-    <article data-cursor={href ? "View" : "Case study soon"} data-cursor-style={href ? undefined : "orbit"} className="group w-full transition-transform duration-500 ease-out hover:-translate-y-1.5">
+    <article
+      data-cursor={href ? "View" : "Case study soon"}
+      data-cursor-style={href ? undefined : "orbit"}
+      className="group relative w-full transition-transform duration-500 ease-out hover:-translate-y-1.5"
+    >
       <div
         className="relative overflow-hidden rounded-[22px] bg-surface transition-shadow duration-500 group-hover:shadow-[0_30px_60px_-20px_rgb(0_0_0/0.8)]"
         style={FRAME}
       >
-        {project.cover ? (
-          <Image
-            src={project.cover}
-            alt=""
-            fill
-            draggable={false}
-            // Matches the card's width in the grid and in the list, so phones get small files
-            sizes={full ? "(min-width: 1280px) 30vw, (min-width: 640px) 46vw, 92vw" : "(min-width: 768px) 28vw, 78vw"}
-            placeholder={previewOf(project.cover) ? "blur" : "empty"}
-            blurDataURL={previewOf(project.cover)}
-            className="pointer-events-none object-cover"
-          />
-        ) : (
-          // No cover yet: the project's colours and its name, in the same frame
-          <div
-            className="absolute inset-0 grid place-items-center p-6"
-            style={{
-              background: `radial-gradient(70% 80% at 0% 100%, color-mix(in srgb, ${first} 45%, transparent), transparent 70%), radial-gradient(60% 70% at 100% 0%, color-mix(in srgb, ${second} 30%, transparent), transparent 70%)`,
-            }}
-          >
-            <span className="text-center font-display text-[clamp(1.75rem,3vw,3rem)] leading-[0.9] font-bold tracking-[-0.05em] uppercase">
-              {project.name}
-            </span>
-          </div>
-        )}
+        {/* Every listed project has a cover (PROJECTS only keeps those), so there's no fallback to draw */}
+        <Image
+          src={project.cover!}
+          alt=""
+          fill
+          draggable={false}
+          sizes={decorative ? SIZES.wall : SIZES.grid}
+          loading={eager ? "eager" : undefined}
+          fetchPriority={eager ? "high" : undefined}
+          placeholder={previewOf(project.cover!) ? "blur" : "empty"}
+          blurDataURL={previewOf(project.cover!)}
+          className="pointer-events-none object-cover"
+        />
       </div>
       <Caption title={project.name} detail={`${project.kind} · ${project.year}`}>
-        <ul className="flex shrink-0 gap-1 pt-1.5" aria-label="Disciplines">
+        {/* With `full` the names are spelled out below, so the dots are only for the eye there */}
+        <ul className="flex shrink-0 gap-1 pt-1.5" aria-label="Disciplines" aria-hidden={full || undefined}>
           {project.disciplines.map((d) => (
-            <li key={d} title={d} className="size-2.5 rounded-full" style={{ background: DISCIPLINE_COLOR[d] }} />
+            <li key={d} title={d} className="size-2.5 rounded-full" style={{ background: DISCIPLINE_COLOR[d] }}>
+              <span className="sr-only">{d}</span>
+            </li>
           ))}
         </ul>
       </Caption>
@@ -86,6 +100,12 @@ export function ProjectCard({ project, full = false, decorative = false }: { pro
           </ul>
         </div>
       ) : null}
+      {href ? null : (
+        // Last in the markup so it's read after the name, but it sits on the cover's corner
+        <p className="absolute top-3 left-3 rounded-full bg-surface/70 px-3 py-1.5 text-xs font-semibold text-ink backdrop-blur-md md:top-4 md:left-4">
+          Case study soon
+        </p>
+      )}
     </article>
   );
   return href ? (

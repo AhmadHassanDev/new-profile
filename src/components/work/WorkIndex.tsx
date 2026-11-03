@@ -27,6 +27,7 @@ function fromUrl(search: string): Filters {
   };
 }
 
+/** A filter toggle (`active` set) or, without `active`, a plain action button that isn't announced as a toggle. */
 function Pill({
   active,
   onClick,
@@ -34,7 +35,7 @@ function Pill({
   count,
   children,
 }: {
-  active: boolean;
+  active?: boolean;
   onClick: () => void;
   color?: string;
   count?: number;
@@ -51,7 +52,7 @@ function Pill({
     >
       {color ? <span aria-hidden className="size-2 rounded-full" style={{ background: color }} /> : null}
       {children}
-      {count !== undefined ? <span className={active ? "text-bg/60" : "text-muted/70"}>{count}</span> : null}
+      {count !== undefined ? <span className={active ? "text-bg/60" : "text-muted"}>{count}</span> : null}
     </button>
   );
 }
@@ -161,8 +162,9 @@ export default function WorkIndex() {
             <Select label="Year" value={filters.year} options={YEARS} onChange={(year) => set({ year })} />
           </Group>
           <Group label="Sort">
-            <Pill active={false} onClick={() => set({ newest: !filters.newest })}>
-              {filters.newest ? "Newest first ↓" : "Oldest first ↑"}
+            <Pill onClick={() => set({ newest: !filters.newest })}>
+              {filters.newest ? "Newest first" : "Oldest first"}
+              <span aria-hidden>{filters.newest ? "↓" : "↑"}</span>
             </Pill>
           </Group>
           <button
@@ -171,7 +173,7 @@ export default function WorkIndex() {
             disabled={!filtering}
             className="ml-auto shrink-0 rounded-full px-4 py-2 text-sm font-semibold whitespace-nowrap text-ink transition-opacity duration-300 disabled:pointer-events-none disabled:opacity-0"
           >
-            Clear ✕
+            Clear <span aria-hidden>✕</span>
           </button>
         </div>
       </div>

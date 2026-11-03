@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { createParticleMorph } from "./objects/particleMorph";
 import type { Frame, HeroObject } from "./objects/types";
 import { haloFragment, haloVertex } from "./shaders";
+import { damp } from "@/lib/math";
 
 const rgb = (hex: string) => {
   const c = new THREE.Color(hex);
@@ -15,7 +16,6 @@ const PALETTE = {
   uCoral: { value: rgb("#f64f59") },
 };
 
-const damp = (from: number, to: number, rate: number, dt: number) => from + (to - from) * (1 - Math.exp(-rate * dt));
 
 /**
  * The hero visual: the particle formations (see ./objects/particleMorph) over a soft halo.
@@ -41,6 +41,7 @@ export class SpectrumScene {
   private layout = { u: 0.45, v: -0.04, rho: 0.8 };
   private zone: { x: number; y: number; w: number; h: number } | null = null;
   private running = false;
+  private warm?: Promise<unknown>;
 
   constructor(
     canvas: HTMLCanvasElement,
@@ -150,10 +151,15 @@ export class SpectrumScene {
       return;
     }
     this.running = true;
-    this.timer.reset();
-    this.renderer.setAnimationLoop((t) => {
-      this.timer.update(t);
-      this.render(Math.min(this.timer.getDelta(), 0.05));
+    // Shaders compile in the background first (where the browser can), so the first frame doesn't stall the page
+    this.warm ??= this.renderer.compileAsync(this.scene, this.camera);
+    this.warm.then(() => {
+      if (!this.running) return;
+      this.timer.reset();
+      this.renderer.setAnimationLoop((t) => {
+        this.timer.update(t);
+        this.render(Math.min(this.timer.getDelta(), 0.05));
+      });
     });
   }
 

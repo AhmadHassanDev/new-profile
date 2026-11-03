@@ -44,7 +44,7 @@ export default function ScrollWords({ segments, className = "" }: { segments: Se
   return (
     <p ref={ref} className={className} style={{ "--n": words.length } as React.CSSProperties}>
       {words.map(({ word, color }, i) => (
-        <span key={i} className="scroll-word" style={{ "--i": i, color } as React.CSSProperties}>
+        <span key={i} className="scroll-word" style={{ "--i": i, "--word": color } as React.CSSProperties}>
           {word}{" "}
         </span>
       ))}

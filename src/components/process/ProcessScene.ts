@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
+import { clamp01, damp, smoothstep } from "@/lib/math";
 
 /**
  * The process, acted out by the pieces of a web page as you scroll. Every piece is a slab of
@@ -67,13 +68,7 @@ const STAGES = {
   ship: [0.84, 0.96],
 } as const;
 
-const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
-const smooth = (a: number, b: number, x: number) => {
-  const t = clamp01((x - a) / (b - a));
-  return t * t * (3 - 2 * t);
-};
 const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
-const damp = (from: number, to: number, rate: number, dt: number) => from + (to - from) * (1 - Math.exp(-rate * dt));
 const mix = (a: number, b: number, t: number) => a + (b - a) * t;
 
 function roundedRect(w: number, h: number, r: number) {
@@ -177,6 +172,7 @@ export class ProcessScene {
   private smoothPointer = new THREE.Vector2();
   private time = 0;
   private running = false;
+  private warm?: Promise<unknown>;
   private fit = { scale: 1 };
 
   // Scratch objects reused every frame
@@ -380,10 +376,15 @@ export class ProcessScene {
   start() {
     if (this.running) return;
     this.running = true;
-    this.timer.reset();
-    this.renderer.setAnimationLoop((t) => {
-      this.timer.update(t);
-      this.render(Math.min(this.timer.getDelta(), 0.05));
+    // Shaders compile in the background first (where the browser can), so the first frame doesn't stall the page
+    this.warm ??= this.renderer.compileAsync(this.scene, this.camera);
+    this.warm.then(() => {
+      if (!this.running) return;
+      this.timer.reset();
+      this.renderer.setAnimationLoop((t) => {
+        this.timer.update(t);
+        this.render(Math.min(this.timer.getDelta(), 0.05));
+      });
     });
   }
 
@@ -400,10 +401,10 @@ export class ProcessScene {
     const p = this.progress;
     const t = this.time;
 
-    const research = smooth(STAGES.research[0], STAGES.research[1], p);
-    const design = smooth(STAGES.design[0], STAGES.design[1], p);
-    const build = smooth(STAGES.build[0], STAGES.build[1], p);
-    const ship = smooth(STAGES.ship[0], STAGES.ship[1], p);
+    const research = smoothstep(STAGES.research[0], STAGES.research[1], p);
+    const design = smoothstep(STAGES.design[0], STAGES.design[1], p);
+    const build = smoothstep(STAGES.build[0], STAGES.build[1], p);
+    const ship = smoothstep(STAGES.ship[0], STAGES.ship[1], p);
     // Pieces move in a ripple rather than all at once
     const stagger = (stage: number, seed: number) => ease(clamp01((stage - seed * 0.3) / 0.7));
 

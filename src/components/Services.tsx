@@ -22,11 +22,6 @@ const FAN = [
   { rotate: 6, x: 24, y: 22 },
 ];
 
-/**
- * What Ahmed does, as a list of giant rows. Hovering one wipes its title into the spectrum and
- * floats that service's project covers beside the cursor, leaning into the way it moves. Each
- * row opens the work page filtered to it (or contact, for a service with nothing published yet).
- */
 /** Stand-in for branding work: Ahmed's own mark on frosted glass. */
 function BrandCard() {
   return (
@@ -41,36 +36,66 @@ function BrandCard() {
   );
 }
 
+/**
+ * What Ahmed does, as a list of giant rows. Hovering one wipes its title into the spectrum and
+ * floats that service's project covers beside the cursor, leaning into the way it moves. Each
+ * row opens the work page filtered to it (or contact, for a service with nothing published yet).
+ */
 export default function Services() {
   const [active, setActive] = useState<number | null>(null);
+  const sectionRef = useRef<HTMLElement>(null);
   const previewRef = useRef<HTMLDivElement>(null);
-  const target = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
+    const section = sectionRef.current;
     const preview = previewRef.current;
-    if (!preview || !window.matchMedia("(pointer: fine)").matches) return;
-    const pos = { x: target.current.x, y: target.current.y };
+    if (!section || !preview || !window.matchMedia("(pointer: fine)").matches) return;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const target = { x: 0, y: 0 };
+    const pos = { x: 0, y: 0 };
     let frame = 0;
+    const place = (lean: number) =>
+      (preview.style.transform = `translate3d(${pos.x}px, ${pos.y}px, 0) translate(-50%, -50%) rotate(${lean}deg)`);
+    // Only runs while the preview is still catching up with the cursor; stops once it's at rest
     const tick = () => {
-      const dx = target.current.x - pos.x;
+      const dx = target.x - pos.x;
+      const dy = target.y - pos.y;
+      if (Math.abs(dx) < 0.1 && Math.abs(dy) < 0.1) {
+        Object.assign(pos, target);
+        place(0);
+        frame = 0;
+        return;
+      }
       pos.x += dx * 0.14;
-      pos.y += (target.current.y - pos.y) * 0.14;
-      const lean = Math.max(-12, Math.min(12, dx * 0.08));
-      preview.style.transform = `translate3d(${pos.x}px, ${pos.y}px, 0) translate(-50%, -50%) rotate(${lean}deg)`;
+      pos.y += dy * 0.14;
+      place(Math.max(-12, Math.min(12, dx * 0.08)));
       frame = requestAnimationFrame(tick);
     };
-    frame = requestAnimationFrame(tick);
-    // Sits just right of the cursor, so the title being pointed at stays readable
-    const onMove = (e: PointerEvent) => (target.current = { x: e.clientX + 210, y: e.clientY - 20 });
-    window.addEventListener("pointermove", onMove);
+    // Sits just right of the cursor, so the title being pointed at stays readable. Reduced motion: no trail, no lean.
+    const onMove = (e: PointerEvent) => {
+      Object.assign(target, { x: e.clientX + 210, y: e.clientY - 20 });
+      if (reduced) {
+        Object.assign(pos, target);
+        place(0);
+      } else if (!frame) frame = requestAnimationFrame(tick);
+    };
+    // Follow the pointer only while the section is on screen
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) return window.addEventListener("pointermove", onMove);
+      window.removeEventListener("pointermove", onMove);
+      cancelAnimationFrame(frame);
+      frame = 0;
+    });
+    observer.observe(section);
     return () => {
+      observer.disconnect();
       cancelAnimationFrame(frame);
       window.removeEventListener("pointermove", onMove);
     };
   }, []);
 
   return (
-    <section aria-labelledby="services-title" className="relative px-4 py-32 md:px-10 md:py-48">
+    <section ref={sectionRef} aria-labelledby="services-title" className="relative px-4 py-32 md:px-10 md:py-48">
       <div className="mb-12 flex flex-col gap-4 md:mb-16 md:flex-row md:items-end md:justify-between">
         <h2 id="services-title" className="font-display text-5xl leading-[0.9] font-bold tracking-[-0.04em] uppercase md:text-7xl">
           What I
@@ -115,8 +140,7 @@ export default function Services() {
       <div
         ref={previewRef}
         aria-hidden
-        data-active={active !== null}
-        className="service-preview pointer-events-none fixed top-0 left-0 z-40 hidden w-[300px] md:block lg:w-[360px]"
+        className="pointer-events-none fixed top-0 left-0 z-40 hidden w-[300px] md:block lg:w-[360px]"
       >
         {ROWS.map((row, i) =>
           row.contact ? (
@@ -130,7 +154,8 @@ export default function Services() {
             </div>
           ) : row.projects.slice(0, FAN.length).map((project, k) => {
             const fan = FAN[k];
-            return project.cover ? (
+            const cover = project.cover;
+            return (
               <div
                 key={`${row.title}-${project.slug}`}
                 data-show={active === i}
@@ -145,16 +170,16 @@ export default function Services() {
                 }
               >
                 <Image
-                  src={project.cover}
+                  src={cover}
                   alt=""
                   fill
                   sizes="360px"
-                  placeholder={previewOf(project.cover) ? "blur" : "empty"}
-                  blurDataURL={previewOf(project.cover)}
+                  placeholder={previewOf(cover) ? "blur" : "empty"}
+                  blurDataURL={previewOf(cover)}
                   className="object-cover"
                 />
               </div>
-            ) : null;
+            );
           }),
         )}
         {/* Sizes the box; the covers stack inside it */}

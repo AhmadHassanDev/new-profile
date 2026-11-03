@@ -37,11 +37,21 @@ export default function PassionCard({
     const { canvas, release } = freshCanvas(placeholder);
     let disposed = false;
     let resize: ResizeObserver | undefined;
+    let wait = 0;
     const near = new IntersectionObserver(
       ([entry]) => {
         if (!entry.isIntersecting) return;
         near.disconnect();
-        import("./PassionScene").then(({ PassionScene }) => {
+        // Each card builds its scene in a quiet moment, one after another, so the four don't stall a
+        // scroll by all starting at once
+        wait = window.setTimeout(() => import("./PassionScene").then(build), index * 160);
+      },
+      { rootMargin: "800px 0px" },
+    );
+    const build = ({ PassionScene }: typeof import("./PassionScene")) => {
+      const idle = window.requestIdleCallback ?? ((run: () => void) => window.setTimeout(run, 1));
+      idle(
+        () => {
           if (disposed) return;
           try {
             sceneRef.current = new PassionScene(canvas, object, window.matchMedia("(prefers-reduced-motion: reduce)").matches);
@@ -51,20 +61,21 @@ export default function PassionCard({
           sceneRef.current.show(activeRef.current);
           resize = new ResizeObserver(() => sceneRef.current?.resize());
           resize.observe(canvas);
-        });
-      },
-      { rootMargin: "400px 0px" },
-    );
+        },
+        { timeout: 600 },
+      );
+    };
     near.observe(card);
     return () => {
       disposed = true;
+      window.clearTimeout(wait);
       near.disconnect();
       resize?.disconnect();
       sceneRef.current?.dispose();
       sceneRef.current = null;
       release();
     };
-  }, [object]);
+  }, [object, index]);
 
   const toggle = (on: boolean) => {
     activeRef.current = on;
@@ -106,7 +117,7 @@ export default function PassionCard({
       <canvas
         ref={canvasRef}
         aria-hidden
-        className="pointer-events-none absolute -top-[26%] -right-[6%] z-10 aspect-square w-[64%] max-w-[300px] drop-shadow-[0_28px_28px_rgb(0_0_0/0.35)] md:-top-[30%]"
+        className="pointer-events-none absolute -top-[26%] -right-[6%] z-10 aspect-square w-[64%] max-w-[300px] md:drop-shadow-[0_28px_28px_rgb(0_0_0/0.35)] md:-top-[30%]"
       />
       <div className="relative flex items-center justify-between">
         <span className="font-display text-sm font-semibold text-[var(--c)] transition-colors duration-500 group-data-[active]:text-bg">

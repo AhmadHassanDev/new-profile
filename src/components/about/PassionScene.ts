@@ -286,7 +286,8 @@ export class PassionScene {
     this.pivot.visible = false;
     this.scene.add(this.pivot);
     this.resize();
-    this.renderer.compile(this.scene, this.camera);
+    // Compiled in the background (where the browser can), so neither building it nor its first hover stalls the page
+    void this.renderer.compileAsync(this.scene, this.camera);
   }
 
   resize() {

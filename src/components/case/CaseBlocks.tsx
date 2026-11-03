@@ -75,6 +75,7 @@ function Sources({ sources }: { sources?: Source[] }) {
           {i > 0 ? " · " : null}
           <a href={source.href} target="_blank" rel="noreferrer" className="underline decoration-line underline-offset-4 transition-colors hover:text-ink">
             {source.label}
+            <span className="sr-only"> (opens in a new tab)</span>
           </a>
         </span>
       ))}
@@ -188,7 +189,8 @@ function Feature({ text, src, alt }: { text: string; src: string; alt: string })
         className="relative overflow-hidden rounded-[24px] md:col-span-8"
         style={{ aspectRatio: `${COVER_WIDTH} / ${COVER_HEIGHT}` }}
       >
-        <Image src={src} alt={alt} fill sizes="(min-width: 768px) 62vw, 100vw" className="object-cover" />
+        {/* Eight of twelve columns inside the md:px-10 gutters (a touch generous where a signature narrows the page) */}
+        <Image src={src} alt={alt} fill sizes="(min-width: 768px) calc((100vw - 80px) * 2 / 3), calc(100vw - 32px)" className="object-cover" />
       </div>
     </section>
   );
@@ -199,7 +201,18 @@ function Picture({ src, alt, caption, full }: { src: string; alt: string; captio
   return (
     <figure className={`mx-auto px-4 py-8 md:px-10 md:py-12 ${full ? "max-w-[1400px]" : "max-w-[980px]"}`}>
       <div className="relative overflow-hidden rounded-[24px]" style={{ aspectRatio: `${COVER_WIDTH} / ${COVER_HEIGHT}` }}>
-        <Image src={src} alt={alt} fill sizes={full ? "(min-width: 1400px) 1400px, 100vw" : "(min-width: 980px) 980px, 100vw"} className="object-cover" />
+        <Image
+          src={src}
+          alt={alt}
+          fill
+          // The figure's max width less its own padding (px-4, md:px-10)
+          sizes={
+            full
+              ? "(min-width: 1400px) 1320px, (min-width: 768px) calc(100vw - 80px), calc(100vw - 32px)"
+              : "(min-width: 980px) 900px, (min-width: 768px) calc(100vw - 80px), calc(100vw - 32px)"
+          }
+          className="object-cover"
+        />
       </div>
       {caption ? <figcaption className="mt-4 px-2 text-sm text-muted">{caption}</figcaption> : null}
     </figure>
@@ -208,43 +221,52 @@ function Picture({ src, alt, caption, full }: { src: string; alt: string; captio
 
 /**
  * The pages, each in a browser window. Hovering a window scrolls through the whole page, quicker for
- * short pages and slower for long ones; a screen still to come holds its place.
+ * short pages and slower for long ones; a screen still to come holds its place. The strip itself takes
+ * keyboard focus (its scrollbar is hidden), so arrow keys move it, and while focused every page scrolls
+ * through as on hover (`.screens:focus-visible` in globals.css).
  */
 function Screens({ title, screens }: { title: string; screens: Screen[] }) {
   return (
     <section className="py-8 md:py-12">
       <h2 className="mb-6 px-4 font-display text-sm font-semibold tracking-wide text-muted uppercase md:mb-8 md:px-10">{title}</h2>
-      <ul className="flex gap-4 overflow-x-auto px-4 pb-4 [scrollbar-width:none] md:gap-6 md:px-10">
-        {screens.map((screen) => (
-          <li key={screen.label} className="w-[78vw] shrink-0 sm:w-[46vw] lg:w-[30vw]">
-            <div className="overflow-hidden rounded-[20px] bg-surface shadow-[0_30px_60px_-25px_rgb(0_0_0/0.8)]">
-              <div aria-hidden className="flex items-center gap-1.5 px-4 py-3">
-                <span className="size-2.5 rounded-full bg-ink/15" />
-                <span className="size-2.5 rounded-full bg-ink/15" />
-                <span className="size-2.5 rounded-full bg-ink/15" />
-              </div>
-              {screen.src && screen.width && screen.height ? (
-                <div
-                  className="screen-window relative aspect-[4/5] overflow-hidden"
-                  style={{ "--scroll-time": `${((screen.height / screen.width) * 1.4).toFixed(1)}s` } as React.CSSProperties}
-                >
-                  <Image
-                    src={screen.src}
-                    alt={`The ${screen.label} page`}
-                    width={screen.width}
-                    height={screen.height}
-                    sizes="(min-width: 1024px) 30vw, (min-width: 640px) 46vw, 78vw"
-                    className="screen-page block h-auto w-full"
-                  />
+      <div
+        role="region"
+        aria-label={title}
+        tabIndex={0}
+        className="screens overflow-x-auto rounded-[24px] [scrollbar-width:none] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[var(--accent-2)]"
+      >
+        <ul className="flex w-max gap-4 px-4 pb-4 md:gap-6 md:px-10">
+          {screens.map((screen) => (
+            <li key={screen.label} className="w-[78vw] shrink-0 sm:w-[46vw] lg:w-[30vw]">
+              <div className="overflow-hidden rounded-[20px] bg-surface shadow-[0_30px_60px_-25px_rgb(0_0_0/0.8)]">
+                <div aria-hidden className="flex items-center gap-1.5 px-4 py-3">
+                  <span className="size-2.5 rounded-full bg-ink/15" />
+                  <span className="size-2.5 rounded-full bg-ink/15" />
+                  <span className="size-2.5 rounded-full bg-ink/15" />
                 </div>
-              ) : (
-                <div className="grid aspect-[4/5] place-items-center bg-surface/30 text-sm text-muted">Screen coming soon</div>
-              )}
-            </div>
-            <p className="mt-4 px-1 font-display text-lg font-bold tracking-[-0.02em] uppercase">{screen.label}</p>
-          </li>
-        ))}
-      </ul>
+                {screen.src && screen.width && screen.height ? (
+                  <div
+                    className="screen-window relative aspect-[4/5] overflow-hidden"
+                    style={{ "--scroll-time": `${((screen.height / screen.width) * 1.4).toFixed(1)}s` } as React.CSSProperties}
+                  >
+                    <Image
+                      src={screen.src}
+                      alt={`The ${screen.label} page`}
+                      width={screen.width}
+                      height={screen.height}
+                      sizes="(min-width: 1024px) 30vw, (min-width: 640px) 46vw, 78vw"
+                      className="screen-page block h-auto w-full"
+                    />
+                  </div>
+                ) : (
+                  <div className="grid aspect-[4/5] place-items-center bg-surface/30 text-sm text-muted">Screen coming soon</div>
+                )}
+              </div>
+              <p className="mt-4 px-1 font-display text-lg font-bold tracking-[-0.02em] uppercase">{screen.label}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
     </section>
   );
 }

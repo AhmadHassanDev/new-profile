@@ -4,23 +4,28 @@ import Image from "next/image";
 import { useEffect, useRef } from "react";
 import { CLIENTS, type Client } from "@/content/site";
 
-// Two belts moving in opposite directions. Each repeats its logos so it can loop seamlessly.
+// Two belts moving in opposite directions. Each repeats its logos so it can loop seamlessly: one set of a belt
+// is 3,100px+ wide, so a second copy is enough to keep the loop full on any common screen.
 const ROWS = [CLIENTS.filter((_, i) => i % 2 === 0), CLIENTS.filter((_, i) => i % 2 === 1)];
-const REPEAT = 3;
+const REPEAT = 2;
 const BASE_SPEED = 28; // px per second
 const REVEAL_RADIUS = 80; // px: how much of a logo the cursor shows in colour
 
 function LogoImage({ client, className }: { client: Client; className: string }) {
+  // Drawn at its final size from the start, so the belts never reflow as logos arrive
+  const height = client.size ?? 44;
+  const width = Math.round((height * client.logo.width) / client.logo.height);
   return (
     <Image
       src={client.logo.src}
       alt=""
-      width={client.logo.width}
-      height={client.logo.height}
+      width={width}
+      height={height}
       unoptimized
-      loading="eager"
+      loading="lazy"
+      decoding="async"
       draggable={false}
-      style={{ height: client.size ?? 44, width: "auto" }}
+      style={{ width, height }}
       className={`pointer-events-none max-w-none select-none ${className}`}
     />
   );
@@ -33,6 +38,7 @@ function Logo({ client, copy, far }: { client: Client; copy: boolean; far: boole
       className={`flex shrink-0 items-center ${copy ? "motion-reduce:hidden" : ""}`}
     >
       <span
+        data-belt={far ? 1 : 0}
         className={`logo-item relative grid h-28 place-items-center px-10 md:h-36 md:px-16 ${far ? "scale-[0.82] opacity-70" : ""}`}
       >
         <span className="sr-only">{client.name}</span>
@@ -46,19 +52,40 @@ function Logo({ client, copy, far }: { client: Client; copy: boolean; far: boole
   );
 }
 
+type Item = { el: HTMLElement; belt: number; cx: number; cy: number; w: number; h: number; scale: number; lit: boolean };
+
 export default function Clients() {
   const sectionRef = useRef<HTMLElement>(null);
   const glowRef = useRef<HTMLDivElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
   const beltRefs = useRef<(HTMLUListElement | null)[]>([]);
 
   useEffect(() => {
     const section = sectionRef.current;
     const glow = glowRef.current;
-    if (!section || !glow) return;
+    const track = trackRef.current;
+    if (!section || !glow || !track) return;
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const items = [...section.querySelectorAll<HTMLElement>(".logo-item")];
     // Offsets live in [-span, 0): one full set of logos, so wrapping is invisible.
-    const offsets = ROWS.map(() => Number.NaN);
+    const offsets = ROWS.map(() => (reduced ? 0 : Number.NaN));
+    const spans = ROWS.map(() => 0);
+    let items: Item[] = [];
+
+    // Where every logo sits inside the belts, read from layout (untouched by the belts' transforms) once and
+    // again on resize, so the light never has to measure anything while it runs.
+    const measure = () => {
+      beltRefs.current.forEach((belt, i) => {
+        if (belt) spans[i] = belt.scrollWidth / REPEAT;
+      });
+      items = [...section.querySelectorAll<HTMLElement>(".logo-item")].flatMap((el) => {
+        const belt = Number(el.dataset.belt);
+        const ul = beltRefs.current[belt];
+        if (!ul || !el.offsetWidth) return []; // hidden copies (reduced motion) take no part
+        const w = el.offsetWidth;
+        const h = el.offsetHeight;
+        return [{ el, belt, cx: ul.offsetLeft + el.offsetLeft + w / 2, cy: ul.offsetTop + el.offsetTop + h / 2, w, h, scale: belt === 1 ? 0.82 : 1, lit: true }];
+      });
+    };
     // Where the cursor is, and where the light has caught up to (it trails slightly).
     const pointer = { x: -9999, y: -9999, inside: false };
     const lamp = { x: -9999, y: -9999, radius: 0 };
@@ -77,12 +104,18 @@ export default function Clients() {
       glow.style.transform = `translate3d(${lamp.x}px, ${lamp.y}px, 0) translate(-50%, -50%)`;
       glow.style.opacity = pointer.inside ? "1" : "0";
       section.style.setProperty("--r", `${lamp.radius}px`);
+      // One read per frame: where the belts' (untransformed) box is on screen
+      const origin = track.getBoundingClientRect();
       for (const item of items) {
-        // The back row is scaled down; map the light into the item's own, unscaled space.
-        const box = item.getBoundingClientRect();
-        const scale = box.width / (item.offsetWidth || 1);
-        item.style.setProperty("--x", `${(lamp.x - box.left) / scale}px`);
-        item.style.setProperty("--y", `${(lamp.y - box.top) / scale}px`);
+        // The back row is scaled down about each logo's centre; map the light into the item's own, unscaled space.
+        const x = (lamp.x - (origin.left + offsets[item.belt] + item.cx)) / item.scale;
+        const y = (lamp.y - (origin.top + item.cy)) / item.scale;
+        // Only logos the light can reach get new values; the rest are parked off once and left alone
+        const near = Math.abs(x) < item.w / 2 + lamp.radius && Math.abs(y) < item.h / 2 + lamp.radius;
+        if (!near && !item.lit) continue;
+        item.lit = near;
+        item.el.style.setProperty("--x", near ? `${x + item.w / 2}px` : "-999px");
+        item.el.style.setProperty("--y", near ? `${y + item.h / 2}px` : "-999px");
       }
     };
 
@@ -100,14 +133,13 @@ export default function Clients() {
       const lean = Math.max(-7, Math.min(7, velocity * -0.006));
 
       beltRefs.current.forEach((belt, i) => {
-        if (!belt) return;
-        const span = belt.scrollWidth / REPEAT;
+        const span = spans[i];
+        if (!belt || !span) return;
         if (Number.isNaN(offsets[i])) offsets[i] = i === 0 ? 0 : -span;
         offsets[i] += (i === 0 ? -1 : 1) * direction * speed * dt;
         offsets[i] = (((offsets[i] % span) + span) % span) - span;
         belt.style.transform = `translate3d(${offsets[i]}px, 0, 0) skewX(${lean}deg)`;
       });
-
 
       light(dt);
       if (visible) frame = requestAnimationFrame(tick);
@@ -140,12 +172,28 @@ export default function Clients() {
       }
     });
     observer.observe(section);
+    // Logos load lazily, but a moving belt brings in copies from off to the side, which lazy loading would only
+    // fetch as they slide into view. Once the section is close, fetch every logo it shows.
+    const preload = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        section.querySelectorAll("img").forEach((img) => (img.loading = "eager"));
+        preload.disconnect();
+      },
+      { rootMargin: "600px 0px" },
+    );
+    preload.observe(section);
+    const resize = new ResizeObserver(measure);
+    resize.observe(track);
     section.addEventListener("pointermove", onPointer);
     section.addEventListener("pointerleave", onLeave);
+    measure();
     light(0);
 
     return () => {
       observer.disconnect();
+      preload.disconnect();
+      resize.disconnect();
       cancelAnimationFrame(frame);
       section.removeEventListener("pointermove", onPointer);
       section.removeEventListener("pointerleave", onLeave);
@@ -176,14 +224,14 @@ export default function Clients() {
         </p>
       </div>
 
-      <div className="relative z-[1] flex flex-col gap-2 py-6 md:gap-4 [mask-image:linear-gradient(90deg,transparent,#000_10%,#000_90%,transparent)]">
+      <div ref={trackRef} className="relative z-[1] flex flex-col gap-2 py-6 md:gap-4 [mask-image:linear-gradient(90deg,transparent,#000_10%,#000_90%,transparent)]">
         {ROWS.map((row, i) => (
           <ul
             key={i}
             ref={(el) => {
               beltRefs.current[i] = el;
             }}
-            className="flex w-max will-change-transform motion-reduce:w-full motion-reduce:flex-wrap motion-reduce:justify-center"
+            className="relative flex w-max will-change-transform motion-reduce:w-full motion-reduce:flex-wrap motion-reduce:justify-center"
           >
             {Array.from({ length: REPEAT }, (_, copy) =>
               row.map((client) => <Logo key={`${copy}-${client.name}`} client={client} copy={copy > 0} far={i === 1} />),

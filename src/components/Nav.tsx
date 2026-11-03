@@ -51,6 +51,9 @@ export default function Nav() {
     if (!open) return;
     const root = document.documentElement;
     root.style.overflow = "hidden";
+    // The page behind the menu can't be tabbed into or read out while it's open
+    const behind = [...document.querySelectorAll<HTMLElement>("body > :not(header), main, footer")].filter((el) => !el.closest("header"));
+    for (const el of behind) el.inert = true;
     window.dispatchEvent(new CustomEvent(SCROLL_LOCK, { detail: true }));
     firstLinkRef.current?.focus({ preventScroll: true });
 
@@ -67,6 +70,7 @@ export default function Nav() {
     wide.addEventListener("change", onWide);
     return () => {
       root.style.overflow = "";
+      for (const el of behind) el.inert = false;
       window.dispatchEvent(new CustomEvent(SCROLL_LOCK, { detail: false }));
       window.removeEventListener("keydown", onKey);
       wide.removeEventListener("change", onWide);
@@ -75,20 +79,24 @@ export default function Nav() {
 
   return (
     <header className="pointer-events-none fixed inset-x-0 top-0 z-50 [&>*]:pointer-events-auto">
-      {/* Mobile menu: three colour sheets slash across the screen, then the panel lands on top */}
-      <div id="mobile-menu" data-open={open} inert={!open} className="menu fixed inset-0 md:hidden">
-        <div aria-hidden className="menu-layer bg-cyan" />
-        <div aria-hidden className="menu-layer bg-violet" />
-        <div aria-hidden className="menu-layer bg-coral" />
-        <div className="menu-layer flex flex-col overflow-hidden bg-bg px-4 pt-28 pb-8">
+      {/* Mobile menu: three colour sheets slash across the screen, then the panel lands on top (each sheet
+          slides in after the one before, and out in reverse: `--open` and `--close` are their delays) */}
+      <div id="mobile-menu" role="dialog" aria-modal="true" aria-label="Menu" data-open={open} inert={!open} className="menu fixed inset-0 md:hidden">
+        <div aria-hidden className="menu-sheet bg-cyan" style={{ "--open": "0s", "--close": "0.15s" } as React.CSSProperties} />
+        <div aria-hidden className="menu-sheet bg-violet" style={{ "--open": "0.05s", "--close": "0.1s" } as React.CSSProperties} />
+        <div aria-hidden className="menu-sheet bg-coral" style={{ "--open": "0.1s", "--close": "0.05s" } as React.CSSProperties} />
+        <div className="absolute inset-0 flex flex-col overflow-hidden px-4 pt-28 pb-8">
+          <div aria-hidden className="menu-sheet bg-bg" style={{ "--open": "0.15s", "--close": "0s" } as React.CSSProperties} />
+          {/* A soft glow from the corner, painted as a gradient (a blur this size is costly to redraw on a phone) */}
           <div
             aria-hidden
-            className="pointer-events-none absolute -right-1/3 -bottom-1/4 h-[80vmax] w-[80vmax] rounded-full opacity-25 blur-[120px]"
-            style={{ background: "var(--spectrum)" }}
+            className="menu-glow pointer-events-none absolute -right-1/3 -bottom-1/4 h-[80vmax] w-[80vmax] rounded-full"
+            style={{ background: "radial-gradient(closest-side, color-mix(in srgb, var(--violet) 55%, transparent), color-mix(in srgb, var(--coral) 20%, transparent) 55%, transparent)" }}
           />
           <span
             aria-hidden
-            className="menu-slash text-spectrum pointer-events-none absolute -top-[6vh] -right-[18vw] font-display text-[95vh] leading-none font-bold opacity-[0.07]"
+            className="menu-slash pointer-events-none absolute -top-[6vh] -right-[18vw] font-display text-[95vh] leading-none font-bold"
+            style={{ backgroundImage: "var(--spectrum)", backgroundClip: "text", color: "transparent" }}
           >
             /
           </span>
@@ -124,6 +132,7 @@ export default function Nav() {
                 <li key={s.label}>
                   <a href={s.href} target="_blank" rel="noreferrer" className="transition-colors hover:text-violet">
                     {s.label}
+                    <span className="sr-only"> (opens in a new tab)</span>
                   </a>
                 </li>
               ))}
@@ -143,7 +152,7 @@ export default function Nav() {
           <Image src="/logo.svg" alt="" width={58} height={45} priority />
         </Link>
 
-        <nav className="nav-links hidden items-center gap-2 rounded-full border border-line bg-bg/60 p-1.5 text-sm font-medium backdrop-blur-xl transition-colors duration-500 md:flex">
+        <nav aria-label="Main" className="nav-links hidden items-center gap-2 rounded-full border border-line bg-bg/60 p-1.5 text-sm font-medium backdrop-blur-xl transition-colors duration-500 md:flex">
           {/* The filled pill marks the page you're on; Contact stands out on its own with a dot and an arrow */}
           {LINKS.map((link) => {
             const here = current(link.href);

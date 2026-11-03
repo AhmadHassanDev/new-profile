@@ -18,8 +18,8 @@ const mod = (n: number, m: number) => ((n % m) + m) % m;
 /**
  * Selected work as an endless wall of cards filling the screen. It drifts on its own; drag to
  * fling it around (it eases back out of a slight zoom when you let go). Scrolling the page past
- * it nudges it along too. On touch screens, sideways swipes move the grid and vertical ones
- * still scroll the page.
+ * it nudges it along too (not with reduced motion). On touch screens, sideways swipes move the grid
+ * and vertical ones still scroll the page.
  */
 export default function Work({
   as: Heading = "h2",
@@ -27,6 +27,7 @@ export default function Work({
   action,
   vignette = false,
   scrollCue = false,
+  listedBelow = false,
 }: {
   /** The work page uses the grid as its opening, so there it is the page's h1 */
   as?: "h1" | "h2";
@@ -37,6 +38,8 @@ export default function Work({
   vignette?: boolean;
   /** A "scroll" cue at the bottom centre, for when the grid opens the page */
   scrollCue?: boolean;
+  /** The page lists every project right below (the work page's index), so the screen-reader copy here would repeat it */
+  listedBelow?: boolean;
 }) {
   const sectionRef = useRef<HTMLElement>(null);
   const planeRef = useRef<HTMLDivElement>(null);
@@ -54,7 +57,10 @@ export default function Work({
     const cell = { w: 1, h: 1 };
     const drag = { active: false, id: -1, x: 0, y: 0, moved: 0, lastT: 0 };
     let zoom = 1;
-    let lastScroll = window.scrollY;
+    // The scroll position is kept by a scroll listener (and taken fresh in measure, which runs from the
+    // ResizeObserver after layout), so the frame loop only writes and never forces a reflow
+    let scroll = 0;
+    let lastScroll = 0;
     let last = performance.now();
     let frame = 0;
     let visible = false;
@@ -68,6 +74,7 @@ export default function Work({
       // Start with a card's centre roughly in the middle of the screen
       offset.x = section.clientWidth / 2 - cell.w * 1.5;
       offset.y = section.clientHeight / 2 - cell.h * 1.5;
+      scroll = lastScroll = window.scrollY;
       place();
     };
 
@@ -89,19 +96,23 @@ export default function Work({
     const tick = (now: number) => {
       const dt = Math.min((now - last) / 1000, 0.05);
       last = now;
-      const scroll = window.scrollY;
       if (!drag.active) {
         // Let go: the fling decays back into the idle drift
         const ease = 1 - Math.exp(-dt * 2.2);
         velocity.x += ((reduced ? 0 : DRIFT.x) - velocity.x) * ease;
         velocity.y += ((reduced ? 0 : DRIFT.y) - velocity.y) * ease;
         offset.x += velocity.x * dt;
-        offset.y += velocity.y * dt - (scroll - lastScroll) * 0.35;
+        // Scrolling past nudges the wall along, unless motion is reduced
+        offset.y += velocity.y * dt - (reduced ? 0 : (scroll - lastScroll) * 0.35);
       }
       lastScroll = scroll;
       zoom += ((drag.active && drag.moved > 6 ? 0.93 : 1) - zoom) * (1 - Math.exp(-dt * 8));
       place();
       if (visible) frame = requestAnimationFrame(tick);
+    };
+
+    const onScroll = () => {
+      scroll = window.scrollY;
     };
 
     const onDown = (e: PointerEvent) => {
@@ -143,15 +154,16 @@ export default function Work({
       cancelAnimationFrame(frame);
       if (visible) {
         last = performance.now();
-        lastScroll = window.scrollY;
+        lastScroll = scroll;
         frame = requestAnimationFrame(tick);
       }
     });
+    // Its first callback does the initial measure, after layout, instead of forcing one on mount
     const resize = new ResizeObserver(measure);
 
-    measure();
     observer.observe(section);
     resize.observe(section);
+    window.addEventListener("scroll", onScroll, { passive: true });
     section.addEventListener("pointerdown", onDown);
     window.addEventListener("pointermove", onMove);
     window.addEventListener("pointerup", onUp);
@@ -161,6 +173,7 @@ export default function Work({
       cancelAnimationFrame(frame);
       observer.disconnect();
       resize.disconnect();
+      window.removeEventListener("scroll", onScroll);
       section.removeEventListener("pointerdown", onDown);
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerup", onUp);
@@ -177,13 +190,15 @@ export default function Work({
       className="relative h-[100svh] cursor-grab touch-pan-y overflow-hidden select-none active:cursor-grabbing"
     >
       {/* The real list, for screen readers; the wall below is decoration made of copies */}
-      <ul className="sr-only">
-        {PROJECTS.map((p) => (
-          <li key={p.slug}>
-            {p.name}: {p.kind}, {p.year}. {p.summary}
-          </li>
-        ))}
-      </ul>
+      {listedBelow ? null : (
+        <ul className="sr-only">
+          {PROJECTS.map((p) => (
+            <li key={p.slug}>
+              {p.name}: {p.kind}, {p.year}. {p.summary}
+            </li>
+          ))}
+        </ul>
+      )}
 
       <div
         ref={planeRef}
@@ -202,7 +217,9 @@ export default function Work({
               }}
               className="absolute top-0 left-0 w-[var(--card-w)] will-change-transform"
             >
-              <ProjectCard project={tile} decorative />
+              {/* Opening the page, the wall's covers are what's seen first (one is the LCP): the first copy of
+                  each fetches straight away at high priority, and the rest reuse it */}
+              <ProjectCard project={tile} decorative eager={Heading === "h1" && k < TILES.length} />
             </div>
           );
         })}

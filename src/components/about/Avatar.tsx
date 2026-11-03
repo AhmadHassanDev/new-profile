@@ -3,29 +3,23 @@
 import { useEffect, useRef } from "react";
 import { freshCanvas } from "@/lib/canvas";
 
-type Scene = import("./BustScene").BustScene | import("./CharacterScene").CharacterScene;
-
-// Each version of the 3D me, loaded only when it's used
-const SCENES = {
-  bust: () => import("./BustScene").then((m) => m.BustScene),
-  character: () => import("./CharacterScene").then((m) => m.CharacterScene),
-  student: () =>
-    import("./CharacterScene").then(
-      (m) =>
-        class extends m.CharacterScene {
-          constructor(canvas: HTMLCanvasElement, reducedMotion: boolean) {
-            super(canvas, reducedMotion, m.CHARACTERS.student);
-          }
-        },
-    ),
-};
+type Scene = import("./CharacterScene").CharacterScene;
 
 /**
- * The 3D me: the rigged student character in the hero, with the sculpted bust and the "father"
- * character as alternatives. It follows the cursor, reacts to scrolling, and does a trick when clicked
- * or tapped. The scene loads on its own after the page, and the page reads fine without it.
+ * On phones, the 3D scene waits until the page has loaded and the browser is idle, so the text and layout
+ * are usable first and the character arrives a beat later. Elsewhere it starts straight away.
  */
-export default function Avatar({ variant = "bust", className = "" }: { variant?: keyof typeof SCENES; className?: string }) {
+function afterSettling() {
+  if (!window.matchMedia("(hover: none), (max-width: 767px)").matches) return Promise.resolve();
+  const loaded = document.readyState === "complete" ? Promise.resolve() : new Promise((r) => window.addEventListener("load", r, { once: true }));
+  return loaded.then(() => new Promise<void>((r) => (window.requestIdleCallback ?? ((run) => window.setTimeout(run, 200)))(() => r(), { timeout: 1500 })));
+}
+
+/**
+ * The 3D me: the rigged student character. It follows the cursor, reacts to scrolling, and does a trick
+ * when clicked or tapped. The scene loads on its own after the page, and the page reads fine without it.
+ */
+export default function Avatar({ className = "" }: { className?: string }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -36,11 +30,11 @@ export default function Avatar({ variant = "bust", className = "" }: { variant?:
     let disposed = false;
     let cleanup = () => {};
 
-    SCENES[variant]().then((Scene) => {
+    afterSettling().then(() => import("./CharacterScene")).then(({ CharacterScene, CHARACTERS }) => {
       if (disposed) return;
       let scene: Scene;
       try {
-        scene = new Scene(canvas, window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+        scene = new CharacterScene(canvas, window.matchMedia("(prefers-reduced-motion: reduce)").matches, CHARACTERS.student);
       } catch {
         return; // No WebGL
       }
@@ -50,11 +44,13 @@ export default function Avatar({ variant = "bust", className = "" }: { variant?:
         return [((e.clientX - rect.left) / rect.width) * 2 - 1, -(((e.clientY - rect.top) / rect.height) * 2 - 1)] as const;
       };
       const onMove = (e: PointerEvent) => {
+        // Only a real cursor: a finger dragging to scroll shouldn't turn its head
+        if (e.pointerType !== "mouse") return;
         const [x, y] = local(e);
         scene.setPointer(x, y);
         const over = scene.hit(x, y);
         canvas.style.cursor = over ? "pointer" : "";
-        if ("setHover" in scene) scene.setHover(over);
+        scene.setHover(over);
       };
       const onDown = (e: PointerEvent) => {
         const [x, y] = local(e);
@@ -64,20 +60,41 @@ export default function Avatar({ variant = "bust", className = "" }: { variant?:
       // Chapters cue a reaction as they arrive (see AboutGuide)
       const onCue = (e: Event) => scene.react((e as CustomEvent<Parameters<typeof scene.react>[0]>).detail);
       window.addEventListener("avatar:react", onCue);
+      // The page's scroll length is measured on resize, not on every scroll (that would force a layout each time)
       let lastY = window.scrollY;
+      let max = 1;
+      const measure = () => (max = Math.max(1, document.documentElement.scrollHeight - window.innerHeight));
       const onScroll = () => {
-        const max = document.documentElement.scrollHeight - window.innerHeight;
-        scene.setScroll(max > 0 ? window.scrollY / max : 0, window.scrollY - lastY);
+        scene.setScroll(window.scrollY / max, window.scrollY - lastY);
         lastY = window.scrollY;
       };
-      const size = () => scene.resize(canvas.clientWidth, canvas.clientHeight);
+      // Docked small in a phone's corner it doesn't need every frame (see AvatarFrame)
+      const onPower = (e: Event) => scene.setLowPower((e as CustomEvent<boolean>).detail);
+      window.addEventListener("avatar:power", onPower);
+      const size = () => {
+        measure();
+        scene.resize(canvas.clientWidth, canvas.clientHeight);
+      };
       const resize = new ResizeObserver(size);
       resize.observe(canvas);
-      const visibility = new IntersectionObserver(([entry]) => (entry.isIntersecting ? scene.start() : scene.stop()));
+      // Draws only while it's on screen and not faded out (the travelling frame bows out by the footer)
+      let onScreen = false;
+      let bowedOut = false;
+      const run = () => (onScreen && !bowedOut ? scene.start() : scene.stop());
+      const onBow = (e: Event) => {
+        bowedOut = (e as CustomEvent<boolean>).detail;
+        run();
+      };
+      window.addEventListener("avatar:bowed", onBow);
+      const visibility = new IntersectionObserver(([entry]) => {
+        onScreen = entry.isIntersecting;
+        run();
+      });
       visibility.observe(canvas);
       window.addEventListener("pointermove", onMove);
       canvas.addEventListener("pointerdown", onDown);
       window.addEventListener("scroll", onScroll, { passive: true });
+      window.addEventListener("resize", measure);
       size();
       onScroll();
       // Fade in once the model is in; if it can't load, the canvas just stays empty
@@ -93,6 +110,9 @@ export default function Avatar({ variant = "bust", className = "" }: { variant?:
         window.removeEventListener("pointermove", onMove);
         canvas.removeEventListener("pointerdown", onDown);
         window.removeEventListener("scroll", onScroll);
+        window.removeEventListener("resize", measure);
+        window.removeEventListener("avatar:power", onPower);
+        window.removeEventListener("avatar:bowed", onBow);
         window.removeEventListener("avatar:react", onCue);
         scene.dispose();
       };
@@ -103,12 +123,12 @@ export default function Avatar({ variant = "bust", className = "" }: { variant?:
       cleanup();
       release();
     };
-  }, [variant]);
+  }, []);
 
   return (
     <canvas
       ref={canvasRef}
-      aria-label="A cartoon 3D version of Ahmed. Click it for a little trick."
+      aria-label="A cartoon 3D version of Ahmed"
       role="img"
       className={`block h-full w-full touch-pan-y opacity-0 transition-opacity duration-700 data-[ready=true]:opacity-100 ${className}`}
     />

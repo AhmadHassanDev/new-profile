@@ -8,11 +8,13 @@ import DiveSignature from "@/components/case/DiveSignature";
 import ToolLogo from "@/components/case/ToolLogo";
 import Contact from "@/components/Contact";
 import Cursor from "@/components/Cursor";
+import JsonLd from "@/components/JsonLd";
 import Nav from "@/components/Nav";
 import { ProjectCard } from "@/components/work/ProjectCard";
 import WorkLink from "@/components/work/WorkLink";
 import { CASES, caseFor } from "@/content/cases";
-import { DISCIPLINE_COLOR, PROJECTS } from "@/content/site";
+import { COVER_HEIGHT, COVER_WIDTH, DISCIPLINE_COLOR, type Project, PROJECTS } from "@/content/site";
+import { absoluteUrl, breadcrumbs, PERSON_ID, pageMetadata, WEBSITE_ID } from "@/lib/seo";
 
 export function generateStaticParams() {
   return CASES.map(({ slug }) => ({ slug }));
@@ -23,7 +25,42 @@ type Props = { params: Promise<{ slug: string }> };
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const project = PROJECTS.find((p) => p.slug === slug);
-  return project ? { title: `${project.name} — Ahmed Hassan`, description: project.summary } : {};
+  if (!project || !caseFor(slug)) return {};
+  return pageMetadata({
+    title: project.name,
+    description: project.summary,
+    path: `/work/${slug}`,
+    // The project's own cover makes a truer share card than the generic one
+    image: project.cover
+      ? { url: project.cover, width: COVER_WIDTH, height: COVER_HEIGHT, alt: `${project.name}, ${project.kind}`, type: "image/webp" }
+      : undefined,
+  });
+}
+
+/** The case study as a creative work by Ahmed, with where it sits in the site */
+function caseJsonLd(project: Project) {
+  const path = `/work/${project.slug}`;
+  return [
+    {
+      "@type": "CreativeWork",
+      "@id": `${absoluteUrl(path)}#work`,
+      name: project.name,
+      headline: `${project.name}: ${project.kind}`,
+      description: project.summary,
+      url: absoluteUrl(path),
+      ...(project.cover ? { image: absoluteUrl(project.cover) } : {}),
+      genre: project.kind,
+      keywords: project.disciplines.join(", "),
+      dateCreated: project.year,
+      inLanguage: "en",
+      creator: { "@id": PERSON_ID },
+      isPartOf: { "@id": WEBSITE_ID },
+    },
+    breadcrumbs([
+      { name: "Work", path: "/work" },
+      { name: project.name, path },
+    ]),
+  ];
 }
 
 // The frame (nav, footer) renders straight away; the case itself reads the URL, so it streams in
@@ -58,12 +95,13 @@ async function CaseStudy({ params }: Props) {
       className={`case relative isolate ${study.signature ? "md:pr-14" : ""}`}
       style={{ "--accent": study.accent[0], "--accent-2": study.accent[1] } as React.CSSProperties}
     >
+      <JsonLd graph={caseJsonLd(project)} />
       {study.signature === "dive" ? <DiveSignature /> : null}
 
       {/* Opener */}
       <section className="relative px-4 pt-32 pb-16 md:px-10 md:pt-40 md:pb-24">
         <Link href="/work" className="text-sm font-semibold text-muted transition-colors hover:text-ink">
-          ← All work
+          <span aria-hidden>←</span> All work
         </Link>
         <p className="mt-10 flex flex-wrap items-center gap-3 text-sm font-semibold text-muted">
           <span aria-hidden className="h-px w-10" style={{ background: "var(--accent-2)" }} />
@@ -83,7 +121,9 @@ async function CaseStudy({ params }: Props) {
               rel="noreferrer"
               className="group inline-flex w-fit shrink-0 items-center gap-3 rounded-full bg-ink py-2 pr-2 pl-6 text-base font-semibold text-bg transition-transform duration-300 hover:scale-[1.04]"
             >
-              Visit website
+              <span>
+                Visit website<span className="sr-only"> (opens in a new tab)</span>
+              </span>
               <span
                 aria-hidden
                 className="grid size-10 place-items-center rounded-full text-white transition-transform duration-500 group-hover:rotate-45"

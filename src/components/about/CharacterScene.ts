@@ -1,6 +1,11 @@
 import * as THREE from "three";
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { MeshoptDecoder } from "three/examples/jsm/libs/meshopt_decoder.module.js";
+import { clamp01, damp, smooth } from "@/lib/math";
+
+// Renamed only because its "use…" name reads as a React hook to the linter
+const { useWorkers: decodeOnWorkers } = MeshoptDecoder;
 
 /**
  * A premade cartoon character, used as it comes: its own materials, lit like a studio portrait with the
@@ -30,10 +35,22 @@ type Character = {
   view: { height: number; bottom: number };
   /** A turn about the vertical, for a model built facing away from the camera */
   turn?: number;
+  /**
+   * The model's bounds, measured once offline. Measuring a rigged model in the browser runs its skeleton
+   * over every vertex, a long stall on a phone, for numbers that never change
+   */
+  bounds?: { min: [number, number, number]; max: [number, number, number] };
 };
 export const CHARACTERS = {
-  father: { model: "/about/character.glb", eyes: ["Sphere003", "Sphere004"], brows: ["Plane046"], head: { neck: 0.5 }, view: { height: 0.86, bottom: 0.32 } },
-  student: { model: "/about/student.glb", eyes: ["Sphere"], brows: ["Cube"], head: { bones: ["Bone018", "Bone019"] }, view: { height: 0.76, bottom: 0.42 } },
+  student: {
+    // Meshopt-compressed (7.9 MB → 2.4 MB), decoded off the main thread where the browser allows
+    model: "/about/student.glb",
+    eyes: ["Sphere"],
+    brows: ["Cube"],
+    head: { bones: ["Bone018", "Bone019"] },
+    view: { height: 0.76, bottom: 0.42 },
+    bounds: { min: [-26.47078, 72.64909, -40.5672], max: [24.70047, 197.97556, -8.32791] },
+  },
 } satisfies Record<string, Character>;
 const BROW_LIFT = 0.012;
 const UP = new THREE.Vector3(0, 1, 0);
@@ -45,12 +62,6 @@ const REACTIONS: Reaction[] = ["wink", "laugh", "doubletake", "nod"];
 const DURATION: Record<Reaction, number> = { wink: 1.1, laugh: 1.6, doubletake: 1.5, nod: 1.1 };
 const INTRO = 2;
 
-const damp = (from: number, to: number, rate: number, dt: number) => from + (to - from) * (1 - Math.exp(-rate * dt));
-const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
-const smooth = (v: number) => {
-  const t = clamp01(v);
-  return t * t * (3 - 2 * t);
-};
 const easeOutCubic = (t: number) => 1 - Math.pow(1 - clamp01(t), 3);
 // Rises quickly, holds, then lets go over the last part
 const envelope = (p: number, attack = 0.18, release = 0.25) => Math.min(smooth(p / attack), 1 - smooth((p - 1 + release) / release));
@@ -96,6 +107,9 @@ export class CharacterScene {
   private hovered = false;
   private scroll = 0;
   private scrollVelocity = 0;
+  private lowPower = false;
+  // Time since the last frame drawn, which may span skipped frames
+  private pending = 0;
 
   // Motion
   private lookX = new Spring(45, 8.5);
@@ -118,7 +132,7 @@ export class CharacterScene {
   constructor(
     canvas: HTMLCanvasElement,
     private reducedMotion: boolean,
-    private character: Character = CHARACTERS.father,
+    private character: Character = CHARACTERS.student,
   ) {
     this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: "high-performance" });
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -144,8 +158,10 @@ export class CharacterScene {
   }
 
   private async load() {
-    const { model: url, eyes, brows, head, turn } = this.character;
-    const gltf = await new GLTFLoader().loadAsync(url);
+    const { model: url, eyes, brows, head, turn, bounds } = this.character;
+    // Decode the compressed geometry on worker threads, so it doesn't hold up the page
+    decodeOnWorkers(2);
+    const gltf = await new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).loadAsync(url);
     if (this.disposed) return;
     const model = gltf.scene;
     model.rotation.y = turn ?? 0;
@@ -156,7 +172,7 @@ export class CharacterScene {
 
     // Stand it one unit tall, base on the ground, centred
     this.rig.updateMatrixWorld(true);
-    const box = new THREE.Box3().setFromObject(model);
+    const box = bounds ? new THREE.Box3(new THREE.Vector3(...bounds.min), new THREE.Vector3(...bounds.max)) : new THREE.Box3().setFromObject(model);
     const size = box.getSize(new THREE.Vector3());
     const scale = 1 / size.y;
     this.fit.scale.setScalar(scale);
@@ -210,6 +226,10 @@ export class CharacterScene {
     this.hitbox.position.y = bottom + height / 2;
     this.rig.add(this.hitbox);
 
+    // Compile its shaders in the background (where the browser can) before the first frame, so that
+    // frame doesn't stall the page
+    await this.renderer.compileAsync(this.scene, this.camera);
+    if (this.disposed) return;
     this.loaded = true;
     if (!this.running) this.render(0);
   }
@@ -268,13 +288,22 @@ export class CharacterScene {
     this.reactionTime = 0;
   }
 
+  /** Small and out of the way (docked in a phone's corner): draws at half rate to spare the battery. */
+  setLowPower(on: boolean) {
+    this.lowPower = on;
+  }
+
   start() {
     if (this.running) return;
     this.running = true;
     this.timer.reset();
+    this.pending = 0;
     this.renderer.setAnimationLoop((t) => {
       this.timer.update(t);
-      this.render(Math.min(this.timer.getDelta(), 0.05));
+      this.pending += this.timer.getDelta();
+      if (this.lowPower && this.pending < 1 / 32) return;
+      this.render(Math.min(this.pending, 0.05));
+      this.pending = 0;
     });
   }
 

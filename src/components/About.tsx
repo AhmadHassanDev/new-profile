@@ -55,9 +55,19 @@ export default function About() {
       // The intro reads itself in as the section arrives, finishing just after it pins
       const arriving = clamp01(1 - box.top / window.innerHeight);
       introRef.current?.style.setProperty("--p", String(clamp01(arriving * 0.5 + (p / 0.08) * 0.5)));
+      // Off-screen blocks only fade out of sight: they stay in the accessibility tree, so screen readers can read every stage
       WINDOWS.forEach(([start, end], i) => {
         const el = blockRefs.current[i];
         if (!el) return;
+        if (reduced) {
+          // No blur or drift: each block simply swaps in halfway through the gap before it
+          const from = i ? (WINDOWS[i - 1][1] + start) / 2 : -Infinity;
+          const to = i < WINDOWS.length - 1 ? (end + WINDOWS[i + 1][0]) / 2 : Infinity;
+          const on = p >= from && p < to;
+          el.style.opacity = on ? "1" : "0";
+          el.style.pointerEvents = on ? "auto" : "none";
+          return;
+        }
         const enter = clamp01((p - start) / FADE);
         const leave = clamp01((p - end) / FADE);
         const shown = enter * (1 - leave);
@@ -65,7 +75,6 @@ export default function About() {
         el.style.transform = `translate3d(0, ${(1 - enter) * 48 - leave * 48}px, 0)`;
         el.style.filter = shown < 0.99 ? `blur(${(1 - shown) * 10}px)` : "";
         el.style.pointerEvents = shown > 0.5 ? "auto" : "none";
-        el.setAttribute("aria-hidden", String(shown < 0.5));
       });
       // Which step we're on, and how far through the whole process
       stepRefs.current.forEach((step, i) => {
@@ -80,11 +89,25 @@ export default function About() {
     };
     const onPointer = (e: PointerEvent) =>
       scene?.setPointer((e.clientX / window.innerWidth) * 2 - 1, -((e.clientY / window.innerHeight) * 2 - 1));
+    // Tabbing to a link in a block that's faded out (the browser only scrolls the pinned frame into view):
+    // jump to the point in the story where that block is showing, so focus never lands on something invisible
+    const onFocus = (e: FocusEvent) => {
+      const i = blockRefs.current.findIndex((el) => el?.contains(e.target as Node));
+      if (i < 0 || blockRefs.current[i]?.style.opacity === "1") return;
+      const [start, end] = WINDOWS[i];
+      const p = clamp01((Math.max(start, 0) + Math.min(end, 1)) / 2);
+      // Next frame, so it lands after the browser's own scroll-into-view
+      requestAnimationFrame(() => {
+        const top = section.getBoundingClientRect().top + window.scrollY;
+        window.scrollTo({ top: top + p * (section.offsetHeight - window.innerHeight), behavior: "instant" });
+      });
+    };
 
     update();
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll);
     window.addEventListener("pointermove", onPointer);
+    section.addEventListener("focusin", onFocus);
 
     let resizeObserver: ResizeObserver | undefined;
     let visibility: IntersectionObserver | undefined;
@@ -112,6 +135,7 @@ export default function About() {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
       window.removeEventListener("pointermove", onPointer);
+      section.removeEventListener("focusin", onFocus);
       resizeObserver?.disconnect();
       visibility?.disconnect();
       scene?.dispose();
@@ -120,7 +144,18 @@ export default function About() {
   }, []);
 
   return (
-    <section id="about" ref={sectionRef} aria-label="About me" className="relative h-[640svh]">
+    <section id="about" ref={sectionRef} aria-labelledby="about-title" className="relative h-[640svh]">
+      {/* Without JavaScript nothing drives the story: unpin it and show every block, one after another */}
+      <noscript>
+        <style
+          dangerouslySetInnerHTML={{
+            __html:
+              "#about{height:auto!important}#about>div{position:relative!important;height:auto!important;padding:14rem 0 4rem}" +
+              "#about [data-story]{position:static!important;transform:none!important;display:flex!important;flex-direction:column;gap:6rem;width:auto!important;padding:0 1rem}" +
+              "#about [data-story]>div{opacity:1!important}#about .scroll-word{opacity:1!important}#about .process-zone{display:none}",
+          }}
+        />
+      </noscript>
       <div className="sticky top-0 h-[100svh] overflow-hidden">
         {/* The 3D gets its own zone: right of the copy on wide screens, above it on tall ones.
             Its edges fade into the page so the scene never meets the text. */}
@@ -139,7 +174,10 @@ export default function About() {
 
         {/* Where we are in the process */}
         <div className="absolute inset-x-0 top-24 flex items-center justify-between gap-6 px-4 md:top-28 md:px-10">
-          <p className="hidden text-sm font-semibold text-muted sm:block">About me</p>
+          {/* Heads the section in the outline, so the stage h3s don't sit under "Selected work"; visible from sm up */}
+          <h2 id="about-title" className="sr-only text-sm font-semibold text-muted sm:not-sr-only">
+            About me
+          </h2>
           <div className="w-full sm:w-auto">
             <ol className="flex justify-between gap-6 text-xs font-semibold text-muted sm:justify-end sm:text-sm">
               {PROCESS.map((step, i) => (
@@ -163,7 +201,7 @@ export default function About() {
         </div>
 
         {/* The copy: one block per stage, stacked in the same spot */}
-        <div className="absolute inset-x-4 grid portrait:bottom-8 landscape:top-1/2 landscape:left-10 landscape:w-[min(34vw,560px)] landscape:-translate-y-1/2 md:inset-x-10 md:portrait:bottom-12">
+        <div data-story className="absolute inset-x-4 grid portrait:bottom-8 landscape:top-1/2 landscape:left-10 landscape:w-[min(34vw,560px)] landscape:-translate-y-1/2 md:inset-x-10 md:portrait:bottom-12">
           <div
             ref={(el) => {
               blockRefs.current[0] = el;
@@ -179,7 +217,7 @@ export default function About() {
                 <span
                   key={i}
                   className="scroll-word"
-                  style={{ "--i": i, color: word === "designer" ? "var(--violet)" : word === "developer" ? "var(--coral)" : undefined } as React.CSSProperties}
+                  style={{ "--i": i, "--word": word === "designer" ? "var(--violet)" : word === "developer" ? "var(--coral)" : undefined } as React.CSSProperties}
                 >
                   {word}{" "}
                 </span>
@@ -248,6 +286,7 @@ export default function About() {
             >
               More about me
               <span
+                aria-hidden
                 className="grid h-10 w-10 place-items-center rounded-full text-ink transition-transform duration-500 group-hover:rotate-[-45deg]"
                 style={{ background: "var(--spectrum)" }}
               >

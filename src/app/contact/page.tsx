@@ -4,26 +4,46 @@ import ContactForm from "@/components/contact/ContactForm";
 import ContactHero from "@/components/contact/ContactHero";
 import DirectLines from "@/components/contact/DirectLines";
 import Cursor from "@/components/Cursor";
+import JsonLd from "@/components/JsonLd";
 import Nav from "@/components/Nav";
 import SocialIcon from "@/components/SocialIcon";
-import { SOCIALS } from "@/content/site";
+import { CONTACT, SOCIALS } from "@/content/site";
+import { absoluteUrl, breadcrumbs, PERSON_ID, pageMetadata, webPage } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Contact — Ahmed Hassan",
-  description: "Start a project with Ahmed Hassan: send a message, WhatsApp, email, or find him on LinkedIn, Behance, GitHub and Instagram.",
-};
+const DESCRIPTION = "Start a project with Ahmed Hassan: send a message, WhatsApp, email, or find him on LinkedIn, Behance, GitHub and Instagram.";
 
-// Each network's own colour floods its tile on hover, with text that reads on it
+export const metadata: Metadata = pageMetadata({ title: "Contact", description: DESCRIPTION, path: "/contact" });
+
+const JSON_LD = [
+  {
+    ...webPage("ContactPage", { path: "/contact", name: "Contact — Ahmed Hassan", description: DESCRIPTION }),
+    mainEntity: {
+      "@id": PERSON_ID,
+      contactPoint: {
+        "@type": "ContactPoint",
+        contactType: "Project enquiries",
+        email: CONTACT.email,
+        telephone: `+${CONTACT.whatsapp.number}`,
+        url: absoluteUrl("/contact"),
+      },
+    },
+  },
+  breadcrumbs([{ name: "Contact", path: "/contact" }]),
+];
+
+// Each network's own colour floods its tile on hover, with text that reads on it. Instagram's gradient drops its pale
+// yellow/orange end for deeper stops in the same orange → magenta → purple → blue run, so white holds 5:1 or better across it.
 const BRAND: Record<string, { fill: string; text: string }> = {
   LinkedIn: { fill: "#0a66c2", text: "#ffffff" },
   Behance: { fill: "#1769ff", text: "#ffffff" },
   GitHub: { fill: "#edecf2", text: "#0a0a0d" },
-  Instagram: { fill: "linear-gradient(135deg, #feda75, #fa7e1e 25%, #d62976 50%, #962fbf 75%, #4f5bd5)", text: "#ffffff" },
+  Instagram: { fill: "linear-gradient(135deg, #c2410c, #c1306b 35%, #833ab4 70%, #4f5bd5)", text: "#ffffff" },
 };
 
 export default function ContactPage() {
   return (
     <>
+      <JsonLd graph={JSON_LD} />
       <Cursor />
       <Nav />
       <main id="top" className="relative overflow-hidden">
@@ -72,8 +92,14 @@ export default function ContactPage() {
                   </span>
                   <span className="relative">
                     <span className="block font-display text-3xl font-bold tracking-[-0.03em] uppercase md:text-4xl">{social.label}</span>
-                    <span className="mt-2 block text-base font-semibold opacity-80">{social.handle}</span>
-                    <span className="mt-1 block text-sm opacity-60">{social.note}</span>
+                    {/* Dimmed lines go to full strength on the brand flood, where 60–80% white falls under 4.5:1 */}
+                    <span className="mt-2 block text-base font-semibold opacity-80 transition-opacity duration-500 group-hover:opacity-100 group-focus-visible:opacity-100">
+                      {social.handle}
+                    </span>
+                    <span className="mt-1 block text-sm opacity-60 transition-opacity duration-500 group-hover:opacity-100 group-focus-visible:opacity-100">
+                      {social.note}
+                    </span>
+                    <span className="sr-only"> (opens in a new tab)</span>
                   </span>
                 </a>
               </li>

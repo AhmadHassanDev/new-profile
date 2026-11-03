@@ -6,15 +6,25 @@ import HeroRecede from "@/components/about/HeroRecede";
 import PassionCard from "@/components/about/PassionCard";
 import Contact from "@/components/Contact";
 import Cursor from "@/components/Cursor";
+import JsonLd from "@/components/JsonLd";
 import Nav from "@/components/Nav";
 import ScrollWords from "@/components/ScrollWords";
 import { DISCIPLINE_COLOR, PASSIONS, PROCESS, QUOTE, STORY } from "@/content/site";
+import { breadcrumbs, PERSON_ID, pageMetadata, webPage } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "About — Ahmed Hassan",
-  description:
-    "Ahmed Hassan is an Egyptian designer and front-end developer: a computer science graduate who researches, designs and builds digital products.",
-};
+const DESCRIPTION =
+  "Ahmed Hassan is an Egyptian designer and front-end developer: a computer science graduate who researches, designs and builds digital products.";
+
+export const metadata: Metadata = pageMetadata({ title: "About", description: DESCRIPTION, path: "/about" });
+
+// The person itself is described once, in the root layout; this page is its profile
+const JSON_LD = [
+  {
+    ...webPage("ProfilePage", { path: "/about", name: "About — Ahmed Hassan", description: DESCRIPTION }),
+    mainEntity: { "@id": PERSON_ID },
+  },
+  breadcrumbs([{ name: "About", path: "/about" }]),
+];
 
 const FACTS = [
   { value: "6+", label: "Years" },
@@ -67,6 +77,12 @@ function Chapter({
   );
 }
 
+/** The quote, curly-quoted, with one word in violet */
+function quoteSegments(text: string, highlight: string) {
+  const [before, after] = `“${text.replace("'", "’")}”`.split(highlight);
+  return [{ text: before.trim() }, { text: highlight, color: "var(--violet)" }, { text: after.trim() }];
+}
+
 function ChapterTitle({ id, top, bottom }: { id: string; top: string; bottom: string }) {
   return (
     <h2 id={`${id}-title`} className="font-display text-5xl leading-[0.9] font-bold tracking-[-0.04em] uppercase md:text-7xl">
@@ -80,6 +96,7 @@ function ChapterTitle({ id, top, bottom }: { id: string; top: string; bottom: st
 export default function AboutPage() {
   return (
     <>
+      <JsonLd graph={JSON_LD} />
       <Cursor />
       <Nav />
       <main id="top">
@@ -215,7 +232,7 @@ export default function AboutPage() {
                 <blockquote>
                   <ScrollWords
                     className="font-display text-[11vw] leading-[0.92] font-bold tracking-[-0.05em] uppercase md:text-[5.6vw]"
-                    segments={[{ text: "“It always seems" }, { text: "impossible", color: "var(--violet)" }, { text: "until it’s done.”" }]}
+                    segments={quoteSegments(QUOTE.text, "impossible")}
                   />
                 </blockquote>
                 <figcaption className="mt-8 flex items-center gap-3 text-lg font-medium text-muted">

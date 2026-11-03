@@ -112,10 +112,33 @@ body:has(.site-loader:not(.is-exiting)) .animate-rise {
   animation-play-state: paused;
 }
 
-/* Scroll-read copy: --p (0..1) comes from JS, each word lights up as progress passes its index */
+/* Keyboard focus: a clear ring, offset so it reads on filled pills too */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+}
+
+/* Skip link: hidden until it's tabbed to */
+.skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 100;
+  transform: translateY(-200%);
+}
+.skip-link:focus-visible {
+  transform: none;
+}
+
+/* Scroll-read copy: --p (0..1) comes from JS, each word lights up as progress passes its index. Unread
+   words stay dim but legible (3:1 for this large type), in ink; a coloured word takes its colour as it lights */
 .scroll-word {
-  opacity: clamp(0.14, calc(var(--p, 0) * var(--n) * 1.15 - var(--i)), 1);
-  transition: opacity 0.25s linear;
+  --lit: clamp(0, calc(var(--p, 0) * var(--n) * 1.15 - var(--i)), 1);
+  opacity: calc(0.42 + 0.58 * var(--lit));
+  color: color-mix(in srgb, var(--word, var(--ink)) calc(var(--lit) * 100%), var(--ink));
+  transition:
+    opacity 0.25s linear,
+    color 0.25s linear;
 }
 
 /* About: passion cards fill with their colour from the corner */
@@ -265,7 +288,7 @@ body:has(.nav-bar[data-tucked="true"]) .below-nav {
   transform: var(--fan) scale(1);
 }
 
-/* Contact: direct lines and social tiles fill with their brand colour from the corner */
+/* Contact: social tiles fill with their brand colour from the corner */
 .direct-flood {
   clip-path: circle(0% at 100% 0%);
   transition: clip-path 0.7s cubic-bezier(0.76, 0, 0.24, 1);
@@ -371,11 +394,13 @@ body:has(.nav-bar[data-tucked="true"]) .below-nav {
 }
 
 /* Mobile menu: colour sheets wipe in along a "/" edge (the logo's slash), the panel lands last.
-   Closing runs it backwards: links drop out, the panel lifts, the sheets peel away. */
+   Closing runs it backwards. Everything moves by transform and opacity only, which phones animate on
+   the GPU: sheets wider than the screen, skewed into the slash, slide across. */
 .menu {
-  --ease: cubic-bezier(0.76, 0, 0.24, 1);
+  --ease: cubic-bezier(0.65, 0, 0.35, 1);
+  overflow: hidden;
   visibility: hidden;
-  transition: visibility 0s linear 1.3s;
+  transition: visibility 0s linear 0.6s;
 }
 .menu[data-open="true"] {
   visibility: visible;
@@ -384,38 +409,32 @@ body:has(.nav-bar[data-tucked="true"]) .below-nav {
 .menu[data-open="false"] {
   pointer-events: none;
 }
-.menu-layer {
+.menu-sheet {
   position: absolute;
-  inset: 0;
-  /* Corners: top-left, top-right, bottom-right, bottom-left. Parked off the right edge. */
-  clip-path: polygon(130% 0, 130% 0, 130% 100%, 100% 100%);
-  transition: clip-path 0.85s var(--ease);
+  inset: 0 -25vh;
+  transform: translateX(105%) skewX(-12deg);
+  transition: transform 0.45s var(--ease) var(--close, 0s);
+  will-change: transform;
 }
-.menu[data-open="true"] .menu-layer {
-  clip-path: polygon(0 0, 100% 0, 100% 100%, -30% 100%);
+.menu[data-open="true"] .menu-sheet {
+  transform: translateX(0) skewX(-12deg);
+  transition-delay: var(--open, 0s);
 }
-.menu-layer:nth-child(1) { transition-delay: 0.42s; }
-.menu-layer:nth-child(2) { transition-delay: 0.34s; }
-.menu-layer:nth-child(3) { transition-delay: 0.26s; }
-.menu-layer:nth-child(4) { transition-delay: 0.14s; }
-.menu[data-open="true"] .menu-layer:nth-child(1) { transition-delay: 0s; }
-.menu[data-open="true"] .menu-layer:nth-child(2) { transition-delay: 0.07s; }
-.menu[data-open="true"] .menu-layer:nth-child(3) { transition-delay: 0.14s; }
-.menu[data-open="true"] .menu-layer:nth-child(4) { transition-delay: 0.22s; }
 
 .menu-item {
   transform: translateY(110%) skewY(8deg);
   transform-origin: left bottom;
-  transition: transform 0.35s var(--ease);
+  transition: transform 0.2s var(--ease);
 }
 .menu[data-open="true"] .menu-item {
   transform: none;
-  transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1) calc(0.55s + var(--i) * 0.08s);
+  transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1) calc(0.2s + var(--i) * 0.05s);
 }
 .menu-foot,
-.menu-slash {
+.menu-slash,
+.menu-glow {
   opacity: 0;
-  transition: opacity 0.25s, transform 0.25s;
+  transition: opacity 0.2s, transform 0.2s;
 }
 .menu-foot {
   transform: translateY(1rem);
@@ -426,12 +445,16 @@ body:has(.nav-bar[data-tucked="true"]) .below-nav {
 .menu[data-open="true"] .menu-foot {
   opacity: 1;
   transform: none;
-  transition: opacity 0.6s 0.85s, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.85s;
+  transition: opacity 0.4s 0.3s, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.3s;
 }
 .menu[data-open="true"] .menu-slash {
   opacity: 0.07;
   transform: none;
-  transition: opacity 1s 0.4s, transform 1.4s cubic-bezier(0.16, 1, 0.3, 1) 0.3s;
+  transition: opacity 0.5s 0.2s, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.15s;
+}
+.menu[data-open="true"] .menu-glow {
+  opacity: 0.35;
+  transition: opacity 0.5s 0.2s;
 }
 
 /* Burger: two bars that cross into an X */
@@ -488,7 +511,8 @@ html.lenis body {
 .screen-page {
   transition: transform var(--scroll-time, 4s) cubic-bezier(0.45, 0, 0.55, 1);
 }
-.screen-window:hover .screen-page {
+.screen-window:hover .screen-page,
+.screens:focus-visible .screen-page {
   transform: translateY(calc(-100% + 100cqh));
 }
 @media (prefers-reduced-motion: reduce) {
@@ -537,9 +561,9 @@ html.lenis body {
 /* Work: the scroll cue's arrow bobs gently downward */
 .scroll-cue-arrow {
   display: inline-block;
-  animation: scroll-cue 1.6s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  animation: scroll-cue-bob 1.6s cubic-bezier(0.45, 0, 0.55, 1) infinite;
 }
-@keyframes scroll-cue {
+@keyframes scroll-cue-bob {
   0%,
   100% {
     transform: translateY(-2px);

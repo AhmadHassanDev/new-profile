@@ -109,6 +109,7 @@ export default function Hero() {
               >
                 See the work
                 <span
+                  aria-hidden
                   className="grid h-10 w-10 place-items-center rounded-full text-ink transition-transform duration-500 group-hover:rotate-[-45deg]"
                   style={{ background: "var(--spectrum)" }}
                 >

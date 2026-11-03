@@ -23,15 +23,17 @@ export default function Cursor() {
     const pos = { ...target };
     let frame = 0;
 
+    // Runs only while the dot is catching up with the pointer, not every frame forever
     const tick = () => {
       pos.x += (target.x - pos.x) * 0.18;
       pos.y += (target.y - pos.y) * 0.18;
       if (ref.current) ref.current.style.transform = `translate3d(${pos.x}px, ${pos.y}px, 0)`;
-      frame = requestAnimationFrame(tick);
+      frame = Math.abs(target.x - pos.x) + Math.abs(target.y - pos.y) > 0.1 ? requestAnimationFrame(tick) : 0;
     };
     const onMove = (e: PointerEvent) => {
       target.x = e.clientX;
       target.y = e.clientY;
+      if (!frame) frame = requestAnimationFrame(tick);
       const el = (e.target as Element).closest<HTMLElement>("[data-cursor]");
       setLabel(el?.dataset.cursor ?? null);
       setOrbit(el?.dataset.cursorStyle === "orbit");

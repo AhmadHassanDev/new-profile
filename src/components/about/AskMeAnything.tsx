@@ -109,7 +109,8 @@ export default function AskMeAnything() {
         ))}
       </ul>
       {/* Read out for screen readers, shown on phones */}
-      <p ref={answerRef} aria-live="polite" className={`mt-8 scroll-mb-32 rounded-[24px] bg-surface/70 px-6 py-5 text-xl leading-snug font-medium backdrop-blur-xl lg:sr-only ${asked === null ? "hidden" : ""}`}>
+      {/* Always in the page (empty until asked), so the first answer is announced too */}
+      <p ref={answerRef} aria-live="polite" className={`mt-8 scroll-mb-32 rounded-[24px] text-xl leading-snug font-medium lg:sr-only ${asked === null ? "sr-only" : "bg-surface/70 px-6 py-5 backdrop-blur-xl"}`}>
         {asked !== null ? QUESTIONS[asked].a : ""}
       </p>
       <p className="mt-8 hidden text-sm text-muted lg:block">Pick one. I&apos;ll answer on the left.</p>

@@ -39,6 +39,7 @@ export default function DirectLines() {
           <span className="mt-1 block font-display text-lg font-bold tracking-[-0.02em] whitespace-nowrap sm:text-xl md:text-2xl">
             {CONTACT.whatsapp.display}
           </span>
+          <span className="sr-only"> (opens in a new tab)</span>
         </span>
         <span aria-hidden className="relative text-2xl transition-all duration-500 group-hover:rotate-45 group-hover:text-[#25d366]">
           ↗
@@ -58,10 +59,15 @@ export default function DirectLines() {
         <button
           type="button"
           onClick={copy}
+          aria-label="Copy email address"
           className="shrink-0 rounded-full border border-line px-4 py-2 text-sm font-semibold transition-colors duration-300 hover:border-transparent hover:bg-ink hover:text-bg"
         >
-          <span aria-live="polite">{copied ? "Copied ✓" : "Copy"}</span>
+          <span aria-hidden>{copied ? "Copied ✓" : "Copy"}</span>
         </button>
+        {/* Announced once on copy; it empties silently, so the label flipping back to "Copy" isn't read out */}
+        <span role="status" className="sr-only">
+          {copied ? "Email address copied" : ""}
+        </span>
       </div>
     </div>
   );
