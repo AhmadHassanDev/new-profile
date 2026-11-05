@@ -33,6 +33,15 @@ export type Block =
   | { kind: "timeline"; title: string; body?: string; unit: string; steps: { title: string; items: string[] }[] }
   /** Wireframes against the finished screens, compared in one handset with a split */
   | { kind: "evolution"; title: string; body?: string; pairs: { label: string; wire: string; final: string }[] }
+  /** Design directions explored side by side, the one that shipped marked */
+  | {
+      kind: "directions";
+      title: string;
+      body?: string;
+      options: { label: string; idea: string; src: string; width: number; height: number; chosen?: boolean }[];
+    }
+  /** A strip of wide images, e.g. one per product, to scroll through */
+  | { kind: "gallery"; title: string; body?: string; items: { label: string; detail?: string; src: string; width: number; height: number }[] }
   /** The same pages on phones, each in a handset that scrolls on hover */
   | { kind: "phones"; title: string; screens: Screen[] }
   /**
@@ -61,7 +70,7 @@ export type CaseStudy = {
   /** The live site, for projects that shipped as a website */
   site?: string;
   /** A bespoke interaction, loaded on this page only */
-  signature?: "dive" | "pulse" | "blip" | "belt";
+  signature?: "dive" | "pulse" | "blip" | "belt" | "sprint";
   /** Quick facts; a fact can show a logo (the client's) or a row of tool logos instead of plain text */
   facts: { label: string; value: string; logo?: { src: string; width: number; height: number }; tools?: string[] }[];
   blocks: Block[];
@@ -158,6 +167,126 @@ export const CASES: CaseStudy[] = [
           name: "Google PageSpeed Insights",
           logo: "/logos/lighthouse.svg",
           detail: "Lighthouse 13.6 audit, mobile and desktop",
+        },
+      },
+    ],
+  },
+  {
+    slug: "blacksprint",
+    accent: ["#5d6b22", "#def665"],
+    signature: "sprint",
+    site: "https://www.blacksprint.com/",
+    facts: [
+      { label: "Client", value: "Blacksprint" },
+      { label: "Role", value: "Design & development" },
+      { label: "Scope", value: "Website" },
+      { label: "Stack", value: "Figma · Next.js · Vercel", tools: ["Figma", "Next.js", "Vercel"] },
+    ],
+    blocks: [
+      {
+        kind: "feature",
+        text: "Not an agency, not a VC: Blacksprint is a product studio that builds and backs its own ventures. Its site had to prove that the fastest way possible, by putting those ventures in motion on the first screen.",
+        src: "/work/blacksprint.webp",
+        alt: "The Blacksprint homepage on a laptop",
+      },
+      {
+        kind: "chapter",
+        discipline: "UI design",
+        title: "The brief",
+        body: "Blacksprint is Kareem Naguib's studio. He has spent years building across nightlife, dining and entertainment tech, and the studio now builds and backs products of its own: EZeats for restaurant ordering, Techno & Chill for event ticketing, ¡Salud! for nightlife in Montréal and Ottawa, RSRVIT for reservations, Go Book! for sports bookings and Cinemawy for cinemas.\n\nThe people it speaks to are founders looking for a partner and companies looking for a builder. They don't need a pitch; they need to see the work, who it works with, and a fast way to start a conversation.",
+        findings: [
+          { value: "6", label: "Ventures on show" },
+          { value: "10+", label: "Years building ventures" },
+          { value: "50+", label: "Partners & clients" },
+          { value: "2", label: "Countries, Egypt & Canada" },
+        ],
+      },
+      {
+        kind: "directions",
+        title: "Three directions",
+        body: "Before settling, the homepage went three ways in Figma. Each made a different first impression; the one that shipped leads with the products themselves.",
+        options: [
+          { label: "The founder", idea: "Kareem's story first, his ventures as proof.", src: "/work/blacksprint/direction-founder.webp", width: 1200, height: 5280 },
+          { label: "Velocity", idea: "A bold promise, \"turning vision into velocity\", in a warm gold.", src: "/work/blacksprint/direction-velocity.webp", width: 1200, height: 5465 },
+          {
+            label: "Ventures in motion",
+            idea: "The apps themselves on the first screen, in Blacksprint's lime.",
+            src: "/work/blacksprint/home.webp",
+            width: 1200,
+            height: 4944,
+            chosen: true,
+          },
+        ],
+      },
+      { kind: "statement", text: "Lead with the products. For a studio, the work is the credential." },
+      {
+        kind: "chapter",
+        discipline: "UI design",
+        title: "Designed in Figma",
+        body: "Near-black, with Blacksprint's electric lime for every highlight and call to action. The hero sets a row of the ventures' own apps in phones, and the rest of the page earns trust in order: who's behind it, the numbers, each venture in full colour, the partners who work with them, and what the studio offers.\n\nEach venture got a showcase of its own app in its own colours, so on the ventures page every product reads as a brand, not a thumbnail: what it does, where it runs, when it launched and Blacksprint's role in it.",
+      },
+      {
+        kind: "gallery",
+        title: "The ventures",
+        items: [
+          { label: "EZeats", detail: "F&B tech · Egypt", src: "/work/blacksprint/venture-ezeats.webp", width: 1600, height: 960 },
+          { label: "Techno & Chill", detail: "Ticketing · Events", src: "/work/blacksprint/venture-technochill.webp", width: 1600, height: 960 },
+          { label: "¡Salud!", detail: "Nightlife · Canada", src: "/work/blacksprint/venture-salud.webp", width: 1600, height: 960 },
+          { label: "RSRVIT", detail: "Reservations · Egypt", src: "/work/blacksprint/venture-rsrvit.webp", width: 1600, height: 960 },
+          { label: "Go Book!", detail: "Sports bookings", src: "/work/blacksprint/venture-gobook.webp", width: 1600, height: 960 },
+          { label: "Cinemawy", detail: "Cinema & food ordering", src: "/work/blacksprint/venture-cinemawy.webp", width: 1600, height: 960 },
+        ],
+      },
+      {
+        kind: "screens",
+        title: "The pages",
+        screens: [
+          { label: "Home", src: "/work/blacksprint/home.webp", width: 1200, height: 4944 },
+          { label: "Ventures", src: "/work/blacksprint/ventures.webp", width: 1200, height: 4429 },
+        ],
+      },
+      {
+        kind: "chapter",
+        discipline: "Front-end",
+        title: "Built in Next.js",
+        body: "I built the site in Next.js and shipped it on Vercel, with no CMS this time: two pages that change rarely, so the content lives in code and every page is prerendered. The motion carries the brand's speed: a loader that counts up, the ventures' phones gliding across the hero, the founder's story lighting up word by word as you scroll, and the services stacking as cards.",
+      },
+      {
+        kind: "phones",
+        title: "On phones",
+        screens: [
+          { label: "Home", src: "/work/blacksprint/phone-home.webp", width: 786, height: 1704 },
+          { label: "About", src: "/work/blacksprint/phone-about.webp", width: 786, height: 1704 },
+          { label: "Ventures", src: "/work/blacksprint/phone-ventures.webp", width: 786, height: 1704 },
+          { label: "Services", src: "/work/blacksprint/phone-services.webp", width: 786, height: 1704 },
+          { label: "Contact", src: "/work/blacksprint/phone-contact.webp", width: 786, height: 1704 },
+          { label: "All ventures", src: "/work/blacksprint/phone-all-ventures.webp", width: 786, height: 1704 },
+          { label: "A venture", src: "/work/blacksprint/phone-venture.webp", width: 786, height: 1704 },
+        ],
+      },
+      {
+        kind: "pipeline",
+        title: "From Figma to live",
+        steps: [
+          { tool: "Figma", does: "Design & prototype" },
+          { tool: "Next.js", does: "Front-end build" },
+          { tool: "Vercel", does: "Deployment" },
+        ],
+      },
+      {
+        kind: "results",
+        title: "Results",
+        body: "Live at blacksprint.com, and clean where it counts: the live site scores full marks on Google's Lighthouse audit for best practices and SEO, and runs without blocking the browser.",
+        items: [
+          { value: "100", label: "Best practices" },
+          { value: "100", label: "SEO" },
+          { value: "100", label: "Accessibility on desktop" },
+          { value: "0 ms", label: "Blocking time on desktop" },
+        ],
+        measuredWith: {
+          name: "Google Lighthouse",
+          logo: "/logos/lighthouse.svg",
+          detail: "Lighthouse 13 audit of the live site",
         },
       },
     ],

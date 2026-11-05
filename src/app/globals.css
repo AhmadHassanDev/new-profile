@@ -546,6 +546,32 @@ body:has(.nav-bar[data-tucked="true"]) .below-nav {
   opacity: 1;
 }
 
+/* Blacksprint: a night track. Near-black, with the studio's lime glowing up from the floor as you near
+   the finish (--run runs 0 to 1); the lap marks turn lime once passed, and the clock goes lime at the end */
+.sprint-ground {
+  background: linear-gradient(to bottom, #0b0c09, #0a0b08);
+}
+.sprint-glow {
+  background:
+    radial-gradient(90% 55% at 50% 115%, rgb(93 107 34 / 0.55), transparent 70%),
+    radial-gradient(50% 40% at 100% 0%, rgb(222 246 101 / 0.06), transparent 70%);
+  opacity: calc(0.3 + var(--run, 0) * 0.7);
+}
+.sprint-tick {
+  background: rgb(222 246 101 / 0.25);
+  transition: background-color 0.3s ease;
+}
+.sprint-tick[data-passed="true"] {
+  background: var(--accent-2);
+}
+.sprint-clock {
+  transition: background-color 0.4s ease, color 0.4s ease;
+}
+.sprint-card[data-finished] .sprint-clock {
+  background: var(--accent-2);
+  color: #0b0b0b;
+}
+
 /* Mobile menu: colour sheets wipe in along a "/" edge (the logo's slash), the panel lands last.
    Closing runs it backwards. Everything moves by transform and opacity only, which phones animate on
    the GPU: sheets wider than the screen, skewed into the slash, slide across. */

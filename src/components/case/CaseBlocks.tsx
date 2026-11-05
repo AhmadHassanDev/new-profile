@@ -325,6 +325,81 @@ function Phones({ title, screens }: { title: string; screens: Screen[] }) {
   );
 }
 
+/**
+ * Directions explored before one shipped, side by side as full pages that scroll on hover. The one that
+ * shipped carries a tag and stays bright; the others sit back until hovered. On phones they scroll sideways.
+ */
+function Directions({ title, body, options }: Omit<Extract<Block, { kind: "directions" }>, "kind">) {
+  return (
+    <section className="py-16 md:py-24">
+      <div className="px-4 md:px-10">
+        <h2 className="font-display text-5xl leading-[0.9] font-bold tracking-[-0.04em] uppercase md:text-7xl">{title}</h2>
+        {body ? <p className="mt-6 max-w-2xl text-lg leading-relaxed text-muted md:text-xl">{body}</p> : null}
+      </div>
+      <ol className="mt-10 flex gap-4 overflow-x-auto px-4 pb-4 [scrollbar-width:none] md:mt-14 md:grid md:grid-cols-3 md:gap-5 md:overflow-visible md:px-10">
+        {options.map((option, i) => (
+          <li
+            key={option.label}
+            className={`w-[78vw] shrink-0 transition-opacity duration-500 md:w-auto ${option.chosen ? "" : "md:opacity-55 md:hover:opacity-100"}`}
+          >
+            <div
+              className="screen-window relative aspect-[3/4] overflow-hidden rounded-[22px] bg-surface shadow-[0_30px_60px_-25px_rgb(0_0_0/0.8)]"
+              style={{ "--scroll-time": `${((option.height / option.width) * 1.4).toFixed(1)}s` } as React.CSSProperties}
+            >
+              <Image
+                src={option.src}
+                alt={`Direction ${i + 1}, ${option.label}: the homepage`}
+                width={option.width}
+                height={option.height}
+                sizes="(min-width: 768px) calc((100vw - 120px) / 3), 78vw"
+                className="screen-page block h-auto w-full"
+              />
+              {option.chosen ? (
+                <span className="absolute top-3 right-3 rounded-full bg-[var(--accent-2)] px-3 py-1 text-xs font-bold text-[#0b0b0b]">Shipped</span>
+              ) : null}
+            </div>
+            <p className="mt-5 px-1 font-display text-xs font-semibold tracking-wide text-muted uppercase">Direction {String(i + 1).padStart(2, "0")}</p>
+            <p className="mt-1 px-1 font-display text-2xl leading-tight font-bold tracking-[-0.03em] uppercase">{option.label}</p>
+            <p className="mt-2 px-1 text-base text-muted">{option.idea}</p>
+          </li>
+        ))}
+      </ol>
+    </section>
+  );
+}
+
+/** Wide images in a strip that scrolls sideways and snaps to each, with a label under every one. */
+function Gallery({ title, body, items }: Omit<Extract<Block, { kind: "gallery" }>, "kind">) {
+  return (
+    <section className="py-8 md:py-12">
+      <div className="mb-6 px-4 md:mb-8 md:px-10">
+        <h2 className="font-display text-sm font-semibold tracking-wide text-muted uppercase">{title}</h2>
+        {body ? <p className="mt-3 max-w-2xl text-lg leading-relaxed text-muted">{body}</p> : null}
+      </div>
+      <div
+        role="region"
+        aria-label={title}
+        tabIndex={0}
+        className="snap-x snap-mandatory overflow-x-auto rounded-[24px] [scrollbar-width:none] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[var(--accent-2)]"
+      >
+        <ul className="flex w-max gap-4 px-4 pb-4 md:gap-6 md:px-10">
+          {items.map((item) => (
+            <li key={item.label} className="w-[86vw] shrink-0 snap-start scroll-ml-4 md:w-[56vw] md:scroll-ml-10 lg:w-[44vw]">
+              <div className="relative overflow-hidden rounded-[24px] bg-surface" style={{ aspectRatio: `${item.width} / ${item.height}` }}>
+                <Image src={item.src} alt={`${item.label}'s app`} fill sizes="(min-width: 1024px) 44vw, (min-width: 768px) 56vw, 86vw" className="object-cover" />
+              </div>
+              <p className="mt-4 flex items-baseline justify-between gap-4 px-1">
+                <span className="font-display text-lg font-bold tracking-[-0.02em] uppercase">{item.label}</span>
+                {item.detail ? <span className="text-sm text-muted">{item.detail}</span> : null}
+              </p>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  );
+}
+
 /** Renders a case study's blocks in the order the project chose them. */
 export default function CaseBlocks({ blocks }: { blocks: Block[] }) {
   let chapter = 0;
@@ -350,6 +425,10 @@ export default function CaseBlocks({ blocks }: { blocks: Block[] }) {
             return <Timeline key={i} title={block.title} body={block.body} unit={block.unit} steps={block.steps} />;
           case "evolution":
             return <Evolution key={i} title={block.title} body={block.body} pairs={block.pairs} />;
+          case "directions":
+            return <Directions key={i} title={block.title} body={block.body} options={block.options} />;
+          case "gallery":
+            return <Gallery key={i} title={block.title} body={block.body} items={block.items} />;
           case "phones":
             return <Phones key={i} title={block.title} screens={block.screens} />;
         }
