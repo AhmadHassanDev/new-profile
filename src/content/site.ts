@@ -145,15 +145,21 @@ const ALL_PROJECTS: Project[] = [
 // A project goes live once it has a cover; until then it stays out of every grid and list
 export const PROJECTS = ALL_PROJECTS.filter((p): p is Project & { cover: string } => !!p.cover);
 
-/** "Mobile app · Fintech" → "Mobile app" */
-export const typeOf = (kind: string) => kind.split(" · ")[0];
+// Websites and landing pages are one kind of work: they're listed, counted and filtered together
+const WEBSITE = ["Website", "Landing page", "Branding & website"];
+
+/** "Mobile app · Fintech" → "Mobile app"; any website or landing page → "Website" */
+export const typeOf = (kind: string) => {
+  const type = kind.split(" · ")[0];
+  return WEBSITE.includes(type) ? "Website" : type;
+};
 
 /**
  * What Ahmed does. Most are tied to the projects that show them and link to the work page filtered;
  * one with no published project yet links straight to contact instead.
  */
 export const SERVICES: { title: string; type?: string; tag?: Discipline; contact?: string }[] = [
-  { title: "Landing pages", type: "Landing page" },
+  { title: "Websites", type: "Website" },
   { title: "Web apps", type: "Web app" },
   { title: "UX research", tag: "UX research" },
   { title: "Branding & logos", type: "Branding" },
