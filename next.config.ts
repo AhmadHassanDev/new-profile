@@ -16,6 +16,11 @@ const nextConfig: NextConfig = {
   experimental: {
     // The Tailwind CSS is small, so it ships inside the page: the first paint doesn't wait on a stylesheet
     inlineCss: true,
+    // Turbopack's file-system cache misses edits to the hand-written rules in globals.css (Tailwind's own
+    // classes update, those don't): restored on Vercel, each deploy shipped the previous deploy's CSS, and
+    // dev needed `rm -rf .next` after every change. Builds and restarts start cold instead, and correct.
+    turbopackFileSystemCacheForBuild: false,
+    turbopackFileSystemCacheForDev: false,
   },
   partialPrefetching: true,
   turbopack: {
