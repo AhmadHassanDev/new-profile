@@ -268,6 +268,6 @@ export const SOCIALS = [
 
 /** Direct lines, shown on the contact page. The form's inbox is set by CONTACT_TO (see .env.example). */
 export const CONTACT = {
-  email: "ahmad.hassan.abdelmoaty@gmail.com",
+  email: "hello@ahmedhassan.dev",
   whatsapp: { number: "201119523790", display: "+20 111 952 3790" },
 };
