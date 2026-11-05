@@ -129,7 +129,7 @@ export default function WorkIndex() {
   return (
     <section id="projects" aria-labelledby="projects-title" className="scroll-mt-24 px-4 pt-24 pb-32 md:px-10 md:pt-32 md:pb-48">
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-        <h2 id="projects-title" className="font-display text-5xl leading-[0.9] font-bold tracking-[-0.04em] uppercase md:text-7xl">
+        <h2 id="projects-title" className="font-display text-5xl leading-[0.9] font-bold uppercase md:text-7xl">
           Every
           <br />
           <span className="text-spectrum animate-shimmer">project</span>
@@ -189,7 +189,7 @@ export default function WorkIndex() {
         </ul>
       ) : (
         <div className="mt-16 flex flex-col items-start gap-5 rounded-[28px] bg-surface/40 p-10">
-          <p className="font-display text-2xl font-semibold tracking-[-0.02em] md:text-3xl">Nothing matches those filters yet.</p>
+          <p className="font-display text-2xl font-semibold md:text-3xl">Nothing matches those filters yet.</p>
           <button
             type="button"
             onClick={() => setFilters(NONE)}

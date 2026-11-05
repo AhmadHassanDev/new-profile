@@ -42,8 +42,8 @@ export default async function Image() {
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", fontFamily: "Unbounded", fontWeight: 700, textTransform: "uppercase" }}>
-          <div style={{ fontSize: 112, lineHeight: 0.95, letterSpacing: "-0.03em" }}>{NAME}</div>
-          <div style={{ display: "flex", gap: 24, marginTop: 36, fontSize: 52, letterSpacing: "-0.02em" }}>
+          <div style={{ fontSize: 112, lineHeight: 0.95 }}>{NAME}</div>
+          <div style={{ display: "flex", gap: 24, marginTop: 36, fontSize: 52 }}>
             {VERBS.map((verb) => (
               <span key={verb.text} style={{ color: verb.color }}>
                 {verb.text}

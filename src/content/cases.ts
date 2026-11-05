@@ -70,7 +70,7 @@ export type CaseStudy = {
   /** The live site, for projects that shipped as a website */
   site?: string;
   /** A bespoke interaction, loaded on this page only */
-  signature?: "dive" | "pulse" | "blip" | "belt" | "sprint";
+  signature?: "dive" | "pulse" | "blip" | "belt" | "sprint" | "spark";
   /** Quick facts; a fact can show a logo (the client's) or a row of tool logos instead of plain text */
   facts: { label: string; value: string; logo?: { src: string; width: number; height: number }; tools?: string[] }[];
   blocks: Block[];
@@ -168,6 +168,73 @@ export const CASES: CaseStudy[] = [
           logo: "/logos/lighthouse.svg",
           detail: "Lighthouse 13.6 audit, mobile and desktop",
         },
+      },
+    ],
+  },
+  {
+    slug: "spark",
+    accent: ["#004ab5", "#d3fc64"],
+    signature: "spark",
+    site: "https://sparkplatform.app/",
+    facts: [
+      { label: "Client", value: "Spark, Egypt", logo: { src: "/logos/spark.svg", width: 172, height: 42 } },
+      { label: "Role", value: "UI design" },
+      { label: "Scope", value: "Landing page, desktop & mobile" },
+      { label: "Tools", value: "Figma", tools: ["Figma"] },
+    ],
+    blocks: [
+      {
+        kind: "feature",
+        text: "Booking a padel court in Egypt used to mean calls, DMs and Instagram posts. Spark puts every game, tournament and experience in one app, and its landing page had to sell that in a single scroll, to players and to the venues behind them.",
+        src: "/work/spark.webp",
+        alt: "The Spark landing page on a laptop",
+      },
+      {
+        kind: "chapter",
+        discipline: "UI design",
+        title: "The brief",
+        body: "Spark is a booking app for activities across Egypt: padel and football first, then tennis, esports, escape rooms, workshops and trips, with tournaments to enter and venues to book in a few taps. Its pitch is simple: stop jumping between posts, DMs and links.\n\nThe site speaks to two people. A player wants to know what they can book and how fast, then get the app. A venue, organiser or academy wants more bookings with less admin. So the design became two pages: the landing page for players, and Work with us for partners.",
+        findings: [
+          { value: "250k+", label: "Bookings made" },
+          { value: "100k+", label: "People using Spark" },
+          { value: "100+", label: "Activities listed" },
+          { value: "2", label: "Audiences, players & partners" },
+        ],
+        sources: [{ label: "Spark", href: "https://sparkplatform.app/" }],
+      },
+      { kind: "statement", text: "Make booking fun feel as easy as having it." },
+      {
+        kind: "chapter",
+        discipline: "UI design",
+        title: "Designed in Figma",
+        body: "The look is Spark's own energy: its royal blue and electric lime, a mint-to-sky hero and hand-drawn confetti in coral, teal and lime, like streamers at a match. The hero shows the real app in three phones, so the product sells itself before a word is read.\n\nThe page then answers a player's questions in order: how it works in three steps (discover, choose, book), what there is to do (play, experience, create, go), why it beats the back-and-forth, and the numbers and partners behind it. Work with us turns the same language to business: who Spark is for, why partner, four steps to go live, and a look at the admin app and dashboard venues run their bookings from.",
+      },
+      {
+        kind: "screens",
+        title: "The pages",
+        screens: [
+          { label: "Home", src: "/work/spark/home.webp", width: 1200, height: 4009 },
+          { label: "Work with us", src: "/work/spark/partners.webp", width: 1200, height: 4755 },
+        ],
+      },
+      {
+        kind: "phones",
+        title: "On phones",
+        screens: [
+          { label: "Home", src: "/work/spark/phone-home.webp", width: 393, height: 4426 },
+          { label: "Work with us", src: "/work/spark/phone-partners.webp", width: 393, height: 6859 },
+        ],
+      },
+      {
+        kind: "results",
+        title: "Live",
+        body: "Designed in Figma for desktop and phones, and now live at sparkplatform.app.",
+        items: [
+          { value: "2", label: "Pages, for players & partners" },
+          { value: "3", label: "Steps from browsing to booked" },
+          { value: "4", label: "Ways in: play, experience, create, go" },
+          { value: "2", label: "Layouts, desktop & phone" },
+        ],
       },
     ],
   },

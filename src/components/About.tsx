@@ -212,7 +212,7 @@ export default function About() {
           >
             <p
               ref={introRef}
-              className="font-display text-[7.4vw] leading-[1.06] font-semibold tracking-[-0.035em] md:portrait:text-[5.6vw] landscape:text-[clamp(1.6rem,2.9vw,3.25rem)]"
+              className="font-display text-[7.4vw] leading-[1.06] font-semibold md:portrait:text-[5.6vw] landscape:text-[clamp(1.6rem,2.9vw,3.25rem)]"
               style={{ "--n": INTRO_WORDS.length } as React.CSSProperties}
             >
               {INTRO_WORDS.map((word, i) => (
@@ -248,11 +248,11 @@ export default function About() {
                   <span aria-hidden className="h-px w-10" style={{ background: color }} />
                   {step.name}
                 </p>
-                <h3 className="mt-3 font-display text-[12.5vw] leading-[0.86] font-bold tracking-[-0.05em] uppercase md:mt-4 md:portrait:text-[10.5vw] landscape:text-[clamp(2.5rem,4.6vw,6rem)]">
+                <h3 className="mt-3 font-display text-[12.5vw] leading-[0.86] font-bold uppercase md:mt-4 md:portrait:text-[10.5vw] landscape:text-[clamp(2.5rem,4.6vw,6rem)]">
                   {step.verb}
                   <span style={{ color }}>.</span>
                 </h3>
-                <p className="mt-3 font-display text-lg leading-tight font-semibold tracking-[-0.02em] md:mt-4 md:text-2xl">{step.line}</p>
+                <p className="mt-3 font-display text-lg leading-tight font-semibold md:mt-4 md:text-2xl">{step.line}</p>
                 <p className="mt-3 max-w-md text-sm leading-relaxed text-muted md:mt-4 md:text-lg">{step.body}</p>
                 <ul className="mt-4 flex flex-wrap gap-1.5 md:mt-5 md:gap-2">
                   {step.kit.map((item) => (
@@ -275,10 +275,10 @@ export default function About() {
             }}
             className="[grid-area:1/1] portrait:self-end landscape:self-center opacity-0 will-change-transform"
           >
-            <h3 className="font-display text-[12.5vw] leading-[0.86] font-bold tracking-[-0.05em] uppercase md:portrait:text-[10.5vw] landscape:text-[clamp(2.5rem,4.6vw,6rem)]">
+            <h3 className="font-display text-[12.5vw] leading-[0.86] font-bold uppercase md:portrait:text-[10.5vw] landscape:text-[clamp(2.5rem,4.6vw,6rem)]">
               <span className="text-spectrum animate-shimmer">Shipped.</span>
             </h3>
-            <p className="mt-4 max-w-md font-display text-lg leading-tight font-semibold tracking-[-0.02em] md:mt-5 md:text-2xl">
+            <p className="mt-4 max-w-md font-display text-lg leading-tight font-semibold md:mt-5 md:text-2xl">
               Six years. 60+ clients. 5+ regions. <span className="text-muted">One person, end to end.</span>
             </p>
             <Link

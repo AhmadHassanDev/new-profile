@@ -9,6 +9,7 @@ import Nav from "@/components/Nav";
 import SocialIcon from "@/components/SocialIcon";
 import { CONTACT, SOCIALS } from "@/content/site";
 import { absoluteUrl, breadcrumbs, PERSON_ID, pageMetadata, webPage } from "@/lib/seo";
+import { fitLetters } from "@/lib/fit";
 
 const DESCRIPTION = "Start a project with Ahmed Hassan: send a message, WhatsApp, email, or find him on LinkedIn, Behance, GitHub and Instagram.";
 
@@ -68,7 +69,7 @@ export default function ContactPage() {
 
         {/* Socials, front and centre */}
         <section aria-labelledby="socials-title" className="relative px-4 pb-32 md:px-10 md:pb-48">
-          <h2 id="socials-title" className="mb-10 font-display text-5xl leading-[0.9] font-bold tracking-[-0.04em] uppercase md:mb-14 md:text-7xl">
+          <h2 id="socials-title" className="mb-10 font-display text-5xl leading-[0.9] font-bold uppercase md:mb-14 md:text-7xl">
             Find me
             <br />
             <span className="text-spectrum animate-shimmer">online</span>
@@ -90,8 +91,10 @@ export default function ContactPage() {
                       ↗
                     </span>
                   </span>
-                  <span className="relative">
-                    <span className="block font-display text-3xl font-bold tracking-[-0.03em] uppercase md:text-4xl">{social.label}</span>
+                  <span className="@container relative block">
+                    <span className="fit-heading block font-display font-bold uppercase [--fit-max:1.875rem] md:[--fit-max:2.25rem]" style={fitLetters(social.label)}>
+                      {social.label}
+                    </span>
                     {/* Dimmed lines go to full strength on the brand flood, where 60–80% white falls under 4.5:1 */}
                     <span className="mt-2 block text-base font-semibold opacity-80 transition-opacity duration-500 group-hover:opacity-100 group-focus-visible:opacity-100">
                       {social.handle}

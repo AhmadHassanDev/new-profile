@@ -85,7 +85,7 @@ export default function MakeItReal({ href, children }: { href: string; children?
   let count = 0;
   return (
     <div className="make-real">
-      <h2 aria-label={LINES.join(" ")} className="font-display text-[11.5vw] leading-[0.85] font-bold tracking-[-0.05em] uppercase md:text-[10vw]">
+      <h2 aria-label={LINES.join(" ")} className="font-display text-[11.5vw] leading-[0.85] font-bold uppercase md:text-[10vw]">
         {LINES.map((line, row) => (
           <span key={line} aria-hidden className="block">
             {/* Word by word, so a narrow screen wraps between words, never inside one */}

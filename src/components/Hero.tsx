@@ -63,7 +63,7 @@ export default function Hero() {
         <div data-intro-hide className="pointer-events-none portrait:mt-6 landscape:my-auto landscape:py-6">
           {/* Signature */}
           <p className="mb-5 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm font-medium text-muted md:mb-7 md:gap-x-4 md:text-base">
-            <span className="text-xl font-semibold tracking-tight text-ink md:text-3xl">Ahmed Hassan</span>
+            <span className="text-xl font-semibold text-ink md:text-3xl">Ahmed Hassan</span>
             <span aria-hidden className="h-px w-8 bg-line md:w-12" />
             Product designer &amp; front-end developer
           </p>
@@ -72,7 +72,7 @@ export default function Hero() {
               Sized so the longest word always fits beside (landscape) or under (portrait) the particles. */}
           <h1
             ref={headingRef}
-            className="font-display font-bold uppercase leading-[0.86] tracking-[-0.045em] text-ink data-[liquid=true]:[&_span]:text-transparent"
+            className="font-display font-bold uppercase leading-[0.86] text-ink data-[liquid=true]:[&_span]:text-transparent"
           >
             <span className="sr-only">Ahmed Hassan: </span>
             {VERBS.map((verb, i) => (

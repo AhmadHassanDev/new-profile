@@ -210,13 +210,13 @@ export default function Clients() {
         style={{ background: "radial-gradient(circle, rgb(196 113 237 / 0.2), rgb(9 199 251 / 0.08) 45%, transparent 70%)" }}
       />
       <div className="mb-10 flex flex-col gap-4 px-4 md:mb-14 md:flex-row md:items-end md:justify-between md:px-10">
-        <h2 id="clients-title" className="font-display text-4xl leading-[0.9] font-bold tracking-[-0.04em] uppercase md:text-6xl">
+        <h2 id="clients-title" className="font-display text-4xl leading-[0.9] font-bold uppercase md:text-6xl">
           Trusted by
           <br />
           <span className="text-spectrum animate-shimmer">teams that ship</span>
         </h2>
         <p className="flex flex-col gap-1 text-sm font-medium text-muted md:items-end">
-          <span className="font-display text-5xl leading-none font-bold tracking-[-0.04em] text-ink">
+          <span className="font-display text-5xl leading-none font-bold text-ink">
             {CLIENTS.length}
             <span className="text-spectrum ml-[0.12em]">+</span>
           </span>

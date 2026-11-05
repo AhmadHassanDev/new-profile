@@ -303,7 +303,7 @@ export default function Work({
           {/* A pane of frosted glass so the title stays readable over whatever slides beneath (a light blur: it's redone every frame the wall moves) */}
           <Heading
             id="work-title"
-            className="rounded-[28px] bg-bg/65 px-5 py-4 font-display text-5xl leading-[0.9] font-bold tracking-[-0.04em] uppercase backdrop-blur-md md:px-7 md:py-6 md:text-7xl"
+            className="rounded-[28px] bg-bg/65 px-5 py-4 font-display text-5xl leading-[0.9] font-bold uppercase backdrop-blur-md md:px-7 md:py-6 md:text-7xl"
           >
             {title[0]}
             <br />

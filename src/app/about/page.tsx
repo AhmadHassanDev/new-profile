@@ -10,6 +10,7 @@ import JsonLd from "@/components/JsonLd";
 import Nav from "@/components/Nav";
 import ScrollWords from "@/components/ScrollWords";
 import { DISCIPLINE_COLOR, PASSIONS, PROCESS, QUOTE, STORY } from "@/content/site";
+import { fitLetters } from "@/lib/fit";
 import { breadcrumbs, PERSON_ID, pageMetadata, webPage } from "@/lib/seo";
 
 const DESCRIPTION =
@@ -85,11 +86,13 @@ function quoteSegments(text: string, highlight: string) {
 
 function ChapterTitle({ id, top, bottom }: { id: string; top: string; bottom: string }) {
   return (
-    <h2 id={`${id}-title`} className="font-display text-5xl leading-[0.9] font-bold tracking-[-0.04em] uppercase md:text-7xl">
-      {top}
-      <br />
-      <span className="text-spectrum animate-shimmer">{bottom}</span>
-    </h2>
+    <div className="@container">
+      <h2 id={`${id}-title`} className="fit-heading font-display leading-[0.9] font-bold uppercase [--fit-max:3rem] md:[--fit-max:4.5rem]" style={fitLetters(top, bottom)}>
+        {top}
+        <br />
+        <span className="text-spectrum animate-shimmer">{bottom}</span>
+      </h2>
+    </div>
   );
 }
 
@@ -121,7 +124,7 @@ export default function AboutPage() {
           <div aria-hidden className="hero-dim pointer-events-none absolute inset-0 z-10 bg-bg" />
 
           <Kicker>About</Kicker>
-          <h1 className="relative mt-8 font-display leading-[0.84] font-bold tracking-[-0.055em] uppercase">
+          <h1 className="relative mt-8 font-display leading-[0.84] font-bold uppercase">
             <span className="hero-split-left reveal block text-[17vw] md:text-[13vw] lg:text-[10vw]">
               <span className="animate-rise block">Hi, I&apos;m</span>
             </span>
@@ -148,9 +151,9 @@ export default function AboutPage() {
             </p>
             <dl className="grid grid-cols-4 lg:col-span-7">
               {FACTS.map((fact, i) => (
-                <div key={fact.label} className={`flex flex-col-reverse gap-1 ${i > 0 ? "border-l border-line pl-3 md:pl-5 lg:pl-8" : ""}`}>
+                <div key={fact.label} className={`@container flex flex-col-reverse gap-1 ${i > 0 ? "border-l border-line pl-3 md:pl-5 lg:pl-8" : ""}`}>
                   <dt className="text-xs font-medium text-muted md:text-sm">{fact.label}</dt>
-                  <dd className="font-display text-2xl leading-none font-bold tracking-[-0.04em] md:text-4xl lg:text-5xl">{fact.value}</dd>
+                  <dd className="font-display text-[min(1.5rem,40cqw)] leading-none font-bold md:text-[min(2.25rem,40cqw)] lg:text-[min(3rem,40cqw)]">{fact.value}</dd>
                 </div>
               ))}
             </dl>
@@ -171,11 +174,11 @@ export default function AboutPage() {
                     className="grid gap-3 border-t border-line py-8 md:grid-cols-8 md:gap-8 md:py-10"
                     style={{ "--c": STORY_COLORS[i] } as React.CSSProperties}
                   >
-                    <p className="font-display text-4xl leading-none font-bold tracking-[-0.04em] text-[var(--c)] md:col-span-3 md:text-5xl">
+                    <p className="font-display text-4xl leading-none font-bold text-[var(--c)] md:col-span-3 md:text-5xl">
                       {step.when}
                     </p>
                     <div className="md:col-span-5">
-                      <h3 className="font-display text-2xl font-semibold tracking-[-0.02em] md:text-3xl">{step.title}</h3>
+                      <h3 className="font-display text-2xl font-semibold md:text-3xl">{step.title}</h3>
                       <p className="mt-3 text-lg leading-relaxed text-muted">{step.body}</p>
                     </div>
                   </li>
@@ -190,11 +193,16 @@ export default function AboutPage() {
                   const color = DISCIPLINE_COLOR[step.name];
                   return (
                     <div key={step.verb} className="grid gap-4 border-t border-line py-10 md:grid-cols-8 md:gap-8">
-                      <h3 className="font-display text-5xl leading-none font-bold tracking-[-0.05em] uppercase md:col-span-3 md:text-[clamp(2rem,3.3vw,3.5rem)]" style={{ color }}>
-                        {step.verb}
-                      </h3>
+                      <div className="@container md:col-span-3">
+                        <h3
+                          className="fit-heading font-display leading-none font-bold uppercase [--fit-max:3rem] md:[--fit-max:3.5rem]"
+                          style={{ color, ...fitLetters(step.verb) }}
+                        >
+                          {step.verb}
+                        </h3>
+                      </div>
                       <div className="md:col-span-5">
-                        <p className="font-display text-2xl font-semibold tracking-[-0.02em] md:text-3xl">{step.line}</p>
+                        <p className="font-display text-2xl font-semibold md:text-3xl">{step.line}</p>
                         <p className="mt-3 text-lg leading-relaxed text-muted">{step.body}</p>
                         <ul className="mt-6 flex flex-wrap gap-2">
                           {step.kit.map((item) => (
@@ -231,7 +239,7 @@ export default function AboutPage() {
               <figure>
                 <blockquote>
                   <ScrollWords
-                    className="font-display text-[11vw] leading-[0.92] font-bold tracking-[-0.05em] uppercase md:text-[5.6vw]"
+                    className="font-display text-[11vw] leading-[0.92] font-bold uppercase md:text-[5.6vw]"
                     segments={quoteSegments(QUOTE.text, "impossible")}
                   />
                 </blockquote>

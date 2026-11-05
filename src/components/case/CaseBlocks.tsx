@@ -2,6 +2,7 @@ import Image from "next/image";
 import type { Block, Screen, Source } from "@/content/cases";
 import Evolution from "./Evolution";
 import Pipeline from "./Pipeline";
+import { fitLetters } from "@/lib/fit";
 import Timeline from "./Timeline";
 import { COVER_HEIGHT, COVER_WIDTH, DISCIPLINE_COLOR, type Discipline } from "@/content/site";
 
@@ -16,7 +17,7 @@ const CHAPTER_VERB: Record<Discipline, string> = {
 function Statement({ text }: { text: string }) {
   return (
     <section className="px-4 py-16 md:px-10 md:py-24">
-      <p className="max-w-5xl font-display text-[clamp(1.9rem,4.4vw,4.5rem)] leading-[1.05] font-semibold tracking-[-0.035em]">
+      <p className="max-w-5xl font-display text-[clamp(1.9rem,4.4vw,4.5rem)] leading-[1.05] font-semibold">
         {text}
       </p>
     </section>
@@ -38,8 +39,10 @@ function Chapter({ discipline, title, body, findings, sources, index }: ChapterP
           {CHAPTER_VERB[discipline]}
         </p>
       </div>
-      <div className="md:col-span-8">
-        <h2 className="font-display text-4xl leading-[0.95] font-bold tracking-[-0.04em] uppercase md:text-6xl">{title}</h2>
+      <div className="@container md:col-span-8">
+        <h2 className="fit-heading font-display leading-[0.95] font-bold uppercase [--fit-max:2.25rem] md:[--fit-max:3.75rem]" style={fitLetters(title)}>
+          {title}
+        </h2>
         {body ? (
           body.split("\n\n").map((paragraph, i) => (
             <p key={i} className="mt-6 max-w-2xl text-lg leading-relaxed text-muted md:text-xl">
@@ -54,10 +57,10 @@ function Chapter({ discipline, title, body, findings, sources, index }: ChapterP
           <dl className={`mt-10 grid grid-cols-2 gap-3 md:gap-4 ${findings.length === 4 ? "xl:grid-cols-4" : ""}`}>
             {findings.map((f) => (
               // Numbers line up along the top whatever their labels' length (reversed, so the label follows in reading order)
-              <div key={f.label} className="flex flex-col-reverse justify-end gap-2 rounded-[22px] bg-surface/60 p-5 backdrop-blur-xl md:p-6">
+              <div key={f.label} className="@container flex flex-col-reverse justify-end gap-2 rounded-[22px] bg-surface/60 p-5 backdrop-blur-xl md:p-6">
                 <dt className="text-sm text-muted">{f.label}</dt>
-                {/* Sized to the card, so a long figure like "£337m" never spills out */}
-                <dd className="font-display text-[clamp(1.75rem,8vw,2.25rem)] leading-none font-bold tracking-[-0.04em] md:text-4xl xl:text-[clamp(1.75rem,2.2vw,3rem)]">
+                {/* Sized to the card, so a long figure like "£337m" (4.5em wide) never spills out */}
+                <dd className="font-display text-[min(2.25rem,21cqw)] leading-none font-bold xl:text-[min(3rem,21cqw)]">
                   {f.value}
                 </dd>
               </div>
@@ -98,13 +101,13 @@ function Pending({ children, className = "" }: { children: React.ReactNode; clas
   );
 }
 
-/** A result's number; a unit after it ("10 ms") sits smaller so the figure stays the hero */
+/** A result's number, sized to its card; a unit after it ("10 ms") sits smaller so the figure stays the hero */
 function Figure({ value }: { value: string }) {
   const [number, unit] = value.split(" ");
   return (
-    <span className="block font-display text-5xl font-bold tracking-[-0.05em] whitespace-nowrap md:text-7xl">
+    <span className="block font-display text-[min(3rem,38cqw)] font-bold whitespace-nowrap md:text-[min(4.5rem,38cqw)]">
       {number}
-      {unit ? <span className="ml-1 text-2xl tracking-[-0.02em] text-muted md:text-3xl">{unit}</span> : null}
+      {unit ? <span className="ml-1 text-2xl text-muted md:text-3xl">{unit}</span> : null}
     </span>
   );
 }
@@ -112,8 +115,10 @@ function Figure({ value }: { value: string }) {
 function Results({ title, body, items, measuredWith, sources }: Omit<Extract<Block, { kind: "results" }>, "kind">) {
   const slots = items.length ? items : [null, null, null];
   return (
-    <section className="px-4 py-14 md:px-10 md:py-20">
-      <h2 className="font-display text-5xl leading-[0.9] font-bold tracking-[-0.04em] uppercase md:text-7xl">{title}</h2>
+    <section className="@container px-4 py-14 md:px-10 md:py-20">
+      <h2 className="fit-heading font-display leading-[0.9] font-bold uppercase [--fit-max:3rem] md:[--fit-max:4.5rem]" style={fitLetters(title)}>
+        {title}
+      </h2>
       {body ? <p className="mt-6 max-w-3xl text-lg leading-relaxed text-muted md:text-xl">{body}</p> : null}
       {measuredWith ? (
         <p className="mt-8 inline-flex items-center gap-4 rounded-[22px] bg-surface/70 py-3 pr-6 pl-3 backdrop-blur-xl">
@@ -130,7 +135,7 @@ function Results({ title, body, items, measuredWith, sources }: Omit<Extract<Blo
         {slots.map((item, i) => (
           <li
             key={i}
-            className={`flex min-h-[200px] flex-col rounded-[28px] p-6 md:min-h-[260px] md:p-9 ${
+            className={`@container flex min-h-[200px] flex-col rounded-[28px] p-6 md:min-h-[260px] md:p-9 ${
               item ? "bg-surface/70 backdrop-blur-xl" : "bg-surface/30"
             }`}
           >
@@ -149,7 +154,7 @@ function Results({ title, body, items, measuredWith, sources }: Omit<Extract<Blo
               <span className="mt-auto pt-8">
                 {item.before ? (
                   // Where it started, struck through, so the jump reads at a glance
-                  <span className="mb-1 block font-display text-2xl font-bold tracking-[-0.03em] whitespace-nowrap text-muted/70 md:text-4xl">
+                  <span className="mb-1 block font-display text-[min(1.5rem,18cqw)] font-bold whitespace-nowrap text-muted/70 md:text-[min(2.25rem,18cqw)]">
                     <span className="sr-only">From </span>
                     <span className="line-through decoration-[var(--accent)] decoration-[3px]">{item.before}</span>
                     <span className="sr-only"> to</span>
@@ -160,7 +165,7 @@ function Results({ title, body, items, measuredWith, sources }: Omit<Extract<Blo
               </span>
             ) : (
               <span className="mt-auto pt-10">
-                <span className="block font-display text-6xl font-bold tracking-[-0.05em] text-muted/40 md:text-7xl">—</span>
+                <span className="block font-display text-6xl font-bold text-muted/40 md:text-7xl">—</span>
                 <span className="mt-3 block text-base text-muted">Result coming soon</span>
               </span>
             )}
@@ -270,7 +275,7 @@ function Screens({ title, screens }: { title: string; screens: Screen[] }) {
                   <div className="grid aspect-[4/5] place-items-center bg-surface/30 text-sm text-muted">Screen coming soon</div>
                 )}
               </div>
-              <p className="mt-4 px-1 font-display text-lg font-bold tracking-[-0.02em] uppercase">{screen.label}</p>
+              <p className="mt-4 px-1 font-display text-lg font-bold uppercase">{screen.label}</p>
             </li>
           ))}
         </ul>
@@ -316,7 +321,7 @@ function Phones({ title, screens }: { title: string; screens: Screen[] }) {
                   <div className="grid aspect-[393/852] place-items-center rounded-[36px] bg-surface/30 text-sm text-muted">Screen coming soon</div>
                 )}
               </div>
-              <p className="mt-4 px-1 font-display text-lg font-bold tracking-[-0.02em] uppercase">{screen.label}</p>
+              <p className="mt-4 px-1 font-display text-lg font-bold uppercase">{screen.label}</p>
             </li>
           ))}
         </ul>
@@ -332,8 +337,10 @@ function Phones({ title, screens }: { title: string; screens: Screen[] }) {
 function Directions({ title, body, options }: Omit<Extract<Block, { kind: "directions" }>, "kind">) {
   return (
     <section className="py-16 md:py-24">
-      <div className="px-4 md:px-10">
-        <h2 className="font-display text-5xl leading-[0.9] font-bold tracking-[-0.04em] uppercase md:text-7xl">{title}</h2>
+      <div className="@container px-4 md:px-10">
+        <h2 className="fit-heading font-display leading-[0.9] font-bold uppercase [--fit-max:3rem] md:[--fit-max:4.5rem]" style={fitLetters(title)}>
+          {title}
+        </h2>
         {body ? <p className="mt-6 max-w-2xl text-lg leading-relaxed text-muted md:text-xl">{body}</p> : null}
       </div>
       <ol className="mt-10 flex gap-4 overflow-x-auto px-4 pb-4 [scrollbar-width:none] md:mt-14 md:grid md:grid-cols-3 md:gap-5 md:overflow-visible md:px-10">
@@ -359,7 +366,7 @@ function Directions({ title, body, options }: Omit<Extract<Block, { kind: "direc
               ) : null}
             </div>
             <p className="mt-5 px-1 font-display text-xs font-semibold tracking-wide text-muted uppercase">Direction {String(i + 1).padStart(2, "0")}</p>
-            <p className="mt-1 px-1 font-display text-2xl leading-tight font-bold tracking-[-0.03em] uppercase">{option.label}</p>
+            <p className="mt-1 px-1 font-display text-2xl leading-tight font-bold uppercase">{option.label}</p>
             <p className="mt-2 px-1 text-base text-muted">{option.idea}</p>
           </li>
         ))}
@@ -389,7 +396,7 @@ function Gallery({ title, body, items }: Omit<Extract<Block, { kind: "gallery" }
                 <Image src={item.src} alt={`${item.label}'s app`} fill sizes="(min-width: 1024px) 44vw, (min-width: 768px) 56vw, 86vw" className="object-cover" />
               </div>
               <p className="mt-4 flex items-baseline justify-between gap-4 px-1">
-                <span className="font-display text-lg font-bold tracking-[-0.02em] uppercase">{item.label}</span>
+                <span className="font-display text-lg font-bold uppercase">{item.label}</span>
                 {item.detail ? <span className="text-sm text-muted">{item.detail}</span> : null}
               </p>
             </li>

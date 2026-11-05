@@ -456,6 +456,13 @@ body:has(.nav-bar[data-tucked="true"]) .below-nav {
   from { scale: 1.9; }
 }
 
+/* Big uppercase headings never break a word, so each is capped to fit its longest word (--letters, set
+   by fitLetters, at 0.92em a letter: the display face's capitals measure 0.77–0.9em in real words) in its
+   container, the nearest @container; --fit-max is the size it reaches when there's room */
+.fit-heading {
+  font-size: min(var(--fit-max), calc(100cqw / (var(--letters) * 0.92)));
+}
+
 /* Case timeline: each step's bar fills in turn once the list is in view, and its card brightens as it
    does (--i is the step's place). Without JavaScript or with reduced motion, it all shows at once. */
 .timeline-fill {
@@ -570,6 +577,50 @@ body:has(.nav-bar[data-tucked="true"]) .below-nav {
 .sprint-card[data-finished] .sprint-clock {
   background: var(--accent-2);
   color: #0b0b0b;
+}
+
+/* Spark: a floodlit night in Spark's blue. The lights come up as you read (--booking runs 0 to 1); each
+   step of the booking lights up and bursts into hand-drawn confetti, and the confirmation slides in at the end */
+.spark-ground {
+  background: linear-gradient(to bottom, #071030, #060a1c);
+}
+.spark-flood {
+  background:
+    radial-gradient(60% 45% at 80% -5%, rgb(211 252 100 / 0.14), transparent 70%),
+    radial-gradient(55% 45% at 0% 100%, rgb(0 74 181 / 0.45), transparent 70%),
+    radial-gradient(40% 35% at 100% 80%, rgb(0 214 152 / 0.1), transparent 70%);
+  opacity: calc(0.45 + var(--booking, 0) * 0.55);
+}
+.spark-dot {
+  background: rgb(255 255 255 / 0.16);
+  transition: background-color 0.3s ease, scale 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.spark-stage[data-reached="true"] .spark-dot {
+  background: var(--accent-2);
+  scale: 1.15;
+}
+.spark-confetti path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  transition: stroke-dashoffset 0.6s cubic-bezier(0.65, 0, 0.35, 1);
+}
+.spark-stage[data-reached="true"] .spark-confetti path {
+  stroke-dashoffset: 0;
+}
+.spark-toast {
+  opacity: 0;
+  translate: 0 140%;
+  transition: opacity 0.4s ease, translate 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.spark-toast[data-shown] {
+  opacity: 1;
+  translate: 0 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .spark-confetti path,
+  .spark-toast {
+    transition-duration: 0s;
+  }
 }
 
 /* Mobile menu: colour sheets wipe in along a "/" edge (the logo's slash), the panel lands last.

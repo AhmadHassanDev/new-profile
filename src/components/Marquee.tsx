@@ -9,7 +9,7 @@ function Track({ outline = false }: { outline?: boolean }) {
         <div key={half} className="flex shrink-0 items-center">
           {run.map((item, i) => (
             <span key={i} className="flex items-center">
-              <span className={`px-6 font-display text-4xl font-bold uppercase tracking-[-0.03em] md:px-10 md:text-7xl ${outline ? "text-muted" : ""}`}>
+              <span className={`px-6 font-display text-4xl font-bold uppercase md:px-10 md:text-7xl ${outline ? "text-muted" : ""}`}>
                 {item}
               </span>
               <span className={`font-display text-4xl font-light md:text-7xl ${outline ? "text-muted" : ""}`}>/</span>

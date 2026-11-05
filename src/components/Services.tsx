@@ -97,7 +97,7 @@ export default function Services() {
   return (
     <section ref={sectionRef} aria-labelledby="services-title" className="relative px-4 py-32 md:px-10 md:py-48">
       <div className="mb-12 flex flex-col gap-4 md:mb-16 md:flex-row md:items-end md:justify-between">
-        <h2 id="services-title" className="font-display text-5xl leading-[0.9] font-bold tracking-[-0.04em] uppercase md:text-7xl">
+        <h2 id="services-title" className="font-display text-5xl leading-[0.9] font-bold uppercase md:text-7xl">
           What I
           <br />
           <span className="text-spectrum animate-shimmer">do</span>
@@ -118,7 +118,7 @@ export default function Services() {
               <span className="w-8 shrink-0 font-display text-sm font-semibold text-muted md:w-12">0{i + 1}</span>
               <span
                 data-text={row.title}
-                className="service-title relative min-w-0 flex-1 font-display text-[8.4vw] leading-[0.95] font-bold tracking-[-0.05em] uppercase md:text-[5.4vw]"
+                className="service-title relative min-w-0 flex-1 font-display text-[8.4vw] leading-[0.95] font-bold uppercase md:text-[5.4vw]"
               >
                 {row.title}
               </span>

@@ -16,7 +16,7 @@ function Caption({ title, detail, children }: { title: string; detail: string; c
   return (
     <div className="mt-3 flex h-14 items-start justify-between gap-3 px-1 md:mt-4">
       <div className="min-w-0">
-        <h3 className="truncate font-display text-lg leading-tight font-bold tracking-[-0.03em] uppercase md:text-xl">{title}</h3>
+        <h3 className="truncate font-display text-lg leading-tight font-bold uppercase md:text-xl">{title}</h3>
         <p className="mt-1 truncate text-xs font-medium text-muted md:text-sm">{detail}</p>
       </div>
       {children}

@@ -102,7 +102,7 @@ export default function Loader() {
           <p className="text-right text-muted">
             Loading
             <br />
-            <span ref={percentRef} className="font-display text-2xl font-bold tracking-[-0.04em] text-ink tabular-nums">
+            <span ref={percentRef} className="font-display text-2xl font-bold text-ink tabular-nums">
               00
             </span>
             <span className="text-spectrum ml-0.5 font-display text-base font-bold">%</span>

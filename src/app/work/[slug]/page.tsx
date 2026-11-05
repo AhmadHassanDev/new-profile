@@ -8,6 +8,7 @@ import BlipSignature from "@/components/case/BlipSignature";
 import CaseBlocks from "@/components/case/CaseBlocks";
 import DiveSignature from "@/components/case/DiveSignature";
 import PulseSignature from "@/components/case/PulseSignature";
+import SparkSignature from "@/components/case/SparkSignature";
 import SprintSignature from "@/components/case/SprintSignature";
 import ToolLogo from "@/components/case/ToolLogo";
 import Contact from "@/components/Contact";
@@ -18,9 +19,8 @@ import { ProjectCard } from "@/components/work/ProjectCard";
 import WorkLink from "@/components/work/WorkLink";
 import { CASES, caseFor } from "@/content/cases";
 import { COVER_HEIGHT, COVER_WIDTH, DISCIPLINE_COLOR, type Project, PROJECTS } from "@/content/site";
+import { fitLetters } from "@/lib/fit";
 import { absoluteUrl, breadcrumbs, PERSON_ID, pageMetadata, WEBSITE_ID } from "@/lib/seo";
-
-const longestWord = (name: string) => Math.max(...name.split(/\s+/).map((word) => word.length));
 
 export function generateStaticParams() {
   return CASES.map(({ slug }) => ({ slug }));
@@ -99,7 +99,7 @@ async function CaseStudy({ params }: Props) {
       id="top"
       // On wide screens the right margin is kept clear for a signature's side instruments (e.g. the dive gauge;
       // the belt's upright rank card and the sprint's stopwatch need a little more)
-      className={`case relative isolate ${study.signature === "belt" ? "md:pr-20" : study.signature === "sprint" ? "md:pr-24" : study.signature ? "md:pr-14" : ""}`}
+      className={`case relative isolate ${study.signature === "belt" ? "md:pr-20" : study.signature === "sprint" || study.signature === "spark" ? "md:pr-24" : study.signature ? "md:pr-14" : ""}`}
       style={{ "--accent": study.accent[0], "--accent-2": study.accent[1] } as React.CSSProperties}
     >
       <JsonLd graph={caseJsonLd(project)} />
@@ -113,10 +113,12 @@ async function CaseStudy({ params }: Props) {
         <BeltSignature />
       ) : study.signature === "sprint" ? (
         <SprintSignature />
+      ) : study.signature === "spark" ? (
+        <SparkSignature />
       ) : null}
 
       {/* Opener */}
-      <section className="relative px-4 pt-32 pb-16 md:px-10 md:pt-40 md:pb-24">
+      <section className="@container relative px-4 pt-32 pb-16 md:px-10 md:pt-40 md:pb-24">
         <Link href="/work" className="text-sm font-semibold text-muted transition-colors hover:text-ink">
           <span aria-hidden>←</span> All work
         </Link>
@@ -124,10 +126,10 @@ async function CaseStudy({ params }: Props) {
           <span aria-hidden className="h-px w-10" style={{ background: "var(--accent-2)" }} />
           {project.kind} · {project.year}
         </p>
-        {/* A name with a long word shrinks until that word fits the width (the display face runs ~0.9em a letter) */}
+        {/* As big as the screen allows, shrinking only as far as its longest word needs to fit */}
         <h1
-          className="mt-6 font-display text-[15.5vw] leading-[0.84] font-bold tracking-[-0.055em] uppercase md:text-[13vw]"
-          style={longestWord(project.name) > 7 ? { fontSize: `min(13vw, calc((100vw - 2rem) / ${(longestWord(project.name) * 0.9).toFixed(2)}))` } : undefined}
+          className="fit-heading mt-6 font-display leading-[0.84] font-bold uppercase [--fit-max:15.5vw] md:[--fit-max:13vw]"
+          style={fitLetters(project.name)}
         >
           <span className="reveal block">
             <span className="animate-rise block">{project.name}</span>
@@ -173,8 +175,8 @@ async function CaseStudy({ params }: Props) {
                     ))}
                   </span>
                 ) : fact.logo ? (
-                  // Stacked on phones, so a wide logo never pushes the name into the next column
-                  <span className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:gap-3">
+                  // Stacked until the columns are wide, so a wide logo never pushes the name into the next column
+                  <span className="flex flex-col items-start gap-2 xl:flex-row xl:items-center xl:gap-3">
                     {/* White, as in the clients carousel */}
                     <Image
                       src={fact.logo.src}
@@ -182,7 +184,7 @@ async function CaseStudy({ params }: Props) {
                       width={fact.logo.width}
                       height={fact.logo.height}
                       unoptimized
-                      className="h-9 w-auto max-w-full brightness-0 invert"
+                      className="h-9 w-auto max-w-full object-contain object-left brightness-0 invert"
                     />
                     {fact.value}
                   </span>
@@ -209,9 +211,9 @@ async function CaseStudy({ params }: Props) {
       <CaseBlocks blocks={study.blocks} />
 
       {/* Keep exploring */}
-      <section aria-labelledby="more-title" className="px-4 pt-24 pb-8 md:px-10 md:pt-40">
+      <section aria-labelledby="more-title" className="@container px-4 pt-24 pb-8 md:px-10 md:pt-40">
         <div className="mb-10 flex flex-col gap-6 md:mb-14 md:flex-row md:items-end md:justify-between">
-          <h2 id="more-title" className="font-display text-5xl leading-[0.9] font-bold tracking-[-0.04em] uppercase md:text-7xl">
+          <h2 id="more-title" className="fit-heading font-display leading-[0.9] font-bold uppercase [--fit-max:3rem] md:[--fit-max:4.5rem]" style={fitLetters("Keep exploring")}>
             Keep
             <br />
             <span className="text-spectrum animate-shimmer">exploring</span>

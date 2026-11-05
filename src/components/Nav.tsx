@@ -114,7 +114,7 @@ export default function Nav() {
                     style={{ "--i": i } as React.CSSProperties}
                   >
                     <span
-                      className={`font-display text-[13.5vw] leading-[0.95] font-bold tracking-[-0.05em] uppercase transition-colors duration-300 ${current(link.href) ? link.here : link.hover}`}
+                      className={`font-display text-[13.5vw] leading-[0.95] font-bold uppercase transition-colors duration-300 ${current(link.href) ? link.here : link.hover}`}
                     >
                       {link.label}
                     </span>

@@ -92,7 +92,7 @@ export default function ContactForm() {
         <span aria-hidden className="grid size-16 place-items-center rounded-full text-2xl text-bg" style={{ background: "var(--spectrum)" }}>
           ✓
         </span>
-        <h2 ref={sentHeading} tabIndex={-1} className="font-display text-4xl outline-none leading-[0.95] font-bold tracking-[-0.04em] uppercase md:text-5xl">
+        <h2 ref={sentHeading} tabIndex={-1} className="font-display text-4xl outline-none leading-[0.95] font-bold uppercase md:text-5xl">
           Message
           <br />
           <span className="text-spectrum">sent.</span>

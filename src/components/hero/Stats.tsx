@@ -49,7 +49,7 @@ export default function Stats({ className = "" }: { className?: string }) {
       {STATS.map((stat, i) => (
         <div key={stat.label} className={`flex flex-col-reverse gap-1 ${i > 0 ? "border-l border-line pl-5 md:pl-8" : ""} pr-5 md:pr-8 last:pr-0`}>
           <dt className="text-xs font-medium whitespace-nowrap text-muted md:text-sm">{stat.label}</dt>
-          <dd className="font-display text-3xl leading-none font-bold tracking-[-0.04em] md:text-5xl">
+          <dd className="font-display text-3xl leading-none font-bold md:text-5xl">
             <span ref={(el) => {
               numberRefs.current[i] = el;
             }}>

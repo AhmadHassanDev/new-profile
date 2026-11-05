@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import { fitLetters } from "@/lib/fit";
 
 type Pair = { label: string; wire: string; final: string };
 
@@ -55,8 +56,10 @@ export default function Evolution({ title, body, pairs }: { title: string; body?
 
   return (
     <section className="grid items-center gap-10 px-4 py-16 md:grid-cols-12 md:gap-12 md:px-10 md:py-24">
-      <div className="md:col-span-6 lg:col-span-5">
-        <h2 className="font-display text-5xl leading-[0.9] font-bold tracking-[-0.04em] uppercase md:text-7xl">{title}</h2>
+      <div className="@container md:col-span-6 lg:col-span-5">
+        <h2 className="fit-heading font-display leading-[0.9] font-bold uppercase [--fit-max:3rem] md:[--fit-max:4.5rem]" style={fitLetters(title)}>
+          {title}
+        </h2>
         {body ? <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted md:text-xl">{body}</p> : null}
         <div role="group" aria-label="Screens" className="mt-8 flex flex-wrap gap-2">
           {pairs.map((pair, i) => (

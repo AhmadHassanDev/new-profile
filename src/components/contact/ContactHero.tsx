@@ -81,7 +81,7 @@ export default function ContactHero() {
         <span aria-hidden className="h-px w-10 bg-line" />
         Contact
       </p>
-      <h1 className="mt-6 font-display text-[19vw] leading-[0.84] font-bold tracking-[-0.055em] uppercase md:text-[9.5vw]">
+      <h1 className="mt-6 font-display text-[19vw] leading-[0.84] font-bold uppercase md:text-[9.5vw]">
         <span className="reveal block md:inline-block">
           <span className="animate-rise block">Let&apos;s&nbsp;</span>
         </span>

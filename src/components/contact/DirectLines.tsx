@@ -34,9 +34,10 @@ export default function DirectLines() {
         <span className="relative grid size-12 shrink-0 place-items-center rounded-full bg-[#25d366] text-bg transition-transform duration-500 group-hover:scale-110 sm:size-14">
           <SocialIcon name="WhatsApp" className="size-7" />
         </span>
-        <span className="relative min-w-0 flex-1">
+        <span className="@container relative min-w-0 flex-1">
           <span className="block text-sm font-semibold text-muted">WhatsApp</span>
-          <span className="mt-1 block font-display text-lg font-bold tracking-[-0.02em] whitespace-nowrap sm:text-xl md:text-2xl">
+          {/* On one line, sized to the card: the number runs about 10.5em wide */}
+          <span className="mt-1 block font-display text-[min(1.125rem,9.4cqw)] font-bold whitespace-nowrap sm:text-[min(1.25rem,9.4cqw)] md:text-[min(1.5rem,9.4cqw)]">
             {CONTACT.whatsapp.display}
           </span>
           <span className="sr-only"> (opens in a new tab)</span>
@@ -52,7 +53,7 @@ export default function DirectLines() {
         </span>
         <a href={`mailto:${CONTACT.email}`} className="min-w-0 flex-1 transition-colors hover:text-violet">
           <span className="block text-sm font-semibold text-muted">Email</span>
-          <span className="mt-1 block font-display text-xs font-bold tracking-[-0.02em] break-all sm:text-sm md:text-base">
+          <span className="mt-1 block font-display text-xs font-bold break-all sm:text-sm md:text-base">
             {CONTACT.email}
           </span>
         </a>

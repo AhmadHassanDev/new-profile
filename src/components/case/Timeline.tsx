@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { fitLetters } from "@/lib/fit";
 
 type Step = { title: string; items: string[] };
 
@@ -31,8 +32,8 @@ export default function Timeline({ title, body, unit, steps }: { title: string; 
   const [first, ...rest] = title.split(", ");
   const last = steps.length - 1;
   return (
-    <section className="px-4 py-16 md:px-10 md:py-24">
-      <h2 className="font-display text-5xl leading-[0.9] font-bold tracking-[-0.04em] uppercase md:text-7xl">
+    <section className="@container px-4 py-16 md:px-10 md:py-24">
+      <h2 className="fit-heading font-display leading-[0.9] font-bold uppercase [--fit-max:3rem] md:[--fit-max:4.5rem]" style={fitLetters(title)}>
         {first}
         {rest.length ? (
           <>
@@ -63,7 +64,7 @@ export default function Timeline({ title, body, unit, steps }: { title: string; 
               <span className="font-display text-xs font-semibold tracking-wide text-muted uppercase">
                 {unit} {String(i + 1).padStart(2, "0")}
               </span>
-              <span className="mt-2 font-display text-2xl leading-[1.05] font-bold tracking-[-0.03em]">{step.title}</span>
+              <span className="mt-2 font-display text-2xl leading-[1.05] font-bold">{step.title}</span>
               <ul className="mt-5 space-y-1.5 text-base text-muted">
                 {step.items.map((item) => (
                   <li key={item} className="flex gap-2.5">

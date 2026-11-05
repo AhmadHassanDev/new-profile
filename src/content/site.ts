@@ -45,6 +45,16 @@ const ALL_PROJECTS: Project[] = [
     cover: "/work/slydive.webp",
   },
   {
+    slug: "spark",
+    name: "Spark",
+    kind: "Landing page · Sports & activities",
+    year: "2026",
+    summary:
+      "Landing page design for Spark, Egypt's app for booking padel, football, tournaments and experiences, with a second page that signs up the venues behind them.",
+    disciplines: ["UI design"],
+    cover: "/work/spark.webp",
+  },
+  {
     slug: "prime-hills",
     name: "Prime Hills",
     kind: "Branding · Real estate",
