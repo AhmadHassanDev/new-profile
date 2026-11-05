@@ -456,11 +456,11 @@ body:has(.nav-bar[data-tucked="true"]) .below-nav {
   from { scale: 1.9; }
 }
 
-/* Big uppercase headings never break a word, so each is capped to fit its longest word (--letters, set
-   by fitLetters, at 0.92em a letter: the display face's capitals measure 0.77–0.9em in real words) in its
-   container, the nearest @container; --fit-max is the size it reaches when there's room */
+/* Big uppercase headings never break a word, so each is capped to fit its longest word in its container
+   (the nearest @container): --fit is that size, from fitLetters; --fit-max is the size it reaches when
+   there's room */
 .fit-heading {
-  font-size: min(var(--fit-max), calc(100cqw / (var(--letters) * 0.92)));
+  font-size: min(var(--fit-max), var(--fit));
 }
 
 /* Case timeline: each step's bar fills in turn once the list is in view, and its card brightens as it
@@ -623,6 +623,25 @@ body:has(.nav-bar[data-tucked="true"]) .below-nav {
   }
 }
 
+/* London DBS: a quiet clinic at night in the brand's blue, a little brighter as the stimulation comes up
+   (--stim runs 0 to 1); the readout turns mint once the tremor has settled */
+.dbs-ground {
+  background: linear-gradient(to bottom, #07111d, #060b14);
+}
+.dbs-glow {
+  background:
+    radial-gradient(70% 50% at 85% -5%, rgb(0 119 182 / 0.32), transparent 70%),
+    radial-gradient(50% 45% at 0% 100%, rgb(0 119 182 / 0.22), transparent 70%),
+    radial-gradient(35% 30% at 100% 70%, rgb(154 227 209 / 0.07), transparent 70%);
+  opacity: calc(0.55 + var(--stim, 0) * 0.45);
+}
+.dbs-state {
+  transition: color 0.4s ease;
+}
+.dbs-state[data-settled] {
+  color: var(--accent-2);
+}
+
 /* Mobile menu: colour sheets wipe in along a "/" edge (the logo's slash), the panel lands last.
    Closing runs it backwards. Everything moves by transform and opacity only, which phones animate on
    the GPU: sheets wider than the screen, skewed into the slash, slide across. */
@@ -766,6 +785,14 @@ html.lenis body {
   .screen-page {
     transition-duration: 0s;
   }
+}
+
+/* Phones in a case study: a frosted strip behind the island, fading out downwards, as a phone's status
+   bar sits over the page scrolling under it */
+.phone-status {
+  backdrop-filter: blur(10px) saturate(1.1);
+  background: linear-gradient(to bottom, rgb(255 255 255 / 0.18), rgb(255 255 255 / 0));
+  mask-image: linear-gradient(to bottom, #000 55%, transparent);
 }
 
 /* About: the 3D me stands in a circle. Below the circle's middle the canvas only shows inside it, which

@@ -315,6 +315,9 @@ function Phones({ title, screens }: { title: string; screens: Screen[] }) {
                       sizes="(min-width: 1580px) 300px, (min-width: 1024px) 19vw, (min-width: 640px) 32vw, 58vw"
                       className="screen-page block h-auto w-full"
                     />
+                    {/* A soft frosted strip under the island, like a phone's status bar, so the page never collides with
+                        it. It carries the screen's corner radius itself: Chrome doesn't clip a blur to a parent's corners */}
+                    <span aria-hidden className="phone-status absolute inset-x-0 top-0 h-[7.5%] rounded-t-[clamp(24px,3.3vw,36px)]" />
                     <span aria-hidden className="absolute top-[2.2%] left-1/2 h-[3.4%] w-[30%] -translate-x-1/2 rounded-full bg-[#050507]" />
                   </div>
                 ) : (

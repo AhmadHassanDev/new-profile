@@ -70,7 +70,7 @@ export type CaseStudy = {
   /** The live site, for projects that shipped as a website */
   site?: string;
   /** A bespoke interaction, loaded on this page only */
-  signature?: "dive" | "pulse" | "blip" | "belt" | "sprint" | "spark";
+  signature?: "dive" | "pulse" | "blip" | "belt" | "sprint" | "spark" | "spiral";
   /** Quick facts; a fact can show a logo (the client's) or a row of tool logos instead of plain text */
   facts: { label: string; value: string; logo?: { src: string; width: number; height: number }; tools?: string[] }[];
   blocks: Block[];
@@ -172,6 +172,140 @@ export const CASES: CaseStudy[] = [
     ],
   },
   {
+    slug: "london-dbs",
+    accent: ["#0077b6", "#9ae3d1"],
+    signature: "spiral",
+    site: "https://www.london-dbs.com/",
+    facts: [
+      { label: "Client", value: "London DBS", logo: { src: "/logos/london-dbs.svg", width: 1343, height: 314 } },
+      { label: "Role", value: "Brand, research, design & build" },
+      { label: "Scope", value: "Brand, website & CMS" },
+      { label: "Stack", value: "Figma · Next.js · Sanity · Vercel", tools: ["Figma", "Next.js", "Sanity", "Vercel"] },
+    ],
+    blocks: [
+      {
+        kind: "feature",
+        text: "Deep brain stimulation is brain surgery, and the people considering it are frightened. London DBS needed a brand and a site that feel like the first calm conversation: who the team is, what DBS can do, and exactly what happens next.",
+        src: "/work/london-dbs.webp",
+        alt: "The London DBS homepage on a laptop",
+      },
+      {
+        kind: "chapter",
+        discipline: "UX research",
+        title: "Research",
+        body: "London DBS is a clinic dedicated to deep brain stimulation, led by neurosurgeon Prof. Erlick Pereira and neurologist Prof. Francesca Morgante. It treats movement disorders, chiefly Parkinson's disease, essential tremor and dystonia, and sees patients at St George's on the NHS and at six private hospitals across London.\n\nIts visitors are patients and, as often, the families researching on their behalf: people living with a condition that hasn't responded to medication, weighing an operation. What they need first is trust: who will operate, whether DBS suits their condition, and what the process really involves.",
+        findings: [
+          { value: "80%", label: "Typical arm-tremor improvement" },
+          { value: "7", label: "London hospitals, NHS & private" },
+          { value: "3", label: "Movement disorders treated" },
+          { value: "2 mm", label: "Skull openings in surgery" },
+        ],
+        sources: [{ label: "London DBS", href: "https://www.london-dbs.com/" }],
+      },
+      {
+        kind: "chapter",
+        discipline: "UX research",
+        title: "Benchmarking",
+        body: "Melbourne DBS, one of the most established DBS clinics online, was the benchmark, alongside other clinics' sites. It got the structure right: a page for every condition, the process laid out step by step, the research and the full team behind it, and London DBS keeps that backbone.\n\nWhere it fell short was warmth and pace: grey pages, long walls of text, consultants who appear only further down, and a closing line telling visitors they need a GP referral first. London DBS answers each of those: the founders by name and face on the first screen, the clinic's blue and mint in place of grey, the process in four short steps, risks in pop-ups rather than paragraphs, and the opposite message at the end: no referral needed.",
+      },
+      {
+        kind: "screens",
+        title: "Benchmark: Melbourne DBS",
+        screens: [
+          { label: "Home", src: "/work/london-dbs/benchmark-home.webp", width: 1200, height: 5274 },
+          { label: "About DBS", src: "/work/london-dbs/benchmark-about.webp", width: 1200, height: 2684 },
+          { label: "Parkinson's disease", src: "/work/london-dbs/benchmark-parkinsons.webp", width: 1200, height: 2401 },
+          { label: "The team", src: "/work/london-dbs/benchmark-team.webp", width: 1200, height: 2857 },
+        ],
+      },
+      {
+        kind: "chapter",
+        discipline: "Branding",
+        title: "The brand",
+        body: "It started with a moodboard of MRI scans, electrodes and quiet clinical light, then three rounds of marks. The first explored a scan's crosshair over a brain cell, one half of a brain, and a head with a pulse inside it. The second gave the brain a charge, as lightning. The third set the brain on a pulse line, and its bolder version became the mark: unmistakably neurological, and steady rather than dramatic.\n\nThe wordmark pairs London DBS with a spelled-out \"Deep brain stimulation\" so nobody has to know the acronym. The palette is a clinical blue with a soft mint and warm white on near-black, chosen to read as cutting-edge and caring at once, and the type pairs Helvetica Neue's extended cuts for headings with SF Pro for reading.",
+      },
+      {
+        kind: "gallery",
+        title: "From moodboard to mark",
+        items: [
+          { label: "Moodboard", detail: "Scans, electrodes, clinical light", src: "/work/london-dbs/brand-moodboard.webp", width: 1600, height: 900 },
+          { label: "Round 1", detail: "Three directions", src: "/work/london-dbs/brand-round-1.webp", width: 1600, height: 900 },
+          { label: "Round 2", detail: "A brain with a charge", src: "/work/london-dbs/brand-round-2.webp", width: 1600, height: 900 },
+          { label: "Round 3", detail: "The brain on a pulse line", src: "/work/london-dbs/brand-mark.webp", width: 1600, height: 900 },
+          { label: "The lockup", detail: "With the name spelled out", src: "/work/london-dbs/brand-lockup.webp", width: 1600, height: 900 },
+          { label: "Colourways", detail: "For light and dark", src: "/work/london-dbs/brand-alt.webp", width: 1600, height: 900 },
+          { label: "Colours", detail: "Blue, mint, warm white", src: "/work/london-dbs/brand-colours.webp", width: 1600, height: 900 },
+          { label: "Type", detail: "Helvetica Neue & SF Pro", src: "/work/london-dbs/brand-type.webp", width: 1600, height: 900 },
+          { label: "In use", detail: "Signage, coats, packaging", src: "/work/london-dbs/brand-usage.webp", width: 1600, height: 900 },
+        ],
+      },
+      { kind: "statement", text: "Calm first, clever second. A patient should feel looked after before they feel impressed." },
+      {
+        kind: "chapter",
+        discipline: "UI design",
+        title: "Designed in Figma",
+        body: "The site follows a patient's questions in order. The homepage introduces the founders by name and face, the conditions DBS treats, the four steps from first consultation to recovery, and why a clinic that does only DBS is different. Each condition has its own page, written for the person living with it.\n\nAbout walks through the process in detail, with the risks and side effects one tap away in clear pop-ups: honest, but never a wall of warnings. The team page carries every consultant's credentials, research and media keep the clinic's work current, and contact says up front what matters most: you don't need a GP referral, and here are the NHS and private hospitals where you'll be seen.",
+      },
+      {
+        kind: "screens",
+        title: "The pages",
+        screens: [
+          { label: "Home", src: "/work/london-dbs/home.webp", width: 1200, height: 6053 },
+          { label: "About", src: "/work/london-dbs/about.webp", width: 1200, height: 3585 },
+          { label: "Team", src: "/work/london-dbs/team.webp", width: 1200, height: 2911 },
+          { label: "Conditions", src: "/work/london-dbs/conditions.webp", width: 1200, height: 2073 },
+          { label: "A condition", src: "/work/london-dbs/condition.webp", width: 1200, height: 1684 },
+          { label: "Media", src: "/work/london-dbs/media.webp", width: 1200, height: 2129 },
+          { label: "Contact", src: "/work/london-dbs/contact.webp", width: 1200, height: 1669 },
+        ],
+      },
+      {
+        kind: "chapter",
+        discipline: "Front-end",
+        title: "Built in Next.js, run on Sanity",
+        body: "I built the site in Next.js with its content in Sanity CMS, so the clinic can publish news, media appearances and research, and keep the team and conditions current, without touching code. Pages are prerendered and served from Vercel's edge, with the metadata search engines need for people looking for DBS in London.",
+      },
+      {
+        kind: "phones",
+        title: "Live, on phones",
+        screens: [
+          { label: "Home", src: "/work/london-dbs/phone/home.webp", width: 786, height: 1704 },
+          { label: "About", src: "/work/london-dbs/phone/about.webp", width: 786, height: 1704 },
+          { label: "Team", src: "/work/london-dbs/phone/team.webp", width: 786, height: 1704 },
+          { label: "Conditions", src: "/work/london-dbs/phone/conditions.webp", width: 786, height: 1704 },
+          { label: "News & media", src: "/work/london-dbs/phone/news.webp", width: 786, height: 1704 },
+          { label: "Contact", src: "/work/london-dbs/phone/contact.webp", width: 786, height: 1704 },
+        ],
+      },
+      {
+        kind: "pipeline",
+        title: "From Figma to live",
+        steps: [
+          { tool: "Figma", does: "Brand & design" },
+          { tool: "Next.js", does: "Front-end build" },
+          { tool: "Sanity", does: "Content management" },
+          { tool: "Vercel", does: "Deployment" },
+        ],
+      },
+      {
+        kind: "results",
+        title: "Results",
+        body: "Live at london-dbs.com, from the first sketch of the mark to the deployed site. On Google's Lighthouse audit of the live site:",
+        items: [
+          { value: "93", label: "Performance on desktop" },
+          { value: "96", label: "Accessibility on mobile" },
+          { value: "96", label: "Best practices" },
+          { value: "1.4 s", label: "Largest paint on desktop" },
+        ],
+        measuredWith: {
+          name: "Google Lighthouse",
+          logo: "/logos/lighthouse.svg",
+          detail: "Lighthouse 13 audit of the live site",
+        },
+      },
+    ],
+  },
+  {
     slug: "spark",
     accent: ["#004ab5", "#d3fc64"],
     signature: "spark",
@@ -221,8 +355,8 @@ export const CASES: CaseStudy[] = [
         kind: "phones",
         title: "On phones",
         screens: [
-          { label: "Home", src: "/work/spark/phone-home.webp", width: 393, height: 4426 },
-          { label: "Work with us", src: "/work/spark/phone-partners.webp", width: 393, height: 6859 },
+          { label: "Home", src: "/work/spark/phone/home.webp", width: 393, height: 4485 },
+          { label: "Work with us", src: "/work/spark/phone/partners.webp", width: 393, height: 6918 },
         ],
       },
       {
@@ -322,13 +456,8 @@ export const CASES: CaseStudy[] = [
         kind: "phones",
         title: "On phones",
         screens: [
-          { label: "Home", src: "/work/blacksprint/phone-home.webp", width: 786, height: 1704 },
-          { label: "About", src: "/work/blacksprint/phone-about.webp", width: 786, height: 1704 },
-          { label: "Ventures", src: "/work/blacksprint/phone-ventures.webp", width: 786, height: 1704 },
-          { label: "Services", src: "/work/blacksprint/phone-services.webp", width: 786, height: 1704 },
-          { label: "Contact", src: "/work/blacksprint/phone-contact.webp", width: 786, height: 1704 },
-          { label: "All ventures", src: "/work/blacksprint/phone-all-ventures.webp", width: 786, height: 1704 },
-          { label: "A venture", src: "/work/blacksprint/phone-venture.webp", width: 786, height: 1704 },
+          { label: "Home", src: "/work/blacksprint/phone/home.webp", width: 786, height: 1704 },
+          { label: "Ventures", src: "/work/blacksprint/phone/ventures.webp", width: 786, height: 1704 },
         ],
       },
       {
@@ -418,12 +547,12 @@ export const CASES: CaseStudy[] = [
         kind: "phones",
         title: "On phones",
         screens: [
-          { label: "Home", src: "/work/bliphub/phone-home.webp", width: 393, height: 7320 },
-          { label: "About", src: "/work/bliphub/phone-about.webp", width: 393, height: 4410 },
-          { label: "Services", src: "/work/bliphub/phone-services.webp", width: 393, height: 3290 },
-          { label: "Portfolio", src: "/work/bliphub/phone-projects.webp", width: 393, height: 3854 },
-          { label: "Project", src: "/work/bliphub/phone-project.webp", width: 393, height: 3206 },
-          { label: "Contact", src: "/work/bliphub/phone-contact.webp", width: 393, height: 2340 },
+          { label: "Home", src: "/work/bliphub/phone/home.webp", width: 393, height: 7379 },
+          { label: "About", src: "/work/bliphub/phone/about.webp", width: 393, height: 4469 },
+          { label: "Services", src: "/work/bliphub/phone/services.webp", width: 393, height: 3349 },
+          { label: "Portfolio", src: "/work/bliphub/phone/projects.webp", width: 393, height: 3913 },
+          { label: "Project", src: "/work/bliphub/phone/project.webp", width: 393, height: 3265 },
+          { label: "Contact", src: "/work/bliphub/phone/contact.webp", width: 393, height: 2399 },
         ],
       },
       {
@@ -504,18 +633,18 @@ export const CASES: CaseStudy[] = [
         kind: "phones",
         title: "The app",
         screens: [
-          { label: "Onboarding", src: "/work/anubis/onboarding.webp", width: 393, height: 852 },
-          { label: "Login", src: "/work/anubis/login.webp", width: 393, height: 852 },
-          { label: "Home", src: "/work/anubis/home.webp", width: 393, height: 1861 },
-          { label: "Sessions", src: "/work/anubis/sessions.webp", width: 393, height: 852 },
-          { label: "Calendar", src: "/work/anubis/calendar-month.webp", width: 393, height: 852 },
-          { label: "Session", src: "/work/anubis/session.webp", width: 393, height: 852 },
-          { label: "Packages", src: "/work/anubis/packages-list.webp", width: 393, height: 852 },
-          { label: "Package", src: "/work/anubis/package.webp", width: 393, height: 852 },
-          { label: "Coach", src: "/work/anubis/coach.webp", width: 393, height: 852 },
-          { label: "Achievements", src: "/work/anubis/achievements.webp", width: 393, height: 852 },
-          { label: "Merch", src: "/work/anubis/merch.webp", width: 393, height: 852 },
-          { label: "Profile", src: "/work/anubis/profile.webp", width: 393, height: 852 },
+          { label: "Onboarding", src: "/work/anubis/phone/onboarding.webp", width: 393, height: 911 },
+          { label: "Login", src: "/work/anubis/phone/login.webp", width: 393, height: 911 },
+          { label: "Home", src: "/work/anubis/phone/home.webp", width: 393, height: 1920 },
+          { label: "Sessions", src: "/work/anubis/phone/sessions.webp", width: 393, height: 911 },
+          { label: "Calendar", src: "/work/anubis/phone/calendar-month.webp", width: 393, height: 911 },
+          { label: "Session", src: "/work/anubis/phone/session.webp", width: 393, height: 911 },
+          { label: "Packages", src: "/work/anubis/phone/packages-list.webp", width: 393, height: 911 },
+          { label: "Package", src: "/work/anubis/phone/package.webp", width: 393, height: 911 },
+          { label: "Coach", src: "/work/anubis/phone/coach.webp", width: 393, height: 911 },
+          { label: "Achievements", src: "/work/anubis/phone/achievements.webp", width: 393, height: 911 },
+          { label: "Merch", src: "/work/anubis/phone/merch.webp", width: 393, height: 911 },
+          { label: "Profile", src: "/work/anubis/phone/profile.webp", width: 393, height: 911 },
         ],
       },
       {

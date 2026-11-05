@@ -64,6 +64,16 @@ const ALL_PROJECTS: Project[] = [
     cover: "/work/primehills.webp",
   },
   {
+    slug: "london-dbs",
+    name: "London DBS",
+    kind: "Branding & website · Healthcare",
+    year: "2025",
+    summary:
+      "Brand, website and Sanity CMS for London DBS, the deep brain stimulation clinic led by Prof. Erlick Pereira and Prof. Francesca Morgante, from the logo to the live site.",
+    disciplines: ["Branding", "UX research", "UI design", "Front-end"],
+    cover: "/work/london-dbs.webp",
+  },
+  {
     slug: "blacksprint",
     name: "Blacksprint",
     kind: "Website · Venture studio",
