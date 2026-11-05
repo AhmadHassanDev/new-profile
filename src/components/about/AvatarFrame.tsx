@@ -23,6 +23,7 @@ type Size = { width: number; height: number };
  */
 export default function AvatarFrame() {
   const layerRef = useRef<HTMLDivElement>(null);
+  const shareRef = useRef<HTMLDivElement>(null);
   const moverRef = useRef<HTMLDivElement>(null);
   const boxRef = useRef<HTMLDivElement>(null);
   const frameRef = useRef<HTMLDivElement>(null);
@@ -30,10 +31,11 @@ export default function AvatarFrame() {
   // Follow the slots
   useEffect(() => {
     const layer = layerRef.current;
+    const share = shareRef.current;
     const mover = moverRef.current;
     const box = boxRef.current;
     const hero = document.querySelector<HTMLElement>('[data-avatar-slot="hero"]');
-    if (!layer || !mover || !box || !hero) return;
+    if (!layer || !share || !mover || !box || !hero) return;
     const docks = [...document.querySelectorAll<HTMLElement>('[data-avatar-slot="dock"]')];
     const end = document.querySelector<HTMLElement>("[data-avatar-end]");
     const section = hero.closest("section") ?? hero;
@@ -74,6 +76,11 @@ export default function AvatarFrame() {
      * the screen's height and moves the corner dock with it; so the flight is measured partly in
      * percentages of the full-screen layer, which is the very box the dock hangs in, and the landed
      * frame moves with the dock without anything being re-measured.
+     *
+     * The percentage and the pixels move two nested layers, each a plain translate: one mixing both in a
+     * calc() can't run on the compositor, so it trailed the scroll, and scrolling back up left the avatar
+     * low and clipped. And the keyframes are placed along the page's own scroll range (its clientHeight,
+     * as the scroll timeline measures it), not innerHeight, which on phones grows behind the toolbar.
      */
     const fly = (dock: HTMLElement, base: Size) => {
       const y0 = window.scrollY;
@@ -83,7 +90,7 @@ export default function AvatarFrame() {
       const screen = layer.getBoundingClientRect().height;
       // The dock's centre, from the bottom of the screen
       const gap = screen - (b.top + b.height / 2);
-      const max = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+      const max = Math.max(1, document.documentElement.scrollHeight - document.documentElement.clientHeight);
       // Lands by the time the hero spot is mostly scrolled away
       const range = Math.min(max, Math.max(1, top + rect.height - window.innerHeight * 0.2));
       const at = (y: number) => {
@@ -93,17 +100,18 @@ export default function AvatarFrame() {
         // Centre to centre: from the hero spot (from the top, in px) to the dock (from the bottom, as a
         // share of the screen), lifting a little mid-flight
         const heroY = top + rect.height / 2 - y;
-        const share = (t - arc * 0.05) * 100;
         const px = (1 - t) * heroY - t * gap - base.height / 2;
-        return { move: `translate3d(${cx - base.width / 2}px, calc(${share}% + ${px}px), 0)`, transform };
+        return { share: `translate3d(0, ${(t - arc * 0.05) * 100}%, 0)`, move: `translate3d(${cx - base.width / 2}px, ${px}px, 0)`, transform };
       };
+      const shares: Keyframe[] = [];
       const moves: Keyframe[] = [];
       const turns: Keyframe[] = [];
       for (let i = 0; i <= 30; i++) {
         const y = (range * i) / 30;
-        const { move, transform } = at(y);
-        moves.push({ offset: y / max, transform: move, opacity: 1 });
-        turns.push({ offset: y / max, transform });
+        const step = at(y);
+        shares.push({ offset: y / max, transform: step.share });
+        moves.push({ offset: y / max, transform: step.move, opacity: 1 });
+        turns.push({ offset: y / max, transform: step.transform });
       }
       const landed = at(range);
       const out = end ? end.getBoundingClientRect().top + y0 - window.innerHeight * 0.75 : Infinity;
@@ -112,10 +120,22 @@ export default function AvatarFrame() {
         moves.push({ offset: Math.min(1, (out + 80) / max), transform: landed.move, opacity: 0 });
       }
       if (moves[moves.length - 1].offset !== 1) moves.push({ offset: 1, transform: landed.move, opacity: moves[moves.length - 1].opacity });
+      shares.push({ offset: 1, transform: landed.share });
       turns.push({ offset: 1, transform: landed.transform });
+      // Already flying (the page grew, say, as an answer opened): new keyframes on the same animations.
+      // Cancelling and starting over would leave a frame with no flight at all, the avatar flashing up
+      // full size at the top of the screen
+      if (flight.length === 3) {
+        [shares, moves, turns].forEach((frames, i) => (flight[i].effect as KeyframeEffect).setKeyframes(frames));
+        return;
+      }
       ground();
       const timeline = new ScrollTimeline({ source: document.documentElement });
-      flight = [mover.animate(moves, { timeline, fill: "both" }), box.animate(turns, { timeline, fill: "both" })];
+      flight = [
+        share.animate(shares, { timeline, fill: "both" }),
+        mover.animate(moves, { timeline, fill: "both" }),
+        box.animate(turns, { timeline, fill: "both" }),
+      ];
     };
 
     const place = () => {
@@ -227,15 +247,18 @@ export default function AvatarFrame() {
 
   return (
     <div ref={layerRef} className="pointer-events-none fixed inset-0 z-40 opacity-0 transition-opacity duration-500">
-      <div ref={moverRef} className="absolute inset-0">
-        <div ref={boxRef} className="absolute top-0 left-0 origin-center [perspective:900px]">
-          <div
-            ref={frameRef}
-            className="pointer-events-auto relative h-full w-full transition-transform duration-700 ease-[cubic-bezier(0.2,0.8,0.2,1)] [transform:rotateX(var(--tilt-x,0deg))_rotateY(var(--tilt-y,0deg))]"
-          >
-            <div aria-hidden className="avatar-circle absolute inset-x-0 bottom-0 aspect-square rounded-full" />
-            <div className="avatar-frame absolute inset-0">
-              <Avatar />
+      {/* On phones the flight moves this one by a share of the screen's height, and the mover inside by pixels */}
+      <div ref={shareRef} className="absolute inset-0">
+        <div ref={moverRef} className="absolute inset-0">
+          <div ref={boxRef} className="absolute top-0 left-0 origin-center [perspective:900px]">
+            <div
+              ref={frameRef}
+              className="pointer-events-auto relative h-full w-full transition-transform duration-700 ease-[cubic-bezier(0.2,0.8,0.2,1)] [transform:rotateX(var(--tilt-x,0deg))_rotateY(var(--tilt-y,0deg))]"
+            >
+              <div aria-hidden className="avatar-circle absolute inset-x-0 bottom-0 aspect-square rounded-full" />
+              <div className="avatar-frame absolute inset-0">
+                <Avatar />
+              </div>
             </div>
           </div>
         </div>
