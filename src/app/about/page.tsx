@@ -9,7 +9,8 @@ import Cursor from "@/components/Cursor";
 import JsonLd from "@/components/JsonLd";
 import Nav from "@/components/Nav";
 import ScrollWords from "@/components/ScrollWords";
-import { DISCIPLINE_COLOR, PASSIONS, PROCESS, QUOTE, STORY } from "@/content/site";
+import SocialIcon from "@/components/SocialIcon";
+import { CV, DISCIPLINE_COLOR, PASSIONS, PROCESS, QUOTE, STORY } from "@/content/site";
 import { fitLetters } from "@/lib/fit";
 import { breadcrumbs, PERSON_ID, pageMetadata, webPage } from "@/lib/seo";
 
@@ -143,12 +144,26 @@ export default function AboutPage() {
           />
 
           <div className="relative mt-auto grid gap-10 pt-16 lg:grid-cols-12 lg:items-end">
-            <p className="max-w-xl text-xl leading-snug font-medium text-muted md:text-2xl lg:col-span-5">
-              Egyptian designer and front-end developer.{" "}
-              <span className="text-ink">
-                I research what people need, design what they&apos;ll choose, and build it myself.
-              </span>
-            </p>
+            <div className="lg:col-span-5">
+              <p className="max-w-xl text-xl leading-snug font-medium text-muted md:text-2xl">
+                Egyptian designer and front-end developer.{" "}
+                <span className="text-ink">
+                  I research what people need, design what they&apos;ll choose, and build it myself.
+                </span>
+              </p>
+              {/* The whole career on two pages, for anyone hiring */}
+              <a
+                href={CV.href}
+                download={CV.file}
+                className="group mt-8 inline-flex items-center gap-3 rounded-full bg-ink py-3 pr-6 pl-3 font-semibold text-bg transition-transform duration-300 hover:scale-[1.03]"
+              >
+                <span className="grid size-9 place-items-center rounded-full" style={{ background: "var(--spectrum)" }}>
+                  <SocialIcon name="Download" className="size-4 transition-transform duration-300 group-hover:translate-y-0.5" />
+                </span>
+                Download my CV
+                <span className="text-sm font-medium opacity-60">{CV.note}</span>
+              </a>
+            </div>
             <dl className="grid grid-cols-4 lg:col-span-7">
               {FACTS.map((fact, i) => (
                 <div key={fact.label} className={`@container flex flex-col-reverse gap-1 ${i > 0 ? "border-l border-line pl-3 md:pl-5 lg:pl-8" : ""}`}>

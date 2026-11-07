@@ -266,6 +266,9 @@ export const SOCIALS = [
   { label: "Instagram", handle: "@ahmedhdev", note: "Behind the scenes", href: "https://www.instagram.com/ahmedhdev/" },
 ];
 
+/** The CV, downloadable from the nav, the About hero and the contact page */
+export const CV = { href: "/ahmed-hassan-cv.pdf", file: "Ahmed Hassan - CV.pdf", note: "PDF · 2 pages" };
+
 /** Direct lines, shown on the contact page. The form's inbox is set by CONTACT_TO (see .env.example). */
 export const CONTACT = {
   email: "hello@ahmedhassan.dev",

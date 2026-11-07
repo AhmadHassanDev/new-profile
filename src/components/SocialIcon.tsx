@@ -38,6 +38,10 @@ const ICONS: Record<string, React.ReactNode> = {
       <path d="M3.5 7l8.5 6 8.5-6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
     </>
   ),
+  // An arrow dropping into a tray, for the CV
+  Download: (
+    <path d="M12 3.5v11m0 0l-4.5-4.5m4.5 4.5l4.5-4.5M4 15.5v2A3 3 0 0 0 7 20.5h10a3 3 0 0 0 3-3v-2" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+  ),
   Instagram: (
     <>
       <rect x="2.25" y="2.25" width="19.5" height="19.5" rx="5.5" fill="none" stroke="currentColor" strokeWidth="2.2" />

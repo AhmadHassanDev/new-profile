@@ -4,8 +4,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { SOCIALS } from "@/content/site";
+import { CV, SOCIALS } from "@/content/site";
 import { SCROLL_LOCK } from "@/lib/scroll";
+import SocialIcon from "./SocialIcon";
 
 // Each link takes one of the hero's discipline colours in the mobile menu, on hover and while you're on its page.
 const LINKS = [
@@ -126,6 +127,11 @@ export default function Nav() {
           </nav>
 
           <div className="menu-foot relative flex flex-col gap-5">
+            <a href={CV.href} download={CV.file} className="flex items-center gap-3 font-display text-xl font-bold uppercase sm:text-2xl">
+              <SocialIcon name="Download" className="size-6 shrink-0" />
+              <span className="whitespace-nowrap">Download CV</span>
+              <span className="ml-auto font-sans text-sm font-medium whitespace-nowrap text-muted normal-case">{CV.note}</span>
+            </a>
             <span aria-hidden className="h-px w-full" style={{ background: "var(--spectrum)" }} />
             <ul className="flex flex-wrap gap-x-6 gap-y-2 text-base font-medium">
               {SOCIALS.map((s) => (
@@ -152,43 +158,57 @@ export default function Nav() {
           <Image src="/logo.svg" alt="" width={58} height={45} priority />
         </Link>
 
-        <nav aria-label="Main" className="nav-links hidden items-center gap-2 rounded-full border border-line bg-bg/60 p-1.5 text-sm font-medium backdrop-blur-xl transition-colors duration-500 md:flex">
-          {/* The filled pill marks the page you're on; Contact stands out on its own with a dot and an arrow */}
-          {LINKS.map((link) => {
-            const here = current(link.href);
-            const cta = link.href === "/contact";
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                aria-current={here ? "page" : undefined}
-                className={`group flex items-center gap-2 rounded-full px-4 py-2 transition-colors duration-300 ${here ? "bg-ink text-bg" : "hover:bg-white/10"}`}
-              >
-                {cta && !here && <span aria-hidden className="size-1.5 rounded-full" style={{ background: "var(--spectrum)" }} />}
-                {link.label}
-                {cta && !here && (
-                  <span aria-hidden className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5">
-                    ↗
-                  </span>
-                )}
-              </Link>
-            );
-          })}
-        </nav>
+        <div className="flex items-center gap-2">
+          <nav aria-label="Main" className="nav-links hidden items-center gap-2 rounded-full border border-line bg-bg/60 p-1.5 text-sm font-medium backdrop-blur-xl transition-colors duration-500 md:flex">
+            {/* The filled pill marks the page you're on; Contact stands out on its own with a dot and an arrow */}
+            {LINKS.map((link) => {
+              const here = current(link.href);
+              const cta = link.href === "/contact";
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  aria-current={here ? "page" : undefined}
+                  className={`group flex items-center gap-2 rounded-full px-4 py-2 transition-colors duration-300 ${here ? "bg-ink text-bg" : "hover:bg-white/10"}`}
+                >
+                  {cta && !here && <span aria-hidden className="size-1.5 rounded-full" style={{ background: "var(--spectrum)" }} />}
+                  {link.label}
+                  {cta && !here && (
+                    <span aria-hidden className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5">
+                      ↗
+                    </span>
+                  )}
+                </Link>
+              );
+            })}
+          </nav>
 
-        <button
-          ref={buttonRef}
-          type="button"
-          aria-expanded={open}
-          aria-controls="mobile-menu"
-          aria-label={open ? "Close menu" : "Open menu"}
-          onClick={() => setOpen((o) => !o)}
-          data-open={open}
-          className="burger relative grid size-12 place-items-center rounded-full border border-line bg-bg/60 backdrop-blur-xl transition-colors duration-500 data-[open=true]:border-transparent data-[open=true]:bg-ink md:hidden"
-        >
-          <span aria-hidden className="burger-bar" />
-          <span aria-hidden className="burger-bar" />
-        </button>
+          {/* The CV, on every page: beside the links on wide screens, beside the burger on phones */}
+          <a
+            href={CV.href}
+            download={CV.file}
+            aria-label="Download CV (PDF)"
+            data-open={open}
+            className="group flex h-12 items-center gap-2 rounded-full border border-line bg-bg/60 pr-4 pl-3 text-sm font-semibold backdrop-blur-xl transition-[background-color,color,border-color,opacity] duration-300 hover:border-transparent hover:bg-ink hover:text-bg data-[open=true]:pointer-events-none data-[open=true]:opacity-0 md:h-auto md:self-stretch"
+          >
+            <SocialIcon name="Download" className="size-4 transition-transform duration-300 group-hover:translate-y-0.5" />
+            CV
+          </a>
+
+          <button
+            ref={buttonRef}
+            type="button"
+            aria-expanded={open}
+            aria-controls="mobile-menu"
+            aria-label={open ? "Close menu" : "Open menu"}
+            onClick={() => setOpen((o) => !o)}
+            data-open={open}
+            className="burger relative grid size-12 place-items-center rounded-full border border-line bg-bg/60 backdrop-blur-xl transition-colors duration-500 data-[open=true]:border-transparent data-[open=true]:bg-ink md:hidden"
+          >
+            <span aria-hidden className="burger-bar" />
+            <span aria-hidden className="burger-bar" />
+          </button>
+        </div>
       </div>
     </header>
   );

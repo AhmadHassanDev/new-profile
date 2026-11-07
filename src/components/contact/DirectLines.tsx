@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { CONTACT } from "@/content/site";
+import { CONTACT, CV } from "@/content/site";
 import SocialIcon from "../SocialIcon";
 
-/** The two fastest ways to reach Ahmed: WhatsApp, and email with a one-tap copy. */
+/** The fastest ways to reach Ahmed (WhatsApp, and email with a one-tap copy), and his CV */
 export default function DirectLines() {
   const [copied, setCopied] = useState(false);
   const copy = async () => {
@@ -70,6 +70,29 @@ export default function DirectLines() {
           {copied ? "Email address copied" : ""}
         </span>
       </div>
+
+      {/* The CV, for anyone hiring */}
+      <a
+        href={CV.href}
+        download={CV.file}
+        className="group relative flex items-center gap-4 overflow-hidden rounded-[28px] bg-surface/50 p-5 backdrop-blur-xl sm:gap-5 sm:p-6 md:p-7"
+      >
+        <span
+          aria-hidden
+          className="absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+          style={{ background: "radial-gradient(70% 140% at 0% 50%, color-mix(in srgb, var(--violet) 22%, transparent), transparent 70%)" }}
+        />
+        <span className="relative grid size-12 shrink-0 place-items-center rounded-full text-bg transition-transform duration-500 group-hover:scale-110 sm:size-14" style={{ background: "var(--spectrum)" }}>
+          <SocialIcon name="Download" className="size-6" />
+        </span>
+        <span className="relative min-w-0 flex-1">
+          <span className="block text-sm font-semibold text-muted">CV · {CV.note}</span>
+          <span className="mt-1 block font-display text-[1.125rem] font-bold sm:text-xl md:text-2xl">Download my CV</span>
+        </span>
+        <span aria-hidden className="relative text-2xl transition-transform duration-500 group-hover:translate-y-1">
+          ↓
+        </span>
+      </a>
     </div>
   );
 }
