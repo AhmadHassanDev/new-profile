@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 import { flushSync } from "react-dom";
+import { track } from "@/lib/analytics";
 import { type ContactErrors, type ContactMessage, TOPICS, validate } from "@/lib/contact";
 
 type Status = { state: "idle" | "sending" | "sent" } | { state: "error"; message: string };
@@ -79,6 +80,8 @@ export default function ContactForm() {
     const data = (await res?.json().catch(() => null)) as { ok?: boolean; error?: string; errors?: ContactErrors } | null;
 
     if (res?.ok && data?.ok) {
+      // GA4's recommended event for a lead; the topic says what kind of project it is
+      track("generate_lead", { method: "contact_form", topic: values.topic });
       setStatus({ state: "sent" });
       return;
     }
