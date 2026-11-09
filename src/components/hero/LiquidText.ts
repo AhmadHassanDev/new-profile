@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { NOISE } from "./shaders";
 
 export type TextLine = { text: string; x: number; baseline: number };
-export type TextStyle = { font: string; letterSpacing: number };
+export type TextStyle = { font: string; letterSpacing: number; rtl?: boolean };
 
 const quadVertex = /* glsl */ `
 varying vec2 vUv;
@@ -172,12 +172,16 @@ export class LiquidText {
     ctx.clearRect(0, 0, width, height);
     ctx.font = style.font;
     ctx.textBaseline = "alphabetic";
+    // Arabic: shaped right to left, but still placed by its left edge, as measured
+    ctx.direction = style.rtl ? "rtl" : "ltr";
+    ctx.textAlign = "left";
     const spaced = ctx as { letterSpacing?: string };
     const native = typeof spaced.letterSpacing === "string";
     if (native) spaced.letterSpacing = `${style.letterSpacing}px`;
     lines.forEach((line, i) => {
       ctx.fillStyle = LINE_CHANNELS[i % LINE_CHANNELS.length];
-      if (native) {
+      // Arabic letters join, so they're always drawn as a whole line (spacing is 0 there anyway)
+      if (native || style.rtl) {
         ctx.fillText(line.text, line.x, line.baseline);
         return;
       }

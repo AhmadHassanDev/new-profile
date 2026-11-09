@@ -1,5 +1,7 @@
 "use client";
 
+import { useLang } from "@/i18n/LangProvider";
+import { ui } from "@/i18n/ui";
 import { useEffect, useRef } from "react";
 
 // The app's own three steps, reached a third of the way down the page apart
@@ -29,6 +31,8 @@ const BURSTS = [
  * the app's own confirmation slides in. Behind the page, a floodlit night in Spark's blue.
  */
 export default function SparkSignature() {
+  const t = ui(useLang()).signatures.spark;
+  const names = t.steps;
   const groundRef = useRef<HTMLDivElement>(null);
   const fillRef = useRef<HTMLSpanElement>(null);
   const stagesRef = useRef<HTMLOListElement>(null);
@@ -53,7 +57,7 @@ export default function SparkSignature() {
       if (now !== reached) {
         reached = now;
         stages.forEach((stage, i) => ((stage as HTMLElement).dataset.reached = String(i <= now)));
-        if (labelRef.current) labelRef.current.textContent = `0${now + 1} ${STAGES[now].name}`;
+        if (labelRef.current) labelRef.current.textContent = `0${now + 1} ${names[now]}`;
       }
       // The booking goes through at the very bottom, and is taken back if you scroll up again
       const done = shown >= 0.985;
@@ -90,7 +94,7 @@ export default function SparkSignature() {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", measure);
     };
-  }, []);
+  }, [names]);
 
   return (
     <>
@@ -101,7 +105,7 @@ export default function SparkSignature() {
       {/* The ticket: the three steps along a track that fills as you read, the step you're on above it */}
       <div aria-hidden className="pointer-events-none fixed top-1/2 right-5 z-20 hidden -translate-y-1/2 md:block">
         <span ref={labelRef} className="absolute right-0 bottom-full mb-12 rounded-full bg-bg/75 px-2.5 py-1 font-display text-xs font-bold whitespace-nowrap backdrop-blur-md">
-          01 Discover
+          01 {names[0]}
         </span>
         <div className="relative h-[42vh] w-4">
           <span className="absolute inset-y-0 right-[7px] w-0.5 rounded-full bg-white/12" />
@@ -146,8 +150,8 @@ export default function SparkSignature() {
           </svg>
         </span>
         <span>
-          <span className="block text-sm font-bold">Padel booking confirmed</span>
-          <span className="block text-xs text-[#4a5677]">Today at 7:00 PM in Maadi</span>
+          <span className="block text-sm font-bold">{t.confirmed}</span>
+          <span className="block text-xs text-[#4a5677]">{t.when}</span>
         </span>
       </div>
     </>

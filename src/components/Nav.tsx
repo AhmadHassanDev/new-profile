@@ -4,21 +4,32 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { CV, SOCIALS } from "@/content/site";
+import { siteFor } from "@/content";
+import { localePath, splitPath } from "@/i18n/lang";
+import { useLang } from "@/i18n/LangProvider";
+import { ui } from "@/i18n/ui";
 import { SCROLL_LOCK } from "@/lib/scroll";
 import SocialIcon from "./SocialIcon";
 
 // Each link takes one of the hero's discipline colours in the mobile menu, on hover and while you're on its page.
 const LINKS = [
-  { href: "/work", label: "Work", hover: "group-hover:text-cyan", here: "text-cyan" },
-  { href: "/about", label: "About", hover: "group-hover:text-violet", here: "text-violet" },
-  { href: "/contact", label: "Contact", hover: "group-hover:text-coral", here: "text-coral" },
-];
+  { href: "/work", key: "work", hover: "group-hover:text-cyan", here: "text-cyan" },
+  { href: "/about", key: "about", hover: "group-hover:text-violet", here: "text-violet" },
+  { href: "/contact", key: "contact", hover: "group-hover:text-coral", here: "text-coral" },
+] as const;
 
 export default function Nav() {
+  const lang = useLang();
+  const t = ui(lang);
+  const { CV, SOCIALS } = siteFor(lang);
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
-  const current = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
+  // Paths compared without the /ar prefix, so the same link lights up in both languages
+  const here = splitPath(pathname).path;
+  const current = (href: string) => here === href || here.startsWith(`${href}/`);
+  // The same page in the other language
+  const other = lang === "ar" ? "en" : "ar";
+  const switchHref = localePath(other, here);
   // Frosted once the page moves under it; tucked away while scrolling down, back on the way up
   const [scrolled, setScrolled] = useState(false);
   const [tucked, setTucked] = useState(false);
@@ -82,7 +93,7 @@ export default function Nav() {
     <header className="pointer-events-none fixed inset-x-0 top-0 z-50 [&>*]:pointer-events-auto">
       {/* Mobile menu: three colour sheets slash across the screen, then the panel lands on top (each sheet
           slides in after the one before, and out in reverse: `--open` and `--close` are their delays) */}
-      <div id="mobile-menu" role="dialog" aria-modal="true" aria-label="Menu" data-open={open} inert={!open} className="menu fixed inset-0 md:hidden">
+      <div id="mobile-menu" role="dialog" aria-modal="true" aria-label={t.nav.menu} data-open={open} inert={!open} className="menu fixed inset-0 md:hidden">
         <div aria-hidden className="menu-sheet bg-cyan" style={{ "--open": "0s", "--close": "0.15s" } as React.CSSProperties} />
         <div aria-hidden className="menu-sheet bg-violet" style={{ "--open": "0.05s", "--close": "0.1s" } as React.CSSProperties} />
         <div aria-hidden className="menu-sheet bg-coral" style={{ "--open": "0.1s", "--close": "0.05s" } as React.CSSProperties} />
@@ -96,28 +107,28 @@ export default function Nav() {
           />
           <span
             aria-hidden
-            className="menu-slash pointer-events-none absolute -top-[6vh] -right-[18vw] font-display text-[95vh] leading-none font-bold"
+            className="menu-slash pointer-events-none absolute -top-[6vh] -right-[18vw] font-display text-[length:calc((95vh)*var(--ds))] leading-none font-bold"
             style={{ backgroundImage: "var(--spectrum)", backgroundClip: "text", color: "transparent" }}
           >
             /
           </span>
 
-          <nav aria-label="Main" className="relative my-auto">
+          <nav aria-label={t.nav.main} className="relative my-auto">
             <ul className="flex flex-col gap-1">
               {LINKS.map((link, i) => (
                 <li key={link.href} className="reveal">
                   <Link
                     ref={i === 0 ? firstLinkRef : undefined}
-                    href={link.href}
+                    href={localePath(lang, link.href)}
                     aria-current={current(link.href) ? "page" : undefined}
                     onClick={() => setOpen(false)}
                     className="menu-item group flex items-start gap-2 py-1"
                     style={{ "--i": i } as React.CSSProperties}
                   >
                     <span
-                      className={`font-display text-[13.5vw] leading-[0.95] font-bold uppercase transition-colors duration-300 ${current(link.href) ? link.here : link.hover}`}
+                      className={`font-display text-[length:calc((13.5vw)*var(--ds))] leading-[0.95] font-bold uppercase transition-colors duration-300 ${current(link.href) ? link.here : link.hover}`}
                     >
-                      {link.label}
+                      {t.nav[link.key]}
                     </span>
                     <span className="mt-[0.4em] font-display text-xs font-semibold text-muted">0{i + 1}</span>
                   </Link>
@@ -129,8 +140,8 @@ export default function Nav() {
           <div className="menu-foot relative flex flex-col gap-5">
             <a href={CV.href} download={CV.file} className="flex items-center gap-3 font-display text-xl font-bold uppercase sm:text-2xl">
               <SocialIcon name="Download" className="size-6 shrink-0" />
-              <span className="whitespace-nowrap">Download CV</span>
-              <span className="ml-auto font-sans text-sm font-medium whitespace-nowrap text-muted normal-case">{CV.note}</span>
+              <span className="whitespace-nowrap">{t.nav.downloadCv}</span>
+              <span className="ms-auto font-sans text-sm font-medium whitespace-nowrap text-muted normal-case">{CV.note}</span>
             </a>
             <span aria-hidden className="h-px w-full" style={{ background: "var(--spectrum)" }} />
             <ul className="flex flex-wrap gap-x-6 gap-y-2 text-base font-medium">
@@ -138,12 +149,17 @@ export default function Nav() {
                 <li key={s.label}>
                   <a href={s.href} target="_blank" rel="noreferrer" className="transition-colors hover:text-violet">
                     {s.label}
-                    <span className="sr-only"> (opens in a new tab)</span>
+                    <span className="sr-only">{t.common.newTab}</span>
                   </a>
                 </li>
               ))}
             </ul>
-            <p className="text-sm text-muted">Ahmed Hassan · Portfolio ©2026</p>
+            <div className="flex items-center justify-between gap-4 text-sm text-muted">
+              <p>{t.nav.foot}</p>
+              <a href={switchHref} hrefLang={other} lang={other} aria-label={t.common.switchLabel} className="font-semibold text-ink transition-colors hover:text-violet">
+                {t.common.switchTo}
+              </a>
+            </div>
           </div>
         </div>
       </div>
@@ -152,30 +168,30 @@ export default function Nav() {
         data-scrolled={scrolled}
         data-tucked={tucked && !open}
         data-open={open}
-        className="nav-bar relative mx-2 mt-3 flex items-center justify-between rounded-full py-2 pr-2 pl-2 md:mx-6 md:mt-4 md:pl-4"
+        className="nav-bar relative mx-2 mt-3 flex items-center justify-between rounded-full py-2 pe-2 ps-2 md:mx-6 md:mt-4 md:ps-4"
       >
-        <Link href="/" aria-label="Ahmed Hassan, home" className="relative" onClick={() => setOpen(false)}>
+        <Link href={localePath(lang, "/")} aria-label={t.nav.home} className="relative" onClick={() => setOpen(false)}>
           <Image src="/logo.svg" alt="" width={58} height={45} priority />
         </Link>
 
         <div className="flex items-center gap-2">
-          <nav aria-label="Main" className="nav-links hidden items-center gap-2 rounded-full border border-line bg-bg/60 p-1.5 text-sm font-medium backdrop-blur-xl transition-colors duration-500 md:flex">
+          <nav aria-label={t.nav.main} className="nav-links hidden items-center gap-2 rounded-full border border-line bg-bg/60 p-1.5 text-sm font-medium backdrop-blur-xl transition-colors duration-500 md:flex">
             {/* The filled pill marks the page you're on; Contact stands out on its own with a dot and an arrow */}
             {LINKS.map((link) => {
-              const here = current(link.href);
+              const isHere = current(link.href);
               const cta = link.href === "/contact";
               return (
                 <Link
                   key={link.href}
-                  href={link.href}
-                  aria-current={here ? "page" : undefined}
-                  className={`group flex items-center gap-2 rounded-full px-4 py-2 transition-colors duration-300 ${here ? "bg-ink text-bg" : "hover:bg-white/10"}`}
+                  href={localePath(lang, link.href)}
+                  aria-current={isHere ? "page" : undefined}
+                  className={`group flex items-center gap-2 rounded-full px-4 py-2 transition-colors duration-300 ${isHere ? "bg-ink text-bg" : "hover:bg-white/10"}`}
                 >
-                  {cta && !here && <span aria-hidden className="size-1.5 rounded-full" style={{ background: "var(--spectrum)" }} />}
-                  {link.label}
-                  {cta && !here && (
-                    <span aria-hidden className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5">
-                      ↗
+                  {cta && !isHere && <span aria-hidden className="size-1.5 rounded-full" style={{ background: "var(--spectrum)" }} />}
+                  {t.nav[link.key]}
+                  {cta && !isHere && (
+                    <span aria-hidden className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 rtl:group-hover:-translate-x-0.5">
+                      <span className="arrow">↗</span>
                     </span>
                   )}
                 </Link>
@@ -183,16 +199,28 @@ export default function Nav() {
             })}
           </nav>
 
+          {/* The other language, as a plain link to the same page there (a full load: each language has its own root layout) */}
+          <a
+            href={switchHref}
+            hrefLang={other}
+            lang={other}
+            aria-label={t.common.switchLabel}
+            data-open={open}
+            className="hidden h-12 items-center rounded-full border border-line bg-bg/60 px-4 text-sm font-semibold backdrop-blur-xl transition-[background-color,color,border-color,opacity] duration-300 hover:border-transparent hover:bg-ink hover:text-bg data-[open=true]:pointer-events-none data-[open=true]:opacity-0 md:flex md:h-auto md:self-stretch"
+          >
+            {t.common.switchTo}
+          </a>
+
           {/* The CV, on every page: beside the links on wide screens, beside the burger on phones */}
           <a
             href={CV.href}
             download={CV.file}
-            aria-label="Download CV (PDF)"
+            aria-label={t.nav.downloadCvPdf}
             data-open={open}
-            className="group flex h-12 items-center gap-2 rounded-full border border-line bg-bg/60 pr-4 pl-3 text-sm font-semibold backdrop-blur-xl transition-[background-color,color,border-color,opacity] duration-300 hover:border-transparent hover:bg-ink hover:text-bg data-[open=true]:pointer-events-none data-[open=true]:opacity-0 md:h-auto md:self-stretch"
+            className="group flex h-12 items-center gap-2 rounded-full border border-line bg-bg/60 pe-4 ps-3 text-sm font-semibold backdrop-blur-xl transition-[background-color,color,border-color,opacity] duration-300 hover:border-transparent hover:bg-ink hover:text-bg data-[open=true]:pointer-events-none data-[open=true]:opacity-0 md:h-auto md:self-stretch"
           >
             <SocialIcon name="Download" className="size-4 transition-transform duration-300 group-hover:translate-y-0.5" />
-            CV
+            {t.nav.cv}
           </a>
 
           <button
@@ -200,7 +228,7 @@ export default function Nav() {
             type="button"
             aria-expanded={open}
             aria-controls="mobile-menu"
-            aria-label={open ? "Close menu" : "Open menu"}
+            aria-label={open ? t.nav.closeMenu : t.nav.openMenu}
             onClick={() => setOpen((o) => !o)}
             data-open={open}
             className="burger relative grid size-12 place-items-center rounded-full border border-line bg-bg/60 backdrop-blur-xl transition-colors duration-500 data-[open=true]:border-transparent data-[open=true]:bg-ink md:hidden"

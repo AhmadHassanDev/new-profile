@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { type Choice, OPEN_CONSENT, readConsent, setConsent } from "@/lib/analytics";
 import { whenLoaderDone } from "@/lib/loader";
 import { lowPower } from "@/lib/motion";
+import { useLang } from "@/i18n/LangProvider";
+import { ui } from "@/i18n/ui";
 
 type Scene = import("./cookie/CookieScene").CookieScene;
 
@@ -16,6 +18,7 @@ type Scene = import("./cookie/CookieScene").CookieScene;
  * sends it sinking away. Where the 3D scenes rest (no GPU) it's a floating 🍪 instead.
  */
 export default function CookieBanner() {
+  const t = ui(useLang()).cookies;
   const [open, setOpen] = useState(false);
   const [shown, setShown] = useState(false);
   const [leaving, setLeaving] = useState(false);
@@ -113,12 +116,12 @@ export default function CookieBanner() {
   return (
     <section
       aria-labelledby="cookie-title"
-      className={`fixed inset-x-3 bottom-3 z-[60] rounded-[28px] border border-line bg-surface/90 p-6 shadow-[0_30px_80px_-20px_rgb(0_0_0/0.8)] backdrop-blur-xl transition-[opacity,translate] duration-300 ease-out sm:inset-x-auto sm:bottom-6 sm:left-6 sm:max-w-md md:p-7 ${
+      className={`fixed inset-x-3 bottom-3 z-[60] rounded-[28px] border border-line bg-surface/90 p-6 shadow-[0_30px_80px_-20px_rgb(0_0_0/0.8)] backdrop-blur-xl transition-[opacity,translate] duration-300 ease-out sm:inset-x-auto sm:bottom-6 sm:start-6 sm:max-w-md md:p-7 ${
         shown ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
       }`}
     >
       {/* The cookie hangs over the top-right corner; decoration only */}
-      <div aria-hidden className="pointer-events-none absolute -top-16 right-1 size-32 sm:-top-20 sm:-right-4 sm:size-40">
+      <div aria-hidden className="pointer-events-none absolute -top-16 end-1 size-32 sm:-top-20 sm:-end-4 sm:size-40">
         {flat ? (
           <span className="cookie-float grid size-full place-items-center text-6xl sm:text-7xl">🍪</span>
         ) : (
@@ -126,16 +129,19 @@ export default function CookieBanner() {
         )}
       </div>
 
-      <h2 ref={heading} id="cookie-title" tabIndex={-1} className="pr-24 font-display text-xl leading-tight font-bold uppercase outline-none sm:pr-28">
-        Cookies? <span className="text-spectrum">Just analytics.</span>
+      <h2 ref={heading} id="cookie-title" tabIndex={-1} className="pe-24 font-display text-xl leading-tight font-bold uppercase outline-none sm:pe-28">
+        {t.title}
+        <span className="text-spectrum">{t.titleTail}</span>
       </h2>
       <p className="mt-3 text-base leading-relaxed text-muted">
-        With your OK, Google Analytics sets cookies to show me which pages people visit and what brought them here. No ads, and no
-        tracking across other sites. You can change your mind any time from <span className="text-ink">Cookie settings</span> in the footer.
+        {t.body}
+        <span className="text-ink">{t.settings}</span>
+        {t.bodyTail}
       </p>
       {current ? (
         <p className="mt-3 text-sm text-muted">
-          Right now: <span className="font-semibold text-ink">{current === "granted" ? "accepted" : "rejected"}</span>
+          {t.now}
+          <span className="font-semibold text-ink">{current === "granted" ? t.accepted : t.rejected}</span>
         </p>
       ) : null}
       <div className="mt-5 grid grid-cols-2 gap-3">
@@ -145,7 +151,7 @@ export default function CookieBanner() {
           disabled={leaving}
           className="rounded-full border border-line bg-bg/40 px-5 py-3 text-base font-semibold text-ink transition-colors duration-300 hover:border-ink/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet"
         >
-          Reject
+          {t.reject}
         </button>
         <button
           type="button"
@@ -153,7 +159,7 @@ export default function CookieBanner() {
           disabled={leaving}
           className="rounded-full bg-ink px-5 py-3 text-base font-semibold text-bg transition-transform duration-300 hover:scale-[1.03] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet"
         >
-          Accept
+          {t.accept}
         </button>
       </div>
     </section>
@@ -164,7 +170,7 @@ export default function CookieBanner() {
 export function CookieSettingsLink({ className = "" }: { className?: string }) {
   return (
     <button type="button" onClick={() => window.dispatchEvent(new Event(OPEN_CONSENT))} className={className}>
-      Cookie settings
+      {ui(useLang()).cookies.settings}
     </button>
   );
 }

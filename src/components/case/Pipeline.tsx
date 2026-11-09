@@ -26,7 +26,10 @@ export default function Pipeline({ title, steps }: { title: string; steps: { too
     return () => observer.disconnect();
   }, []);
 
-  const [first, ...rest] = title.split(" to ");
+  // "Figma to live" splits at "to"; an Arabic title ("من Figma للايف") at its last word, which takes the gradient
+  const arabic = /[\u0600-\u06FF]/.test(title);
+  const cut = title.lastIndexOf(" ");
+  const [first, ...rest] = arabic && cut > 0 ? [title.slice(0, cut), title.slice(cut + 1)] : title.split(" to ");
   return (
     <section className="@container px-4 py-16 md:px-10 md:py-24">
       <h2 className="mb-12 fit-heading font-display leading-[0.9] font-bold uppercase [--fit-max:3rem] md:[--fit-max:4.5rem] md:mb-16" style={fitLetters(title)}>
@@ -34,8 +37,8 @@ export default function Pipeline({ title, steps }: { title: string; steps: { too
         {rest.length ? (
           <>
             <br />
-            <span className="bg-gradient-to-r from-[var(--accent)] to-[var(--accent-2)] bg-clip-text text-transparent">
-              to {rest.join(" to ")}
+            <span className="bg-gradient-to-r from-[var(--accent)] rtl:bg-gradient-to-l to-[var(--accent-2)] bg-clip-text text-transparent">
+              {arabic ? rest.join(" ") : `to ${rest.join(" to ")}`}
             </span>
           </>
         ) : null}
@@ -53,7 +56,7 @@ export default function Pipeline({ title, steps }: { title: string; steps: { too
             <ToolLogo name={step.tool} className="size-16 shrink-0 shadow-[0_10px_30px_-10px_rgb(0_0_0/0.8)] md:size-[4.5rem]" />
             <span className="min-w-0">
               <span className="block font-display text-xs font-semibold text-[var(--accent-2)]">0{i + 1}</span>
-              <span className="mt-1 block font-display text-3xl font-bold md:text-[2.4rem]">{step.tool}</span>
+              <span className="mt-1 block font-display text-3xl font-bold md:text-[length:calc((2.4rem)*var(--ds))]">{step.tool}</span>
               <span className="mt-2 block text-base text-muted md:text-lg">{step.does}</span>
             </span>
           </li>

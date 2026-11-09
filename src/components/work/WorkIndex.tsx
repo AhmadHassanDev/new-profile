@@ -1,7 +1,10 @@
 "use client";
 
 import { useMemo, useState, useSyncExternalStore } from "react";
+import { disciplineLabel, siteFor, typeLabel } from "@/content";
 import { DISCIPLINE_COLOR, PROJECTS, typeOf, type Discipline } from "@/content/site";
+import { useLang } from "@/i18n/LangProvider";
+import { ui } from "@/i18n/ui";
 import { ProjectCard } from "./ProjectCard";
 
 const DISCIPLINES = Object.keys(DISCIPLINE_COLOR) as Discipline[];
@@ -60,13 +63,17 @@ function Pill({
 /** A native select dressed as a pill: compact, and the phone's own picker on touch screens. */
 function Select({
   label,
+  all,
   value,
   options,
+  show = (v) => v,
   onChange,
 }: {
   label: string;
+  all: string;
   value: string | null;
   options: string[];
+  show?: (value: string) => string;
   onChange: (value: string | null) => void;
 }) {
   return (
@@ -75,18 +82,18 @@ function Select({
         aria-label={label}
         value={value ?? ""}
         onChange={(e) => onChange(e.target.value || null)}
-        className={`cursor-pointer appearance-none rounded-full border py-2 pr-9 pl-4 text-sm font-semibold transition-colors duration-300 [&>option]:bg-bg [&>option]:text-ink ${
+        className={`cursor-pointer appearance-none rounded-full border py-2 pe-9 ps-4 text-sm font-semibold transition-colors duration-300 [&>option]:bg-bg [&>option]:text-ink ${
           value ? "border-transparent bg-ink text-bg" : "border-line bg-transparent text-muted hover:border-ink/40 hover:text-ink"
         }`}
       >
-        <option value="">All</option>
+        <option value="">{all}</option>
         {options.map((option) => (
           <option key={option} value={option}>
-            {option}
+            {show(option)}
           </option>
         ))}
       </select>
-      <span aria-hidden className={`pointer-events-none absolute right-3.5 text-[10px] ${value ? "text-bg" : "text-muted"}`}>
+      <span aria-hidden className={`pointer-events-none absolute end-3.5 text-[10px] ${value ? "text-bg" : "text-muted"}`}>
         ▼
       </span>
     </span>
@@ -96,7 +103,7 @@ function Select({
 function Group({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div role="group" aria-label={label} className="flex shrink-0 items-center gap-2">
-      <span className="pr-1 text-xs font-semibold tracking-wide text-muted uppercase">{label}</span>
+      <span className="pe-1 text-xs font-semibold tracking-wide text-muted uppercase">{label}</span>
       {children}
     </div>
   );
@@ -107,6 +114,10 @@ function Group({ label, children }: { label: string; children: React.ReactNode }
  * discipline, type and year, and flips the order; the cards rise back in whenever it changes.
  */
 export default function WorkIndex() {
+  const lang = useLang();
+  const t = ui(lang).index;
+  // Same projects, same order and keys, with this language's words
+  const projects = siteFor(lang).PROJECTS;
   const search = useSyncExternalStore(noSubscribe, () => window.location.search, () => "");
   const linked = useMemo(() => fromUrl(search), [search]);
   // The visitor's own choices take over from whatever the link asked for
@@ -115,13 +126,13 @@ export default function WorkIndex() {
   const set = (change: Partial<Filters>) => setFilters({ ...filters, ...change });
   const filtered = useMemo(
     () =>
-      PROJECTS.filter(
+      projects.filter(
         (p) =>
           (!filters.discipline || p.disciplines.includes(filters.discipline)) &&
           (!filters.type || typeOf(p.kind) === filters.type) &&
           (!filters.year || p.year === filters.year),
       ).sort((a, b) => (filters.newest ? b.year.localeCompare(a.year) : a.year.localeCompare(b.year))),
-    [filters],
+    [filters, projects],
   );
   const count = (match: (p: (typeof PROJECTS)[number]) => boolean) => PROJECTS.filter(match).length;
   const filtering = filters.discipline || filters.type || filters.year;
@@ -130,19 +141,19 @@ export default function WorkIndex() {
     <section id="projects" aria-labelledby="projects-title" className="scroll-mt-24 px-4 pt-24 pb-32 md:px-10 md:pt-32 md:pb-48">
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <h2 id="projects-title" className="font-display text-5xl leading-[0.9] font-bold uppercase md:text-7xl">
-          Every
+          {t.top}
           <br />
-          <span className="text-spectrum animate-shimmer">project</span>
+          <span className="text-spectrum animate-shimmer">{t.bottom}</span>
         </h2>
         <p aria-live="polite" className="text-sm font-medium text-muted">
-          <span className="font-display text-3xl text-ink md:text-5xl">{filtered.length}</span> of {PROJECTS.length}
+          <span className="font-display text-3xl text-ink md:text-5xl">{filtered.length}</span> {t.of} {PROJECTS.length}
         </p>
       </div>
 
       {/* Filters: a sticky pane of frosted glass; on small screens it scrolls sideways, fading at the edge */}
       <div className="below-nav sticky z-30 -mx-2 mt-10 px-2 md:mx-0 md:mt-14 md:px-0">
-        <div className="flex items-center gap-5 overflow-x-auto rounded-full border border-line bg-bg/65 p-2 pl-5 shadow-[0_12px_40px_-12px_rgb(0_0_0/0.7),inset_0_1px_0_rgb(255_255_255/0.06)] backdrop-blur-2xl backdrop-saturate-150 [scrollbar-width:none] max-md:[mask-image:linear-gradient(to_right,#000_82%,transparent)]">
-          <Group label="Tag">
+        <div className="flex items-center gap-5 overflow-x-auto rounded-full border border-line bg-bg/65 p-2 ps-5 shadow-[0_12px_40px_-12px_rgb(0_0_0/0.7),inset_0_1px_0_rgb(255_255_255/0.06)] backdrop-blur-2xl backdrop-saturate-150 [scrollbar-width:none] max-md:[mask-image:linear-gradient(to_right,#000_82%,transparent)] rtl:max-md:[mask-image:linear-gradient(to_left,#000_82%,transparent)]">
+          <Group label={t.tag}>
             {DISCIPLINES.map((d) => (
               <Pill
                 key={d}
@@ -151,19 +162,19 @@ export default function WorkIndex() {
                 count={count((p) => p.disciplines.includes(d))}
                 onClick={() => set({ discipline: filters.discipline === d ? null : d })}
               >
-                {d}
+                {disciplineLabel(lang, d)}
               </Pill>
             ))}
           </Group>
-          <Group label="Type">
-            <Select label="Type" value={filters.type} options={TYPES} onChange={(type) => set({ type })} />
+          <Group label={t.type}>
+            <Select label={t.type} all={t.all} value={filters.type} options={TYPES} show={(v) => typeLabel(lang, v)} onChange={(type) => set({ type })} />
           </Group>
-          <Group label="Year">
-            <Select label="Year" value={filters.year} options={YEARS} onChange={(year) => set({ year })} />
+          <Group label={t.year}>
+            <Select label={t.year} all={t.all} value={filters.year} options={YEARS} onChange={(year) => set({ year })} />
           </Group>
-          <Group label="Sort">
+          <Group label={t.sort}>
             <Pill onClick={() => set({ newest: !filters.newest })}>
-              {filters.newest ? "Newest first" : "Oldest first"}
+              {filters.newest ? t.newest : t.oldest}
               <span aria-hidden>{filters.newest ? "↓" : "↑"}</span>
             </Pill>
           </Group>
@@ -171,9 +182,9 @@ export default function WorkIndex() {
             type="button"
             onClick={() => setFilters(NONE)}
             disabled={!filtering}
-            className="ml-auto shrink-0 rounded-full px-4 py-2 text-sm font-semibold whitespace-nowrap text-ink transition-opacity duration-300 disabled:pointer-events-none disabled:opacity-0"
+            className="ms-auto shrink-0 rounded-full px-4 py-2 text-sm font-semibold whitespace-nowrap text-ink transition-opacity duration-300 disabled:pointer-events-none disabled:opacity-0"
           >
-            Clear <span aria-hidden>✕</span>
+            {t.clear} <span aria-hidden>✕</span>
           </button>
         </div>
       </div>
@@ -183,19 +194,19 @@ export default function WorkIndex() {
         <ul key={JSON.stringify(filters)} className="mt-12 grid gap-x-6 gap-y-14 sm:grid-cols-2 md:mt-16 xl:grid-cols-3">
           {filtered.map((project, i) => (
             <li key={project.slug} className="animate-rise" style={{ animationDelay: `${i * 70}ms` }}>
-              <ProjectCard project={project} full />
+              <ProjectCard project={project} lang={lang} full />
             </li>
           ))}
         </ul>
       ) : (
         <div className="mt-16 flex flex-col items-start gap-5 rounded-[28px] bg-surface/40 p-10">
-          <p className="font-display text-2xl font-semibold md:text-3xl">Nothing matches those filters yet.</p>
+          <p className="font-display text-2xl font-semibold md:text-3xl">{t.none}</p>
           <button
             type="button"
             onClick={() => setFilters(NONE)}
             className="rounded-full bg-ink px-6 py-3 text-base font-semibold text-bg transition-transform hover:scale-[1.04]"
           >
-            Show everything
+            {t.showAll}
           </button>
         </div>
       )}

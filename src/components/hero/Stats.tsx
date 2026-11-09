@@ -1,7 +1,8 @@
 "use client";
 
 import { useLayoutEffect, useRef } from "react";
-import { STATS } from "@/content/site";
+import { siteFor } from "@/content";
+import { useLang } from "@/i18n/LangProvider";
 import { whenLoaderDone } from "@/lib/loader";
 
 // Starts once the loader lifts and the headline has risen into place.
@@ -10,6 +11,7 @@ const DURATION_MS = 1600;
 
 /** The real numbers are in the HTML; on screen they count up from zero once. */
 export default function Stats({ className = "" }: { className?: string }) {
+  const { STATS } = siteFor(useLang());
   const numberRefs = useRef<(HTMLSpanElement | null)[]>([]);
 
   useLayoutEffect(() => {
@@ -42,14 +44,14 @@ export default function Stats({ className = "" }: { className?: string }) {
         if (node) node.textContent = String(stat.value);
       });
     };
-  }, []);
+  }, [STATS]);
 
   return (
     <dl className={`flex ${className}`}>
       {STATS.map((stat, i) => (
-        <div key={stat.label} className={`flex flex-col-reverse gap-1 ${i > 0 ? "border-l border-line pl-5 md:pl-8" : ""} pr-5 md:pr-8 last:pr-0`}>
+        <div key={stat.label} className={`flex flex-col-reverse gap-1 ${i > 0 ? "border-s border-line ps-5 md:ps-8" : ""} pe-5 md:pe-8 last:pe-0`}>
           <dt className="text-xs font-medium whitespace-nowrap text-muted md:text-sm">{stat.label}</dt>
-          <dd className="font-display text-3xl leading-none font-bold md:text-5xl">
+          <dd dir="ltr" className="font-display text-3xl leading-none font-bold md:text-5xl rtl:text-right">
             <span ref={(el) => {
               numberRefs.current[i] = el;
             }}>

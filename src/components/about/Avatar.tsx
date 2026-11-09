@@ -1,5 +1,7 @@
 "use client";
 
+import { useLang } from "@/i18n/LangProvider";
+import { ui } from "@/i18n/ui";
 import { useEffect, useRef } from "react";
 import { freshCanvas } from "@/lib/canvas";
 import { lowPower } from "@/lib/motion";
@@ -130,7 +132,7 @@ export default function Avatar({ className = "" }: { className?: string }) {
   return (
     <canvas
       ref={canvasRef}
-      aria-label="A cartoon 3D version of Ahmed"
+      aria-label={ui(useLang()).aboutPage.avatar}
       role="img"
       className={`block h-full w-full touch-pan-y opacity-0 transition-opacity duration-700 data-[ready=true]:opacity-100 ${className}`}
     />

@@ -169,6 +169,12 @@ body:has(.site-loader:not(.is-exiting)) .animate-rise {
     mask-image: linear-gradient(to bottom, transparent, #000 8%, #000 88%, transparent);
   }
 }
+/* In Arabic the zone sits on the left, so it melts in from its right edge */
+@media (orientation: landscape) {
+  [dir="rtl"] .process-zone {
+    mask-image: linear-gradient(to left, transparent, #000 14%), linear-gradient(to bottom, transparent, #000 12%, #000 88%, transparent);
+  }
+}
 
 /* "Scroll" cue: a drop of light running down a hairline */
 .scroll-cue::after {
@@ -218,6 +224,10 @@ body:has(.site-loader:not(.is-exiting)) .animate-rise {
 .cta:hover .cta-arrow,
 .cta:focus-visible .cta-arrow {
   transform: rotate(45deg);
+}
+[dir="rtl"] .cta:hover .cta-arrow,
+[dir="rtl"] .cta:focus-visible .cta-arrow {
+  transform: rotate(-45deg);
 }
 
 /* Nav: a floating bar that turns to frosted glass once content slides under it, tucks away
@@ -865,4 +875,73 @@ html.lenis body {
 }
 :root[data-low-power] .cookie-float {
   animation: none;
+}
+
+/* Display type scales through --ds: 1 in English; Arabic sets it lower (below) */
+:root {
+  --ds: 1;
+}
+
+/* Arabic: Cairo for everything (the English font variables point at it), no letter-spacing (it breaks the joins between
+   letters). Cairo stands taller than the wide Latin display face at the same size, so the display type runs at 80%
+   and the named sizes a little under English; its lines get the height the dots and descenders need. */
+:root[lang="ar"] {
+  --font-figtree: var(--font-cairo);
+  --font-unbounded: var(--font-cairo);
+  --ds: 0.8;
+  --text-xs: 0.72rem;
+  --text-sm: 0.82rem;
+  --text-base: 0.94rem;
+  --text-lg: 1.05rem;
+  --text-xl: 1.15rem;
+  --text-2xl: 1.38rem;
+  --text-3xl: 1.65rem;
+  --text-4xl: 1.95rem;
+  --text-5xl: 2.45rem;
+  --text-6xl: 2.95rem;
+  --text-7xl: 3.5rem;
+  --text-8xl: 4.6rem;
+  --text-9xl: 6rem;
+}
+:root[lang="ar"] :where(*) {
+  letter-spacing: 0 !important;
+}
+:root[lang="ar"] .font-display {
+  line-height: 1.35;
+  text-transform: none;
+}
+:root[lang="ar"] .fit-heading {
+  font-size: calc(min(var(--fit-max), var(--fit)) * var(--ds));
+}
+/* Rise-in masks and letter flips keep room under the line for dots and descenders */
+:root[lang="ar"] .reveal {
+  clip-path: inset(-0.3em -0.3em -0.3em -0.3em);
+}
+:root[lang="ar"] .roll {
+  height: max(var(--roll, 0.9em), 1.35em);
+  line-height: max(var(--roll, 0.9em), 1.35em);
+}
+
+/* Arabic marquee: a size down and tight lines, so the taller letters stay inside their belts */
+:root[lang="ar"] .marquee-word {
+  font-size: calc(var(--text-4xl) * 0.85);
+  line-height: 1.05;
+}
+@media (min-width: 768px) {
+  :root[lang="ar"] .marquee-word {
+    font-size: calc(var(--text-7xl) * 0.85);
+  }
+}
+
+/* Arabic on an English page (the language switch, marked lang="ar") is set in Cairo too */
+:root:not([lang="ar"]) [lang="ar"] {
+  font-family: var(--font-cairo), system-ui, sans-serif;
+}
+
+/* Arrows point the way you read: mirrored in Arabic (their hover turns are mirrored where they're set) */
+.arrow {
+  display: inline-block;
+}
+[dir="rtl"] .arrow {
+  transform: scaleX(-1);
 }

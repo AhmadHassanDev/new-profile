@@ -80,7 +80,7 @@ export default function DiveSignature() {
               className="absolute right-0 flex -translate-y-1/2 items-center gap-2"
               style={{ top: `${(m / MAX_DEPTH) * 100}%` }}
             >
-              <span className="font-display text-[10px] font-semibold text-ink/60">{m}</span>
+              <span className="font-display text-[length:calc((10px)*var(--ds))] font-semibold text-ink/60">{m}</span>
               <span className="h-px w-2 bg-line" />
             </span>
           ))}

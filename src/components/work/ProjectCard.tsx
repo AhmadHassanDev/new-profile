@@ -1,6 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
+import { disciplineLabel, kindLabel } from "@/content";
 import { caseFor } from "@/content/cases";
+import { localePath, type Lang } from "@/i18n/lang";
+import { ui } from "@/i18n/ui";
 import previews from "@/content/covers.json";
 import { COVER_HEIGHT, COVER_WIDTH, DISCIPLINE_COLOR, type Project } from "@/content/site";
 
@@ -43,16 +46,19 @@ export function ProjectCard({
   full = false,
   decorative = false,
   eager = false,
+  lang = "en",
 }: {
   project: Project;
+  lang?: Lang;
   full?: boolean;
   decorative?: boolean;
   eager?: boolean;
 }) {
-  const href = caseFor(project.slug) ? `/work/${project.slug}` : undefined;
+  const t = ui(lang).card;
+  const href = caseFor(project.slug) ? localePath(lang, `/work/${project.slug}`) : undefined;
   const card = (
     <article
-      data-cursor={href ? "View" : "Case study soon"}
+      data-cursor={href ? t.view : t.soon}
       data-cursor-style={href ? undefined : "orbit"}
       className="group relative w-full transition-transform duration-500 ease-out hover:-translate-y-1.5"
     >
@@ -74,12 +80,12 @@ export function ProjectCard({
           className="pointer-events-none object-cover"
         />
       </div>
-      <Caption title={project.name} detail={`${project.kind} · ${project.year}`}>
+      <Caption title={project.name} detail={`${kindLabel(lang, project.kind)} · ${project.year}`}>
         {/* With `full` the names are spelled out below, so the dots are only for the eye there */}
-        <ul className="flex shrink-0 gap-1 pt-1.5" aria-label="Disciplines" aria-hidden={full || undefined}>
+        <ul className="flex shrink-0 gap-1 pt-1.5" aria-label={t.disciplines} aria-hidden={full || undefined}>
           {project.disciplines.map((d) => (
-            <li key={d} title={d} className="size-2.5 rounded-full" style={{ background: DISCIPLINE_COLOR[d] }}>
-              <span className="sr-only">{d}</span>
+            <li key={d} title={disciplineLabel(lang, d)} className="size-2.5 rounded-full" style={{ background: DISCIPLINE_COLOR[d] }}>
+              <span className="sr-only">{disciplineLabel(lang, d)}</span>
             </li>
           ))}
         </ul>
@@ -94,7 +100,7 @@ export function ProjectCard({
                 className="rounded-full border px-3 py-1 text-xs font-semibold"
                 style={{ color: DISCIPLINE_COLOR[d], borderColor: `color-mix(in srgb, ${DISCIPLINE_COLOR[d]} 40%, transparent)` }}
               >
-                {d}
+                {disciplineLabel(lang, d)}
               </li>
             ))}
           </ul>
@@ -104,11 +110,11 @@ export function ProjectCard({
         // Last in the markup so it's read after the name, but it sits on the cover's corner. On the moving
         // wall it's solid: a blur there would be redone for every badge on every frame.
         <p
-          className={`absolute top-3 left-3 rounded-full px-3 py-1.5 text-xs font-semibold text-ink md:top-4 md:left-4 ${
+          className={`absolute start-3 top-3 rounded-full px-3 py-1.5 text-xs font-semibold text-ink md:start-4 md:top-4 ${
             decorative ? "bg-surface/90" : "bg-surface/70 backdrop-blur-md"
           }`}
         >
-          Case study soon
+          {t.soon}
         </p>
       )}
     </article>

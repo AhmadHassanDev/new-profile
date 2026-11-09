@@ -1,7 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { kindLabel, siteFor } from "@/content";
 import { PROJECTS } from "@/content/site";
+import { useLang } from "@/i18n/LangProvider";
+import { ui } from "@/i18n/ui";
 import { lowPower } from "@/lib/motion";
 import { ProjectCard } from "./work/ProjectCard";
 
@@ -42,7 +45,7 @@ function poolFor(width: number, height: number, cell: { w: number; h: number }) 
  */
 export default function Work({
   as: Heading = "h2",
-  title = ["Selected", "work"],
+  title,
   action,
   vignette = false,
   scrollCue = false,
@@ -50,7 +53,7 @@ export default function Work({
 }: {
   /** The work page uses the grid as its opening, so there it is the page's h1 */
   as?: "h1" | "h2";
-  title?: [string, string];
+  title?: string[];
   /** A call to action under the title, e.g. to the full list */
   action?: React.ReactNode;
   /** Dim the edges hard and fade the bottom fully into the page, so as an opening it reads as more to come */
@@ -60,6 +63,11 @@ export default function Work({
   /** The page lists every project right below (the work page's index), so the screen-reader copy here would repeat it */
   listedBelow?: boolean;
 }) {
+  const lang = useLang();
+  const t = ui(lang).work;
+  const heading = title ?? t.title;
+  // The same projects in the same order, in this language (the wall's maths uses the count, which matches)
+  const projects = siteFor(lang).PROJECTS;
   const sectionRef = useRef<HTMLElement>(null);
   const planeRef = useRef<HTMLDivElement>(null);
   const tileRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -239,9 +247,9 @@ export default function Work({
       {/* The real list, for screen readers; the wall below is decoration made of copies */}
       {listedBelow ? null : (
         <ul className="sr-only">
-          {PROJECTS.map((p) => (
+          {projects.map((p) => (
             <li key={p.slug}>
-              {p.name}: {p.kind}, {p.year}. {p.summary}
+              {p.name}: {kindLabel(lang, p.kind)}, {p.year}. {p.summary}
             </li>
           ))}
         </ul>
@@ -268,7 +276,7 @@ export default function Work({
                 className="absolute top-0 left-0 w-[var(--card-w)]"
               >
                 {/* Opening the page, the first copy of each cover fetches straight away at high priority, and the rest reuse it */}
-                <ProjectCard project={TILES[index]} decorative eager={Heading === "h1" && first} />
+                <ProjectCard project={projects[index]} lang={lang} decorative eager={Heading === "h1" && first} />
               </div>
             );
           })}
@@ -291,8 +299,8 @@ export default function Work({
           href="#projects"
           className="absolute bottom-6 left-1/2 z-10 flex -translate-x-1/2 items-center gap-2.5 rounded-full bg-surface-2/80 px-6 py-3 text-base font-semibold whitespace-nowrap text-ink shadow-[0_12px_30px_-10px_rgb(0_0_0/0.8)] backdrop-blur-md transition-transform duration-300 hover:scale-[1.04] md:bottom-10"
         >
-          <span className="md:hidden">Swipe to explore, or scroll to continue</span>
-          <span className="hidden md:inline">Drag to explore, or scroll to continue</span>
+          <span className="md:hidden">{t.cueTouch}</span>
+          <span className="hidden md:inline">{t.cueMouse}</span>
           <span aria-hidden className="scroll-cue-arrow">
             ↓
           </span>
@@ -305,9 +313,9 @@ export default function Work({
             id="work-title"
             className="rounded-[28px] bg-bg/65 px-5 py-4 font-display text-5xl leading-[0.9] font-bold uppercase backdrop-blur-md md:px-7 md:py-6 md:text-7xl"
           >
-            {title[0]}
+            {heading[0]}
             <br />
-            <span className="text-spectrum animate-shimmer">{title[1]}</span>
+            <span className="text-spectrum animate-shimmer">{heading[1]}</span>
           </Heading>
           {action}
         </div>
@@ -315,8 +323,8 @@ export default function Work({
           <span aria-hidden className="text-ink">
             ✥
           </span>
-          <span className="md:hidden">Swipe to explore</span>
-          <span className="hidden md:inline">Drag to explore</span>
+          <span className="md:hidden">{t.exploreTouch}</span>
+          <span className="hidden md:inline">{t.exploreMouse}</span>
         </p>
       </header>
     </section>

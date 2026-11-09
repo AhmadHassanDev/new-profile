@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { useLang } from "@/i18n/LangProvider";
+import { ui } from "@/i18n/ui";
 import { CONTACT } from "@/content/site";
 import SocialIcon from "../SocialIcon";
 import { freshCanvas } from "@/lib/canvas";
@@ -17,6 +19,7 @@ const touch = (on: boolean) => () => window.dispatchEvent(new CustomEvent(TOUCH_
  * the buttons. Scrolling draws them together; hovering "Start a conversation" closes the gap.
  */
 export default function ContactHero() {
+  const t = ui(useLang()).contact;
   const sectionRef = useRef<HTMLElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -79,16 +82,16 @@ export default function ContactHero() {
     <section ref={sectionRef} className="relative flex min-h-[100svh] flex-col px-4 pt-32 pb-10 md:px-10 md:pt-36 md:pb-12">
       <p className="flex items-center gap-3 text-sm font-semibold text-muted">
         <span aria-hidden className="h-px w-10 bg-line" />
-        Contact
+        {t.kicker}
       </p>
-      <h1 className="mt-6 font-display text-[19vw] leading-[0.84] font-bold uppercase md:text-[9.5vw]">
+      <h1 className="mt-6 font-display text-[length:calc((19vw)*var(--ds))] leading-[0.84] font-bold uppercase md:text-[length:calc((9.5vw)*var(--ds))]">
         <span className="reveal block md:inline-block">
-          <span className="animate-rise block">Let&apos;s&nbsp;</span>
+          <span className="animate-rise block">{t.hello}</span>
         </span>
         <span className="reveal block md:inline-block">
           {/* Padded so the full stop, which the tight tracking pushes past the word, still gets its colour */}
-          <span className="text-spectrum animate-shimmer animate-rise block pr-[0.08em]" style={{ animationDelay: "110ms" }}>
-            talk.
+          <span className="text-spectrum animate-shimmer animate-rise block pe-[0.08em]" style={{ animationDelay: "110ms" }}>
+            {t.talk}
           </span>
         </span>
       </h1>
@@ -104,7 +107,8 @@ export default function ContactHero() {
 
       <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
         <p className="max-w-md text-xl leading-snug font-medium text-muted md:text-2xl">
-          Every product starts with one message. <span className="text-ink">Close the gap.</span>
+          {t.lineA}
+          <span className="text-ink">{t.lineB}</span>
         </p>
         <div className="flex flex-wrap items-center gap-3">
           <a
@@ -113,9 +117,9 @@ export default function ContactHero() {
             onPointerLeave={touch(false)}
             onFocus={touch(true)}
             onBlur={touch(false)}
-            className="group inline-flex items-center gap-3 rounded-full bg-ink py-2 pr-2 pl-6 text-base font-semibold text-bg transition-transform duration-300 hover:scale-[1.04] md:text-lg"
+            className="group inline-flex items-center gap-3 rounded-full bg-ink py-2 pe-2 ps-6 text-base font-semibold text-bg transition-transform duration-300 hover:scale-[1.04] md:text-lg"
           >
-            Start a conversation
+            {t.start}
             <span
               aria-hidden
               className="grid size-11 place-items-center rounded-full text-ink transition-transform duration-500 group-hover:translate-y-0.5"
@@ -133,7 +137,7 @@ export default function ContactHero() {
             className="inline-flex items-center gap-2 rounded-full border border-line bg-bg/40 px-5 py-[15px] text-base font-semibold backdrop-blur-md transition-colors duration-300 hover:border-[#25d366] hover:text-[#25d366]"
           >
             <SocialIcon name="WhatsApp" className="size-5" />
-            WhatsApp
+            {t.whatsapp}
           </a>
         </div>
       </div>

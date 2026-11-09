@@ -127,7 +127,7 @@ export default function PassionCard({
         </span>
         <span aria-hidden className="size-3 rounded-full bg-[var(--c)] transition-[transform,background-color] duration-500 group-data-[active]:scale-0" />
       </div>
-      <h3 className="relative mt-auto font-display text-[13vw] leading-[0.9] font-bold uppercase md:text-[clamp(2.25rem,3.7vw,4rem)]">
+      <h3 className="relative mt-auto font-display text-[length:calc((13vw)*var(--ds))] leading-[0.9] font-bold uppercase md:text-[length:calc((clamp(2.25rem,3.7vw,4rem))*var(--ds))]">
         {title}
       </h3>
       <p className="relative mt-4 max-w-md text-lg leading-snug text-muted transition-colors duration-500 group-data-[active]:text-bg">{body}</p>

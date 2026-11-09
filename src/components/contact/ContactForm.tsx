@@ -2,6 +2,8 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 import { flushSync } from "react-dom";
+import { useLang } from "@/i18n/LangProvider";
+import { ui } from "@/i18n/ui";
 import { track } from "@/lib/analytics";
 import { type ContactErrors, type ContactMessage, TOPICS, validate } from "@/lib/contact";
 
@@ -36,6 +38,8 @@ const INPUT =
  * swaps itself for a thank-you once the message is on its way.
  */
 export default function ContactForm() {
+  const lang = useLang();
+  const t = ui(lang).form;
   const [values, setValues] = useState(EMPTY);
   const [errors, setErrors] = useState<ContactErrors>({});
   const [tried, setTried] = useState(false);
@@ -60,13 +64,13 @@ export default function ContactForm() {
   const update = (field: keyof ContactMessage, value: string) => {
     const next = { ...values, [field]: value };
     setValues(next);
-    if (tried) setErrors(validate(next));
+    if (tried) setErrors(validate(next, lang));
   };
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setTried(true);
-    const found = validate(values);
+    const found = validate(values, lang);
     showErrors(found);
     if (Object.keys(found).length) return;
 
@@ -75,7 +79,7 @@ export default function ContactForm() {
     const res = await fetch("/api/contact", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...values, website }),
+      body: JSON.stringify({ ...values, website, lang }),
     }).catch(() => null);
     const data = (await res?.json().catch(() => null)) as { ok?: boolean; error?: string; errors?: ContactErrors } | null;
 
@@ -86,7 +90,7 @@ export default function ContactForm() {
       return;
     }
     if (data?.errors) showErrors(data.errors);
-    setStatus({ state: "error", message: data?.error ?? "Couldn't reach the server. Check your connection and try again." });
+    setStatus({ state: "error", message: data?.error ?? t.offline });
   };
 
   if (status.state === "sent") {
@@ -96,12 +100,12 @@ export default function ContactForm() {
           ✓
         </span>
         <h2 ref={sentHeading} tabIndex={-1} className="font-display text-4xl outline-none leading-[0.95] font-bold uppercase md:text-5xl">
-          Message
+          {t.sentTop}
           <br />
-          <span className="text-spectrum">sent.</span>
+          <span className="text-spectrum">{t.sentBottom}</span>
         </h2>
         <p className="max-w-sm text-lg text-muted">
-          Thanks, {values.name.split(" ")[0]}. I&apos;ll reply to {values.email}.
+          {t.thanks(values.name.split(" ")[0], values.email)}
         </p>
         <button
           type="button"
@@ -116,7 +120,7 @@ export default function ContactForm() {
           }}
           className="text-sm font-semibold text-muted underline-offset-4 hover:text-ink hover:underline"
         >
-          Send another
+          {t.another}
         </button>
       </div>
     );
@@ -126,7 +130,7 @@ export default function ContactForm() {
   return (
     <form noValidate onSubmit={onSubmit} className="flex flex-col gap-2">
       <div className="grid gap-x-5 gap-y-2 sm:grid-cols-2">
-        <Field id={idOf("name")} label="Name" error={errors.name}>
+        <Field id={idOf("name")} label={t.name} error={errors.name}>
           <input
             id={idOf("name")}
             name="name"
@@ -136,15 +140,16 @@ export default function ContactForm() {
             onChange={(e) => update("name", e.target.value)}
             aria-invalid={!!errors.name}
             aria-describedby={describe("name")}
-            placeholder="Your name"
+            placeholder={t.namePlaceholder}
             className={INPUT}
           />
         </Field>
-        <Field id={idOf("email")} label="Email" error={errors.email}>
+        <Field id={idOf("email")} label={t.email} error={errors.email}>
           <input
             id={idOf("email")}
             name="email"
             type="email"
+            dir="ltr"
             autoComplete="email"
             spellCheck={false}
             required
@@ -167,7 +172,7 @@ export default function ContactForm() {
         className="group/topic flex flex-col gap-2"
       >
         <span id={`${idOf("topic")}-label`} className="mb-2 text-sm font-semibold text-muted">
-          What&apos;s it about?
+          {t.topic}
         </span>
         <div className="flex flex-wrap gap-2">
           {TOPICS.map((topic, i) => (
@@ -183,7 +188,7 @@ export default function ContactForm() {
                 className="peer sr-only"
               />
               <span className="block rounded-full border border-line px-4 py-2.5 text-sm font-semibold text-muted transition-colors duration-300 peer-checked:border-transparent peer-checked:bg-ink peer-checked:text-bg peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-violet group-aria-[invalid=true]/topic:border-coral/60 hover:border-ink/40 hover:text-ink">
-                {topic}
+                {t.topics[topic] ?? topic}
               </span>
             </label>
           ))}
@@ -193,7 +198,7 @@ export default function ContactForm() {
         </span>
       </div>
 
-      <Field id={idOf("message")} label="Message" error={errors.message}>
+      <Field id={idOf("message")} label={t.message} error={errors.message}>
         <textarea
           id={idOf("message")}
           name="message"
@@ -203,7 +208,7 @@ export default function ContactForm() {
           onChange={(e) => update("message", e.target.value)}
           aria-invalid={!!errors.message}
           aria-describedby={describe("message")}
-          placeholder="What are you building, and where can I help?"
+          placeholder={t.messagePlaceholder}
           className={`${INPUT} resize-y`}
         />
       </Field>
@@ -215,15 +220,15 @@ export default function ContactForm() {
         <button
           type="submit"
           disabled={sending}
-          className="group inline-flex items-center gap-4 rounded-full bg-ink py-2.5 pr-2.5 pl-8 text-lg font-semibold text-bg transition-transform duration-300 hover:scale-[1.03] disabled:pointer-events-none disabled:opacity-70"
+          className="group inline-flex items-center gap-4 rounded-full bg-ink py-2.5 pe-2.5 ps-8 text-lg font-semibold text-bg transition-transform duration-300 hover:scale-[1.03] disabled:pointer-events-none disabled:opacity-70"
         >
-          {sending ? "Sending…" : "Send message"}
+          {sending ? t.sending : t.send}
           <span
             aria-hidden
-            className={`grid size-11 place-items-center rounded-full text-ink transition-transform duration-500 group-hover:rotate-45 ${sending ? "animate-spin" : ""}`}
+            className={`grid size-11 place-items-center rounded-full text-ink transition-transform duration-500 group-hover:rotate-45 rtl:group-hover:-rotate-45 ${sending ? "animate-spin" : ""}`}
             style={{ background: "var(--spectrum)" }}
           >
-            {sending ? "◌" : "↗"}
+            {sending ? "◌" : <span className="arrow">↗</span>}
           </span>
         </button>
         {status.state === "error" ? (

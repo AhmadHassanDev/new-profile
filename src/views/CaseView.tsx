@@ -18,76 +18,87 @@ import JsonLd from "@/components/JsonLd";
 import Nav from "@/components/Nav";
 import { ProjectCard } from "@/components/work/ProjectCard";
 import WorkLink from "@/components/work/WorkLink";
-import { CASES, caseFor } from "@/content/cases";
-import { COVER_HEIGHT, COVER_WIDTH, DISCIPLINE_COLOR, type Project, PROJECTS } from "@/content/site";
+import { casesFor, disciplineLabel, kindLabel, siteFor } from "@/content";
+import { CASES } from "@/content/cases";
+import { COVER_HEIGHT, COVER_WIDTH, DISCIPLINE_COLOR, type Project } from "@/content/site";
+import { localePath, type Lang } from "@/i18n/lang";
+import { ui } from "@/i18n/ui";
 import { fitLetters } from "@/lib/fit";
 import { absoluteUrl, breadcrumbs, PERSON_ID, pageMetadata, WEBSITE_ID } from "@/lib/seo";
 
-export function generateStaticParams() {
+/** Every case study, the same in both languages */
+export function caseStaticParams() {
   return CASES.map(({ slug }) => ({ slug }));
 }
 
-type Props = { params: Promise<{ slug: string }> };
+type Props = { lang: Lang; params: Promise<{ slug: string }> };
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function caseMetadata({ lang, params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const project = PROJECTS.find((p) => p.slug === slug);
-  if (!project || !caseFor(slug)) return {};
+  const project = siteFor(lang).PROJECTS.find((p) => p.slug === slug);
+  if (!project || !casesFor(lang).caseFor(slug)) return {};
   return pageMetadata({
     title: project.name,
     description: project.summary,
     path: `/work/${slug}`,
+    lang,
     // The project's own cover makes a truer share card than the generic one
     image: project.cover
-      ? { url: project.cover, width: COVER_WIDTH, height: COVER_HEIGHT, alt: `${project.name}, ${project.kind}`, type: "image/webp" }
+      ? { url: project.cover, width: COVER_WIDTH, height: COVER_HEIGHT, alt: `${project.name}, ${kindLabel(lang, project.kind)}`, type: "image/webp" }
       : undefined,
   });
 }
 
 /** The case study as a creative work by Ahmed, with where it sits in the site */
-function caseJsonLd(project: Project) {
+function caseJsonLd(project: Project, lang: Lang) {
   const path = `/work/${project.slug}`;
+  const url = absoluteUrl(localePath(lang, path));
   return [
     {
       "@type": "CreativeWork",
-      "@id": `${absoluteUrl(path)}#work`,
+      "@id": `${url}#work`,
       name: project.name,
-      headline: `${project.name}: ${project.kind}`,
+      headline: `${project.name}: ${kindLabel(lang, project.kind)}`,
       description: project.summary,
-      url: absoluteUrl(path),
+      url,
       ...(project.cover ? { image: absoluteUrl(project.cover) } : {}),
-      genre: project.kind,
-      keywords: project.disciplines.join(", "),
+      genre: kindLabel(lang, project.kind),
+      keywords: project.disciplines.map((d) => disciplineLabel(lang, d)).join(", "),
       dateCreated: project.year,
-      inLanguage: "en",
+      inLanguage: lang,
       creator: { "@id": PERSON_ID },
       isPartOf: { "@id": WEBSITE_ID },
     },
-    breadcrumbs([
-      { name: "Work", path: "/work" },
-      { name: project.name, path },
-    ]),
+    breadcrumbs(
+      [
+        { name: ui(lang).nav.work, path: "/work" },
+        { name: project.name, path },
+      ],
+      lang,
+    ),
   ];
 }
 
 // The frame (nav, footer) renders straight away; the case itself reads the URL, so it streams in
 // behind a boundary and page-to-page navigation stays instant.
-export default function CasePage({ params }: Props) {
+export default function CaseView({ lang, params }: Props) {
   return (
     <>
       <Cursor />
       <Nav />
       <Suspense fallback={<main id="top" className="min-h-[100svh]" />}>
-        <CaseStudy params={params} />
+        <CaseStudy lang={lang} params={params} />
       </Suspense>
-      <Contact />
+      <Contact lang={lang} />
     </>
   );
 }
 
-async function CaseStudy({ params }: Props) {
+async function CaseStudy({ lang, params }: Props) {
   const { slug } = await params;
-  const study = caseFor(slug);
+  const { PROJECTS } = siteFor(lang);
+  const study = casesFor(lang).caseFor(slug);
+  const t = ui(lang);
   const index = PROJECTS.findIndex((p) => p.slug === slug);
   const project = PROJECTS[index];
   if (!study || !project) notFound();
@@ -103,7 +114,7 @@ async function CaseStudy({ params }: Props) {
       className={`case relative isolate ${study.signature === "spiral" ? "md:pr-28" : study.signature === "belt" ? "md:pr-20" : study.signature === "sprint" || study.signature === "spark" ? "md:pr-24" : study.signature ? "md:pr-14" : ""}`}
       style={{ "--accent": study.accent[0], "--accent-2": study.accent[1] } as React.CSSProperties}
     >
-      <JsonLd graph={caseJsonLd(project)} />
+      <JsonLd graph={caseJsonLd(project, lang)} />
       {study.signature === "dive" ? (
         <DiveSignature />
       ) : study.signature === "pulse" ? (
@@ -122,12 +133,12 @@ async function CaseStudy({ params }: Props) {
 
       {/* Opener */}
       <section className="@container relative px-4 pt-32 pb-16 md:px-10 md:pt-40 md:pb-24">
-        <Link href="/work" className="text-sm font-semibold text-muted transition-colors hover:text-ink">
-          <span aria-hidden>←</span> All work
+        <Link href={localePath(lang, "/work")} className="text-sm font-semibold text-muted transition-colors hover:text-ink">
+          <span aria-hidden className="arrow">←</span> {t.common.allWork}
         </Link>
         <p className="mt-10 flex flex-wrap items-center gap-3 text-sm font-semibold text-muted">
           <span aria-hidden className="h-px w-10" style={{ background: "var(--accent-2)" }} />
-          {project.kind} · {project.year}
+          {kindLabel(lang, project.kind)} · {project.year}
         </p>
         {/* As big as the screen allows, shrinking only as far as its longest word needs to fit */}
         <h1
@@ -145,17 +156,17 @@ async function CaseStudy({ params }: Props) {
               href={study.site}
               target="_blank"
               rel="noreferrer"
-              className="group inline-flex w-fit shrink-0 items-center gap-3 rounded-full bg-ink py-2 pr-2 pl-6 text-base font-semibold text-bg transition-transform duration-300 hover:scale-[1.04]"
+              className="group inline-flex w-fit shrink-0 items-center gap-3 rounded-full bg-ink py-2 pe-2 ps-6 text-base font-semibold text-bg transition-transform duration-300 hover:scale-[1.04]"
             >
               <span>
-                Visit website<span className="sr-only"> (opens in a new tab)</span>
+                {t.caseStudy.visit}<span className="sr-only">{t.common.newTab}</span>
               </span>
               <span
                 aria-hidden
-                className="grid size-10 place-items-center rounded-full text-white transition-transform duration-500 group-hover:rotate-45"
+                className="grid size-10 place-items-center rounded-full text-white transition-transform duration-500 group-hover:rotate-45 rtl:group-hover:-rotate-45"
                 style={{ background: "linear-gradient(135deg, var(--accent), var(--accent-2))" }}
               >
-                ↗
+                <span className="arrow">↗</span>
               </span>
             </a>
           ) : null}
@@ -205,28 +216,30 @@ async function CaseStudy({ params }: Props) {
               className="rounded-full border px-4 py-1.5 text-sm font-semibold"
               style={{ color: DISCIPLINE_COLOR[d], borderColor: `color-mix(in srgb, ${DISCIPLINE_COLOR[d]} 40%, transparent)` }}
             >
-              {d}
+              {disciplineLabel(lang, d)}
             </li>
           ))}
         </ul>
       </section>
 
-      <CaseBlocks blocks={study.blocks} />
+      <CaseBlocks blocks={study.blocks} lang={lang} />
 
       {/* Keep exploring */}
       <section aria-labelledby="more-title" className="@container px-4 pt-24 pb-8 md:px-10 md:pt-40">
         <div className="mb-10 flex flex-col gap-6 md:mb-14 md:flex-row md:items-end md:justify-between">
-          <h2 id="more-title" className="fit-heading font-display leading-[0.9] font-bold uppercase [--fit-max:3rem] md:[--fit-max:4.5rem]" style={fitLetters("Keep exploring")}>
-            Keep
+          <h2 id="more-title" className="fit-heading font-display leading-[0.9] font-bold uppercase [--fit-max:3rem] md:[--fit-max:4.5rem]" style={fitLetters(`${t.caseStudy.keep} ${t.caseStudy.exploring}`)}>
+            {t.caseStudy.keep}
             <br />
-            <span className="text-spectrum animate-shimmer">exploring</span>
+            <span className="text-spectrum animate-shimmer">{t.caseStudy.exploring}</span>
           </h2>
-          <WorkLink href="/work">All work</WorkLink>
+          <WorkLink href="/work" lang={lang}>
+            {t.common.allWork}
+          </WorkLink>
         </div>
         <ul className="grid gap-x-6 gap-y-12 sm:grid-cols-2 xl:grid-cols-3">
           {more.map((p) => (
             <li key={p.slug}>
-              <ProjectCard project={p} />
+              <ProjectCard project={p} lang={lang} />
             </li>
           ))}
         </ul>

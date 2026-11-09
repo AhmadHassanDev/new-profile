@@ -4,29 +4,33 @@ import Evolution from "./Evolution";
 import Pipeline from "./Pipeline";
 import { fitLetters } from "@/lib/fit";
 import Timeline from "./Timeline";
-import { COVER_HEIGHT, COVER_WIDTH, DISCIPLINE_COLOR, type Discipline } from "@/content/site";
+import { COVER_HEIGHT, COVER_WIDTH, DISCIPLINE_COLOR } from "@/content/site";
+import type { Lang } from "@/i18n/lang";
+import { ui, type Dict } from "@/i18n/ui";
 
-// Each chapter is labelled with the step of the process it covers
-const CHAPTER_VERB: Record<Discipline, string> = {
-  "UX research": "Research",
-  "UI design": "Design",
-  "Front-end": "Build",
-  Branding: "Identity",
-};
+/**
+ * A figure with no Arabic in it ("530 ms", "5★", "−98%", "£337m") reads left to right in both languages, so the
+ * Arabic page shows "530 ms", not "ms 530". Figures with Arabic words ("13.4 ألف") keep the page's direction.
+ */
+const ltr = (value: string) => (/[\u0600-\u06FF]/.test(value) ? undefined : "ltr");
+
+// The page's words, handed to each block (server components share no context). Chapters are labelled with the
+// step of the process they cover (t.labels).
+type T = Dict["caseStudy"] & { newTab: string };
 
 function Statement({ text }: { text: string }) {
   return (
     <section className="px-4 py-16 md:px-10 md:py-24">
-      <p className="max-w-5xl font-display text-[clamp(1.9rem,4.4vw,4.5rem)] leading-[1.05] font-semibold">
+      <p className="max-w-5xl font-display text-[length:calc((clamp(1.9rem,4.4vw,4.5rem))*var(--ds))] leading-[1.05] font-semibold">
         {text}
       </p>
     </section>
   );
 }
 
-type ChapterProps = Extract<Block, { kind: "chapter" }> & { index: number };
+type ChapterProps = Extract<Block, { kind: "chapter" }> & { index: number; t: T };
 
-function Chapter({ discipline, title, body, findings, sources, index }: ChapterProps) {
+function Chapter({ discipline, title, body, findings, sources, index, t }: ChapterProps) {
   const color = DISCIPLINE_COLOR[discipline];
   return (
     <section className="grid gap-8 px-4 py-14 md:grid-cols-12 md:px-10 md:py-20">
@@ -36,7 +40,7 @@ function Chapter({ discipline, title, body, findings, sources, index }: ChapterP
             0{index + 1}
           </span>
           <span aria-hidden className="h-px w-10" style={{ background: color }} />
-          {CHAPTER_VERB[discipline]}
+          {t.labels[discipline]}
         </p>
       </div>
       <div className="@container md:col-span-8">
@@ -50,7 +54,7 @@ function Chapter({ discipline, title, body, findings, sources, index }: ChapterP
             </p>
           ))
         ) : (
-          <Pending className="mt-6">Write-up coming soon</Pending>
+          <Pending className="mt-6">{t.writeUpSoon}</Pending>
         )}
         {findings?.length ? (
           // Two by two until the column is wide enough for four figures in a row (a pair stays a pair)
@@ -60,30 +64,30 @@ function Chapter({ discipline, title, body, findings, sources, index }: ChapterP
               <div key={f.label} className="@container flex flex-col-reverse justify-end gap-2 rounded-[22px] bg-surface/60 p-5 backdrop-blur-xl md:p-6">
                 <dt className="text-sm text-muted">{f.label}</dt>
                 {/* Sized to the card, so a long figure like "£337m" (4.5em wide) never spills out */}
-                <dd className="font-display text-[min(2.25rem,21cqw)] leading-none font-bold xl:text-[min(3rem,21cqw)]">
-                  {f.value}
+                <dd className="font-display text-[length:calc((min(2.25rem,21cqw))*var(--ds))] leading-none font-bold xl:text-[length:calc((min(3rem,21cqw))*var(--ds))]">
+                  <span dir={ltr(f.value)}>{f.value}</span>
                 </dd>
               </div>
             ))}
           </dl>
         ) : null}
-        <Sources sources={sources} />
+        <Sources sources={sources} t={t} />
       </div>
     </section>
   );
 }
 
-function Sources({ sources }: { sources?: Source[] }) {
+function Sources({ sources, t }: { sources?: Source[]; t: T }) {
   if (!sources?.length) return null;
   return (
     <p className="mt-6 text-sm text-muted">
-      Sources:{" "}
+      {t.sources}{" "}
       {sources.map((source, i) => (
         <span key={source.href}>
           {i > 0 ? " · " : null}
           <a href={source.href} target="_blank" rel="noreferrer" className="underline decoration-line underline-offset-4 transition-colors hover:text-ink">
             {source.label}
-            <span className="sr-only"> (opens in a new tab)</span>
+            <span className="sr-only">{t.newTab}</span>
           </a>
         </span>
       ))}
@@ -105,14 +109,16 @@ function Pending({ children, className = "" }: { children: React.ReactNode; clas
 function Figure({ value }: { value: string }) {
   const [number, unit] = value.split(" ");
   return (
-    <span className="block font-display text-[min(3rem,38cqw)] font-bold whitespace-nowrap md:text-[min(4.5rem,38cqw)]">
-      {number}
-      {unit ? <span className="ml-1 text-2xl text-muted md:text-3xl">{unit}</span> : null}
+    <span className="block font-display text-[length:calc((min(3rem,38cqw))*var(--ds))] font-bold whitespace-nowrap md:text-[length:calc((min(4.5rem,38cqw))*var(--ds))]">
+      <span dir={ltr(value)}>
+        {number}
+        {unit ? <span className="ms-1 text-2xl text-muted md:text-3xl">{unit}</span> : null}
+      </span>
     </span>
   );
 }
 
-function Results({ title, body, items, measuredWith, sources }: Omit<Extract<Block, { kind: "results" }>, "kind">) {
+function Results({ title, body, items, measuredWith, sources, t }: Omit<Extract<Block, { kind: "results" }>, "kind"> & { t: T }) {
   const slots = items.length ? items : [null, null, null];
   return (
     <section className="@container px-4 py-14 md:px-10 md:py-20">
@@ -121,11 +127,11 @@ function Results({ title, body, items, measuredWith, sources }: Omit<Extract<Blo
       </h2>
       {body ? <p className="mt-6 max-w-3xl text-lg leading-relaxed text-muted md:text-xl">{body}</p> : null}
       {measuredWith ? (
-        <p className="mt-8 inline-flex items-center gap-4 rounded-[22px] bg-surface/70 py-3 pr-6 pl-3 backdrop-blur-xl">
+        <p className="mt-8 inline-flex items-center gap-4 rounded-[22px] bg-surface/70 py-3 pe-6 ps-3 backdrop-blur-xl">
           {/* eslint-disable-next-line @next/next/no-img-element -- a small SVG mark, nothing to optimise */}
           <img src={measuredWith.logo} alt="" width={44} height={44} className="size-11 shrink-0" />
           <span>
-            <span className="block text-xs font-semibold text-muted">Measured with</span>
+            <span className="block text-xs font-semibold text-muted">{t.measured}</span>
             <span className="block font-semibold">{measuredWith.name}</span>
             {measuredWith.detail ? <span className="block text-sm text-muted">{measuredWith.detail}</span> : null}
           </span>
@@ -146,7 +152,7 @@ function Results({ title, body, items, measuredWith, sources }: Omit<Extract<Blo
                   className="rounded-full px-3 py-1 font-display text-sm font-bold text-white md:text-base"
                   style={{ background: "linear-gradient(135deg, var(--accent), var(--accent-2))" }}
                 >
-                  {item.change}
+                  <span dir={ltr(item.change)}>{item.change}</span>
                 </span>
               ) : null}
             </span>
@@ -154,10 +160,12 @@ function Results({ title, body, items, measuredWith, sources }: Omit<Extract<Blo
               <span className="mt-auto pt-8">
                 {item.before ? (
                   // Where it started, struck through, so the jump reads at a glance
-                  <span className="mb-1 block font-display text-[min(1.5rem,18cqw)] font-bold whitespace-nowrap text-muted/70 md:text-[min(2.25rem,18cqw)]">
-                    <span className="sr-only">From </span>
-                    <span className="line-through decoration-[var(--accent)] decoration-[3px]">{item.before}</span>
-                    <span className="sr-only"> to</span>
+                  <span className="mb-1 block font-display text-[length:calc((min(1.5rem,18cqw))*var(--ds))] font-bold whitespace-nowrap text-muted/70 md:text-[length:calc((min(2.25rem,18cqw))*var(--ds))]">
+                    <span className="sr-only">{t.from} </span>
+                    <span dir={ltr(item.before)} className="line-through decoration-[var(--accent)] decoration-[3px]">
+                      {item.before}
+                    </span>
+                    <span className="sr-only"> {t.to}</span>
                   </span>
                 ) : null}
                 <Figure value={item.value} />
@@ -166,13 +174,13 @@ function Results({ title, body, items, measuredWith, sources }: Omit<Extract<Blo
             ) : (
               <span className="mt-auto pt-10">
                 <span className="block font-display text-6xl font-bold text-muted/40 md:text-7xl">—</span>
-                <span className="mt-3 block text-base text-muted">Result coming soon</span>
+                <span className="mt-3 block text-base text-muted">{t.resultSoon}</span>
               </span>
             )}
           </li>
         ))}
       </ul>
-      <Sources sources={sources} />
+      <Sources sources={sources} t={t} />
     </section>
   );
 }
@@ -181,7 +189,7 @@ function Results({ title, body, items, measuredWith, sources }: Omit<Extract<Blo
  * The overview: a short lede beside the work. The first clause reads bright, the rest quieter, so it
  * reads like an editorial introduction rather than a poster.
  */
-function Feature({ text, src, alt }: { text: string; src: string; alt: string }) {
+function Feature({ text, src, alt, t }: { text: string; src: string; alt: string; t: T }) {
   const split = text.indexOf(": ");
   const [lead, rest] = split > 0 ? [text.slice(0, split + 1), text.slice(split + 2)] : [text, ""];
   return (
@@ -189,7 +197,7 @@ function Feature({ text, src, alt }: { text: string; src: string; alt: string })
       <div className="md:col-span-4 md:pt-2">
         <p className="flex items-center gap-3 text-sm font-semibold text-muted">
           <span aria-hidden className="h-px w-10 bg-[var(--accent-2)]" />
-          Overview
+          {t.overview}
         </p>
         <p className="mt-6 text-2xl leading-snug font-medium text-muted md:text-[1.7rem]">
           <span className="text-ink">{lead}</span> {rest}
@@ -238,7 +246,7 @@ function Picture({ src, alt, caption, full, width = COVER_WIDTH, height = COVER_
  * keyboard focus (its scrollbar is hidden), so arrow keys move it, and while focused every page scrolls
  * through as on hover (`.screens:focus-visible` in globals.css).
  */
-function Screens({ title, screens }: { title: string; screens: Screen[] }) {
+function Screens({ title, screens, t }: { title: string; screens: Screen[]; t: T }) {
   return (
     <section className="py-8 md:py-12">
       <h2 className="mb-6 px-4 font-display text-sm font-semibold tracking-wide text-muted uppercase md:mb-8 md:px-10">{title}</h2>
@@ -272,7 +280,7 @@ function Screens({ title, screens }: { title: string; screens: Screen[] }) {
                     />
                   </div>
                 ) : (
-                  <div className="grid aspect-[4/5] place-items-center bg-surface/30 text-sm text-muted">Screen coming soon</div>
+                  <div className="grid aspect-[4/5] place-items-center bg-surface/30 text-sm text-muted">{t.screenSoon}</div>
                 )}
               </div>
               <p className="mt-4 px-1 font-display text-lg font-bold uppercase">{screen.label}</p>
@@ -288,7 +296,7 @@ function Screens({ title, screens }: { title: string; screens: Screen[] }) {
  * The pages on phones, each in a handset (a dark bezel with a dynamic island). Like the browser windows,
  * hovering a phone, or focusing the strip, scrolls the page inside it from top to bottom.
  */
-function Phones({ title, screens }: { title: string; screens: Screen[] }) {
+function Phones({ title, screens, t }: { title: string; screens: Screen[]; t: T }) {
   return (
     <section className="py-8 md:py-12">
       <h2 className="mb-6 px-4 font-display text-sm font-semibold tracking-wide text-muted uppercase md:mb-8 md:px-10">{title}</h2>
@@ -321,7 +329,7 @@ function Phones({ title, screens }: { title: string; screens: Screen[] }) {
                     <span aria-hidden className="absolute top-[2.2%] left-1/2 h-[3.4%] w-[30%] -translate-x-1/2 rounded-full bg-[#050507]" />
                   </div>
                 ) : (
-                  <div className="grid aspect-[393/852] place-items-center rounded-[36px] bg-surface/30 text-sm text-muted">Screen coming soon</div>
+                  <div className="grid aspect-[393/852] place-items-center rounded-[36px] bg-surface/30 text-sm text-muted">{t.screenSoon}</div>
                 )}
               </div>
               <p className="mt-4 px-1 font-display text-lg font-bold uppercase">{screen.label}</p>
@@ -337,7 +345,7 @@ function Phones({ title, screens }: { title: string; screens: Screen[] }) {
  * Directions explored before one shipped, side by side as full pages that scroll on hover. The one that
  * shipped carries a tag and stays bright; the others sit back until hovered. On phones they scroll sideways.
  */
-function Directions({ title, body, options }: Omit<Extract<Block, { kind: "directions" }>, "kind">) {
+function Directions({ title, body, options, t }: Omit<Extract<Block, { kind: "directions" }>, "kind"> & { t: T }) {
   return (
     <section className="py-16 md:py-24">
       <div className="@container px-4 md:px-10">
@@ -358,17 +366,17 @@ function Directions({ title, body, options }: Omit<Extract<Block, { kind: "direc
             >
               <Image
                 src={option.src}
-                alt={`Direction ${i + 1}, ${option.label}: the homepage`}
+                alt={`${t.direction} ${i + 1}, ${option.label}`}
                 width={option.width}
                 height={option.height}
                 sizes="(min-width: 768px) calc((100vw - 120px) / 3), 78vw"
                 className="screen-page block h-auto w-full"
               />
               {option.chosen ? (
-                <span className="absolute top-3 right-3 rounded-full bg-[var(--accent-2)] px-3 py-1 text-xs font-bold text-[#0b0b0b]">Shipped</span>
+                <span className="absolute end-3 top-3 rounded-full bg-[var(--accent-2)] px-3 py-1 text-xs font-bold text-[#0b0b0b]">{t.shipped}</span>
               ) : null}
             </div>
-            <p className="mt-5 px-1 font-display text-xs font-semibold tracking-wide text-muted uppercase">Direction {String(i + 1).padStart(2, "0")}</p>
+            <p className="mt-5 px-1 font-display text-xs font-semibold tracking-wide text-muted uppercase">{t.direction} {String(i + 1).padStart(2, "0")}</p>
             <p className="mt-1 px-1 font-display text-2xl leading-tight font-bold uppercase">{option.label}</p>
             <p className="mt-2 px-1 text-base text-muted">{option.idea}</p>
           </li>
@@ -411,7 +419,8 @@ function Gallery({ title, body, items }: Omit<Extract<Block, { kind: "gallery" }
 }
 
 /** Renders a case study's blocks in the order the project chose them. */
-export default function CaseBlocks({ blocks }: { blocks: Block[] }) {
+export default function CaseBlocks({ blocks, lang = "en" }: { blocks: Block[]; lang?: Lang }) {
+  const t: T = { ...ui(lang).caseStudy, newTab: ui(lang).common.newTab };
   let chapter = 0;
   return (
     <>
@@ -420,27 +429,27 @@ export default function CaseBlocks({ blocks }: { blocks: Block[] }) {
           case "statement":
             return <Statement key={i} text={block.text} />;
           case "chapter":
-            return <Chapter key={i} {...block} index={chapter++} />;
+            return <Chapter key={i} {...block} index={chapter++} t={t} />;
           case "pipeline":
             return <Pipeline key={i} title={block.title} steps={block.steps} />;
           case "feature":
-            return <Feature key={i} text={block.text} src={block.src} alt={block.alt} />;
+            return <Feature key={i} text={block.text} src={block.src} alt={block.alt} t={t} />;
           case "image":
             return <Picture key={i} {...block} />;
           case "results":
-            return <Results key={i} {...block} />;
+            return <Results key={i} {...block} t={t} />;
           case "screens":
-            return <Screens key={i} title={block.title} screens={block.screens} />;
+            return <Screens key={i} title={block.title} screens={block.screens} t={t} />;
           case "timeline":
             return <Timeline key={i} title={block.title} body={block.body} unit={block.unit} steps={block.steps} />;
           case "evolution":
             return <Evolution key={i} title={block.title} body={block.body} pairs={block.pairs} />;
           case "directions":
-            return <Directions key={i} title={block.title} body={block.body} options={block.options} />;
+            return <Directions key={i} title={block.title} body={block.body} options={block.options} t={t} />;
           case "gallery":
             return <Gallery key={i} title={block.title} body={block.body} items={block.items} />;
           case "phones":
-            return <Phones key={i} title={block.title} screens={block.screens} />;
+            return <Phones key={i} title={block.title} screens={block.screens} t={t} />;
         }
       })}
     </>

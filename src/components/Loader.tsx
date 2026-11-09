@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useLang } from "@/i18n/LangProvider";
+import { ui } from "@/i18n/ui";
 import { isLoaderDone, LOADER_PROGRESS, markLoaderDone } from "@/lib/loader";
 
 // The full show, for wide screens with a mouse: long enough to watch the logo gather, never holding the page hostage
@@ -23,6 +25,7 @@ type Phase = "loading" | "exiting" | "gone";
  * climbs, keeps the rest of the page hidden, and lets go at 100 so the logo bursts into the hero.
  */
 export default function Loader() {
+  const t = ui(useLang()).loader;
   // Coming back from another page, the intro already played: skip it. (The server and the first
   // load always start at "loading", so hydration still matches.)
   const [phase, setPhase] = useState<Phase>(() =>
@@ -95,17 +98,17 @@ export default function Loader() {
       <div aria-hidden className={`site-loader pointer-events-none fixed inset-0 z-[55] ${phase === "exiting" ? "is-exiting" : ""}`}>
         <div className="absolute inset-x-0 bottom-0 flex items-end justify-between px-4 pb-6 text-sm font-medium md:px-10 md:pb-10">
           <p className="text-muted">
-            <span className="text-ink">Ahmed Hassan</span>
+            <span className="text-ink">{t.name}</span>
             <br />
-            Portfolio ©2026
+            {t.sub}
           </p>
-          <p className="text-right text-muted">
-            Loading
+          <p className="text-end text-muted">
+            {t.loading}
             <br />
             <span ref={percentRef} className="font-display text-2xl font-bold text-ink tabular-nums">
               00
             </span>
-            <span className="text-spectrum ml-0.5 font-display text-base font-bold">%</span>
+            <span className="text-spectrum ms-0.5 font-display text-base font-bold">%</span>
           </p>
         </div>
         <div className="absolute inset-x-0 bottom-0 h-px bg-line">

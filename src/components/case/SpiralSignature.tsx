@@ -1,5 +1,7 @@
 "use client";
 
+import { useLang } from "@/i18n/LangProvider";
+import { ui } from "@/i18n/ui";
 import { useEffect, useRef } from "react";
 
 const TURNS = 4.25;
@@ -29,6 +31,7 @@ const SPIRAL = (() => {
  * the way deep brain stimulation settles it. Behind the page, the brand's clinical blue.
  */
 export default function SpiralSignature() {
+  const t = ui(useLang()).signatures.spiral;
   const groundRef = useRef<HTMLDivElement>(null);
   const drawnRef = useRef<SVGPathElement>(null);
   const ampRef = useRef<HTMLSpanElement>(null);
@@ -51,7 +54,7 @@ export default function SpiralSignature() {
       const done = shown >= 0.985;
       if (done !== settled) {
         settled = done;
-        if (stateRef.current) stateRef.current.textContent = done ? "Settled" : "DBS on";
+        if (stateRef.current) stateRef.current.textContent = done ? t.settled : t.on;
         stateRef.current?.toggleAttribute("data-settled", done);
       }
     };
@@ -83,7 +86,7 @@ export default function SpiralSignature() {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", measure);
     };
-  }, []);
+  }, [t.on, t.settled]);
 
   return (
     <>
@@ -110,13 +113,13 @@ export default function SpiralSignature() {
         </svg>
         {/* Stacked short lines, so the readout stays inside the margin the spiral sits in */}
         <span className="mt-3 flex flex-col items-center rounded-[12px] bg-bg/75 px-2.5 py-1.5 text-center backdrop-blur-md">
-          <span ref={stateRef} className="dbs-state block font-display text-[9px] font-semibold tracking-[0.08em] whitespace-nowrap text-muted uppercase">
-            DBS on
+          <span ref={stateRef} className="dbs-state block font-display text-[length:calc((9px)*var(--ds))] font-semibold tracking-[0.08em] whitespace-nowrap text-muted uppercase">
+            {t.on}
           </span>
           <span ref={ampRef} className="mt-0.5 block font-display text-xs font-bold whitespace-nowrap tabular-nums">
             0.0 mA
           </span>
-          <span className="block font-display text-[10px] font-semibold whitespace-nowrap text-muted">130 Hz</span>
+          <span className="block font-display text-[length:calc((10px)*var(--ds))] font-semibold whitespace-nowrap text-muted">130 Hz</span>
         </span>
       </div>
     </>

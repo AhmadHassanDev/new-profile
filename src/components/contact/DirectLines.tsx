@@ -1,11 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { CONTACT, CV } from "@/content/site";
+import { siteFor } from "@/content";
+import { useLang } from "@/i18n/LangProvider";
+import { ui } from "@/i18n/ui";
 import SocialIcon from "../SocialIcon";
 
 /** The fastest ways to reach Ahmed (WhatsApp, and email with a one-tap copy), and his CV */
 export default function DirectLines() {
+  const lang = useLang();
+  const t = ui(lang);
+  const { CONTACT, CV } = siteFor(lang);
   const [copied, setCopied] = useState(false);
   const copy = async () => {
     try {
@@ -28,22 +33,22 @@ export default function DirectLines() {
         {/* A soft green glow spreads from behind the icon; the text stays as it is */}
         <span
           aria-hidden
-          className="absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-          style={{ background: "radial-gradient(70% 140% at 0% 50%, rgb(37 211 102 / 0.22), transparent 70%)" }}
+          className="absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100 rtl:[--glow-x:100%]"
+          style={{ background: "radial-gradient(70% 140% at var(--glow-x, 0%) 50%, rgb(37 211 102 / 0.22), transparent 70%)" }}
         />
         <span className="relative grid size-12 shrink-0 place-items-center rounded-full bg-[#25d366] text-bg transition-transform duration-500 group-hover:scale-110 sm:size-14">
           <SocialIcon name="WhatsApp" className="size-7" />
         </span>
         <span className="@container relative min-w-0 flex-1">
-          <span className="block text-sm font-semibold text-muted">WhatsApp</span>
+          <span className="block text-sm font-semibold text-muted">{t.contact.whatsapp}</span>
           {/* On one line, sized to the card: the number runs about 10.5em wide */}
-          <span className="mt-1 block font-display text-[min(1.125rem,9.4cqw)] font-bold whitespace-nowrap sm:text-[min(1.25rem,9.4cqw)] md:text-[min(1.5rem,9.4cqw)]">
-            {CONTACT.whatsapp.display}
+          <span className="mt-1 block font-display text-[length:calc((min(1.125rem,9.4cqw))*var(--ds))] font-bold whitespace-nowrap sm:text-[length:calc((min(1.25rem,9.4cqw))*var(--ds))] md:text-[length:calc((min(1.5rem,9.4cqw))*var(--ds))]">
+            <span dir="ltr">{CONTACT.whatsapp.display}</span>
           </span>
-          <span className="sr-only"> (opens in a new tab)</span>
+          <span className="sr-only">{t.common.newTab}</span>
         </span>
-        <span aria-hidden className="relative text-2xl transition-all duration-500 group-hover:rotate-45 group-hover:text-[#25d366]">
-          ↗
+        <span aria-hidden className="relative text-2xl transition-all duration-500 group-hover:rotate-45 group-hover:text-[#25d366] rtl:group-hover:-rotate-45">
+          <span className="arrow">↗</span>
         </span>
       </a>
 
@@ -52,7 +57,7 @@ export default function DirectLines() {
           <SocialIcon name="Email" className="size-7" />
         </span>
         <a href={`mailto:${CONTACT.email}`} className="min-w-0 flex-1 transition-colors hover:text-violet">
-          <span className="block text-sm font-semibold text-muted">Email</span>
+          <span className="block text-sm font-semibold text-muted">{t.contact.email}</span>
           <span className="mt-1 block font-display text-xs font-bold break-all sm:text-sm md:text-base">
             {CONTACT.email}
           </span>
@@ -60,14 +65,14 @@ export default function DirectLines() {
         <button
           type="button"
           onClick={copy}
-          aria-label="Copy email address"
+          aria-label={t.contact.copyLabel}
           className="shrink-0 rounded-full border border-line px-4 py-2 text-sm font-semibold transition-colors duration-300 hover:border-transparent hover:bg-ink hover:text-bg"
         >
-          <span aria-hidden>{copied ? "Copied ✓" : "Copy"}</span>
+          <span aria-hidden>{copied ? t.contact.copied : t.contact.copy}</span>
         </button>
         {/* Announced once on copy; it empties silently, so the label flipping back to "Copy" isn't read out */}
         <span role="status" className="sr-only">
-          {copied ? "Email address copied" : ""}
+          {copied ? t.contact.copiedLive : ""}
         </span>
       </div>
 
@@ -79,15 +84,18 @@ export default function DirectLines() {
       >
         <span
           aria-hidden
-          className="absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-          style={{ background: "radial-gradient(70% 140% at 0% 50%, color-mix(in srgb, var(--violet) 22%, transparent), transparent 70%)" }}
+          className="absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100 rtl:[--glow-x:100%]"
+          style={{ background: "radial-gradient(70% 140% at var(--glow-x, 0%) 50%, color-mix(in srgb, var(--violet) 22%, transparent), transparent 70%)" }}
         />
         <span className="relative grid size-12 shrink-0 place-items-center rounded-full text-bg transition-transform duration-500 group-hover:scale-110 sm:size-14" style={{ background: "var(--spectrum)" }}>
           <SocialIcon name="Download" className="size-6" />
         </span>
         <span className="relative min-w-0 flex-1">
-          <span className="block text-sm font-semibold text-muted">CV · {CV.note}</span>
-          <span className="mt-1 block font-display text-[1.125rem] font-bold sm:text-xl md:text-2xl">Download my CV</span>
+          <span className="block text-sm font-semibold text-muted">
+            {t.contact.cvPrefix}
+            {CV.note}
+          </span>
+          <span className="mt-1 block font-display text-[length:calc((1.125rem)*var(--ds))] font-bold sm:text-xl md:text-2xl">{t.contact.downloadMyCv}</span>
         </span>
         <span aria-hidden className="relative text-2xl transition-transform duration-500 group-hover:translate-y-1">
           ↓

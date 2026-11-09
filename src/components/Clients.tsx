@@ -3,6 +3,8 @@
 import Image from "next/image";
 import { useEffect, useRef } from "react";
 import { CLIENTS, type Client } from "@/content/site";
+import { useLang } from "@/i18n/LangProvider";
+import { ui } from "@/i18n/ui";
 
 // Two belts moving in opposite directions. Each repeats its logos so it can loop seamlessly: one set of a belt
 // is 3,100px+ wide, so a second copy is enough to keep the loop full on any common screen.
@@ -55,6 +57,7 @@ function Logo({ client, copy, far }: { client: Client; copy: boolean; far: boole
 type Item = { el: HTMLElement; belt: number; cx: number; cy: number; w: number; h: number; scale: number; lit: boolean };
 
 export default function Clients() {
+  const t = ui(useLang()).clients;
   const sectionRef = useRef<HTMLElement>(null);
   const glowRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
@@ -211,20 +214,22 @@ export default function Clients() {
       />
       <div className="mb-10 flex flex-col gap-4 px-4 md:mb-14 md:flex-row md:items-end md:justify-between md:px-10">
         <h2 id="clients-title" className="font-display text-4xl leading-[0.9] font-bold uppercase md:text-6xl">
-          Trusted by
+          {t.top}
           <br />
-          <span className="text-spectrum animate-shimmer">teams that ship</span>
+          <span className="text-spectrum animate-shimmer">{t.bottom}</span>
         </h2>
         <p className="flex flex-col gap-1 text-sm font-medium text-muted md:items-end">
-          <span className="font-display text-5xl leading-none font-bold text-ink">
+          {/* Numbers read left to right in both languages: "32+", never "+32" */}
+          <span dir="ltr" className="font-display text-5xl leading-none font-bold text-ink">
             {CLIENTS.length}
             <span className="text-spectrum ml-[0.12em]">+</span>
           </span>
-          Brands
+          {t.brands}
         </p>
       </div>
 
-      <div ref={trackRef} className="relative z-[1] flex flex-col gap-2 py-6 md:gap-4 [mask-image:linear-gradient(90deg,transparent,#000_10%,#000_90%,transparent)]">
+      {/* Logos have no reading direction: the belts always run left to right, so their looping maths holds in Arabic too */}
+      <div ref={trackRef} dir="ltr" className="relative z-[1] flex flex-col gap-2 py-6 md:gap-4 [mask-image:linear-gradient(90deg,transparent,#000_10%,#000_90%,transparent)]">
         {ROWS.map((row, i) => (
           <ul
             key={i}

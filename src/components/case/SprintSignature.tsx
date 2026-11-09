@@ -1,5 +1,7 @@
 "use client";
 
+import { useLang } from "@/i18n/LangProvider";
+import { ui } from "@/i18n/ui";
 import { useEffect, useRef, useState } from "react";
 
 /** 72.483 → "01:12.48" */
@@ -16,6 +18,7 @@ const clock = (seconds: number) => {
  * with your time. Behind the page, the studio's lime glows up from the floor as you near the end.
  */
 export default function SprintSignature() {
+  const t = ui(useLang()).signatures.sprint;
   const groundRef = useRef<HTMLDivElement>(null);
   const fillRef = useRef<HTMLSpanElement>(null);
   const runnerRef = useRef<HTMLSpanElement>(null);
@@ -63,7 +66,7 @@ export default function SprintSignature() {
         lap = passed;
       }
       const done = target >= 0.995;
-      if (lapRef.current) lapRef.current.textContent = done ? "Finish" : `Lap ${Math.max(1, lap)}/${starts.length || 1}`;
+      if (lapRef.current) lapRef.current.textContent = done ? t.finish : `${t.lap.split(" ")[0]} ${Math.max(1, lap)}/${starts.length || 1}`;
       [...(ticksRef.current?.children ?? [])].forEach((tick, i) => ((tick as HTMLElement).dataset.passed = String(i < lap)));
       // The finish: the clock stops and says so
       if (done !== finished) {
@@ -116,7 +119,7 @@ export default function SprintSignature() {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", measure);
     };
-  }, []);
+  }, [t.finish, t.lap]);
 
   return (
     <>
@@ -127,12 +130,12 @@ export default function SprintSignature() {
       <div aria-hidden className="pointer-events-none fixed top-1/2 right-5 z-20 hidden -translate-y-1/2 md:block">
         {/* The stopwatch, above the track: time spent moving, the lap you're on, and each lap's split */}
         <span ref={cardRef} className="sprint-card absolute right-0 bottom-full mb-4 flex origin-bottom-right flex-col items-end">
-          <span ref={splitRef} className="mb-1 font-display text-[10px] font-semibold text-[var(--accent-2)] tabular-nums opacity-0" />
+          <span ref={splitRef} className="mb-1 font-display text-[length:calc((10px)*var(--ds))] font-semibold text-[var(--accent-2)] tabular-nums opacity-0" />
           <span className="sprint-clock rounded-full bg-bg/75 px-2.5 py-1 font-display text-xs font-bold tabular-nums backdrop-blur-md">
             <span ref={clockRef}>00:00.00</span>
           </span>
-          <span ref={lapRef} className="mt-1.5 font-display text-[10px] font-semibold tracking-[0.12em] text-muted uppercase">
-            Lap 1/1
+          <span ref={lapRef} className="mt-1.5 font-display text-[length:calc((10px)*var(--ds))] font-semibold tracking-[0.12em] text-muted uppercase">
+            {t.lap}
           </span>
         </span>
 

@@ -29,15 +29,31 @@ function measure(heading: HTMLElement, canvas: HTMLCanvasElement) {
   const lineHeight = parseFloat(css.lineHeight);
 
   // Where CSS puts the baseline inside each line box, ignoring the rise-in transform.
+  // The text's own left edge (not the block's), so right-aligned Arabic lines land where CSS put them
   const result: TextLine[] = lines.map((line) => {
     const box = line.getBoundingClientRect();
+    // Measured over the text itself: the line and its inner span are full-width blocks
+    const walker = document.createTreeWalker(line, NodeFilter.SHOW_TEXT);
+    const range = document.createRange();
+    let first: Node | null = null;
+    let last: Node | null = null;
+    for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+      if (!n.textContent?.trim()) continue;
+      first ??= n;
+      last = n;
+    }
+    if (first && last) {
+      range.setStart(first, 0);
+      range.setEnd(last, last.textContent!.length);
+    } else range.selectNodeContents(line);
+    const text = range.getBoundingClientRect();
     return {
       text: (line.textContent ?? "").toUpperCase(),
-      x: box.left - origin.left,
+      x: (text.width ? text.left : box.left) - origin.left,
       baseline: box.top - origin.top + (lineHeight - (ascent + descent)) / 2 + ascent,
     };
   });
-  return { lines: result, style };
+  return { lines: result, style: { ...style, rtl: getComputedStyle(heading).direction === "rtl" } };
 }
 
 export type Lit = [boolean, boolean, boolean];

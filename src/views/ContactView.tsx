@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import Contact from "@/components/Contact";
 import ContactForm from "@/components/contact/ContactForm";
 import ContactHero from "@/components/contact/ContactHero";
@@ -7,17 +6,21 @@ import Cursor from "@/components/Cursor";
 import JsonLd from "@/components/JsonLd";
 import Nav from "@/components/Nav";
 import SocialIcon from "@/components/SocialIcon";
-import { CONTACT, SOCIALS } from "@/content/site";
-import { absoluteUrl, breadcrumbs, PERSON_ID, pageMetadata, webPage } from "@/lib/seo";
+import { siteFor } from "@/content";
+import { CONTACT } from "@/content/site";
+import { localePath, type Lang } from "@/i18n/lang";
+import { ui } from "@/i18n/ui";
+import { absoluteUrl, breadcrumbs, nameIn, PERSON_ID, webPage } from "@/lib/seo";
 import { fitLetters } from "@/lib/fit";
 
-const DESCRIPTION = "Start a project with Ahmed Hassan: send a message, WhatsApp, email, or find him on LinkedIn, Behance, Dribbble, GitHub and Instagram.";
+export const CONTACT_DESCRIPTION = {
+  en: "Start a project with Ahmed Hassan: send a message, WhatsApp, email, or find him on LinkedIn, Behance, Dribbble, GitHub and Instagram.",
+  ar: "ابدأ مشروعك مع أحمد حسن: ابعت رسالة، أو كلمه على واتساب أو الإيميل، أو لاقيه على LinkedIn وBehance وDribbble وGitHub وInstagram.",
+};
 
-export const metadata: Metadata = pageMetadata({ title: "Contact", description: DESCRIPTION, path: "/contact" });
-
-const JSON_LD = [
+const jsonLd = (lang: Lang) => [
   {
-    ...webPage("ContactPage", { path: "/contact", name: "Contact — Ahmed Hassan", description: DESCRIPTION }),
+    ...webPage("ContactPage", { path: "/contact", name: `${ui(lang).nav.contact} — ${nameIn(lang)}`, description: CONTACT_DESCRIPTION[lang], lang }),
     mainEntity: {
       "@id": PERSON_ID,
       contactPoint: {
@@ -25,11 +28,11 @@ const JSON_LD = [
         contactType: "Project enquiries",
         email: CONTACT.email,
         telephone: `+${CONTACT.whatsapp.number}`,
-        url: absoluteUrl("/contact"),
+        url: absoluteUrl(localePath(lang, "/contact")),
       },
     },
   },
-  breadcrumbs([{ name: "Contact", path: "/contact" }]),
+  breadcrumbs([{ name: ui(lang).nav.contact, path: "/contact" }], lang),
 ];
 
 // Each network's own colour floods its tile on hover, with text that reads on it. Instagram's gradient drops its pale
@@ -53,10 +56,12 @@ const TILE = [
   { li: "sm:col-span-2 lg:col-span-3 xl:col-span-1", a: "aspect-[16/9] sm:aspect-[8/3] lg:aspect-[2/1] xl:aspect-[4/3]" },
 ];
 
-export default function ContactPage() {
+export default function ContactView({ lang }: { lang: Lang }) {
+  const { SOCIALS } = siteFor(lang);
+  const t = ui(lang);
   return (
     <>
-      <JsonLd graph={JSON_LD} />
+      <JsonLd graph={jsonLd(lang)} />
       <Cursor />
       <Nav />
       <main id="top" className="relative overflow-hidden">
@@ -70,7 +75,7 @@ export default function ContactPage() {
         <ContactHero />
 
         {/* Form and direct lines */}
-        <section id="message" aria-label="Send a message" className="relative grid scroll-mt-28 gap-6 px-4 pt-16 pb-24 md:px-10 md:pt-24 lg:grid-cols-12 lg:gap-8">
+        <section id="message" aria-label={t.contact.sendMessage} className="relative grid scroll-mt-28 gap-6 px-4 pt-16 pb-24 md:px-10 md:pt-24 lg:grid-cols-12 lg:gap-8">
           <div className="rounded-[32px] bg-surface/50 p-6 backdrop-blur-xl md:p-10 lg:col-span-7">
             <ContactForm />
           </div>
@@ -82,9 +87,9 @@ export default function ContactPage() {
         {/* Socials, front and centre */}
         <section aria-labelledby="socials-title" className="relative px-4 pb-32 md:px-10 md:pb-48">
           <h2 id="socials-title" className="mb-10 font-display text-5xl leading-[0.9] font-bold uppercase md:mb-14 md:text-7xl">
-            Find me
+            {t.contact.findTop}
             <br />
-            <span className="text-spectrum animate-shimmer">online</span>
+            <span className="text-spectrum animate-shimmer">{t.contact.findBottom}</span>
           </h2>
           <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-6 xl:grid-cols-5">
             {SOCIALS.map((social, i) => (
@@ -99,8 +104,8 @@ export default function ContactPage() {
                   <span aria-hidden className="direct-flood absolute inset-0 [background:var(--brand)]" />
                   <span className="relative flex items-start justify-between">
                     <SocialIcon name={social.label} className="size-10 md:size-12" />
-                    <span aria-hidden className="text-2xl transition-transform duration-500 group-hover:rotate-45">
-                      ↗
+                    <span aria-hidden className="text-2xl transition-transform duration-500 group-hover:rotate-45 rtl:group-hover:-rotate-45">
+                      <span className="arrow">↗</span>
                     </span>
                   </span>
                   <span className="@container relative block">
@@ -109,12 +114,12 @@ export default function ContactPage() {
                     </span>
                     {/* Dimmed lines go to full strength on the brand flood, where 60–80% white falls under 4.5:1 */}
                     <span className="mt-2 block text-base font-semibold opacity-80 transition-opacity duration-500 group-hover:opacity-100 group-focus-visible:opacity-100">
-                      {social.handle}
+                      <span dir="ltr">{social.handle}</span>
                     </span>
                     <span className="mt-1 block text-sm opacity-60 transition-opacity duration-500 group-hover:opacity-100 group-focus-visible:opacity-100">
                       {social.note}
                     </span>
-                    <span className="sr-only"> (opens in a new tab)</span>
+                    <span className="sr-only">{t.common.newTab}</span>
                   </span>
                 </a>
               </li>
@@ -122,7 +127,7 @@ export default function ContactPage() {
           </ul>
         </section>
       </main>
-      <Contact minimal />
+      <Contact minimal lang={lang} />
     </>
   );
 }

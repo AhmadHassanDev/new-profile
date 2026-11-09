@@ -1,5 +1,7 @@
 "use client";
 
+import { useLang } from "@/i18n/LangProvider";
+import { ui } from "@/i18n/ui";
 import { useEffect, useRef } from "react";
 
 // The BJJ ranks in order, each earning four stripes before the next; black is the last
@@ -24,6 +26,7 @@ const SPRING = "cubic-bezier(0.34, 1.56, 0.64, 1)";
  * Anubis mark that comes up with it.
  */
 export default function BeltSignature() {
+  const names = ui(useLang()).signatures.belts;
   const groundRef = useRef<HTMLDivElement>(null);
   const beltRef = useRef<HTMLDivElement>(null);
   const stripesRef = useRef<HTMLOListElement>(null);
@@ -75,7 +78,7 @@ export default function BeltSignature() {
       cardRef.current?.toggleAttribute("data-black", belt === BLACK);
       stripes.forEach((stripe, i) => ((stripe as HTMLElement).dataset.earned = String(i < earned)));
       rungs.forEach((rung, i) => ((rung as HTMLElement).dataset.earned = String(i <= belt)));
-      if (nameRef.current) nameRef.current.textContent = BELTS[belt].name;
+      if (nameRef.current) nameRef.current.textContent = names[belt];
       if (promoted) promote();
     };
     const paint = () => {
@@ -112,7 +115,7 @@ export default function BeltSignature() {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", measure);
     };
-  }, []);
+  }, [names]);
 
   return (
     <>
@@ -139,7 +142,7 @@ export default function BeltSignature() {
               the rank, and "Oss." once it's black */}
           <span
             ref={cardRef}
-            className="belt-card absolute top-0 right-full mr-2.5 flex origin-top flex-col items-center gap-2.5 rounded-full bg-bg/70 px-1.5 py-3 backdrop-blur-md"
+            className="belt-card absolute top-0 right-full me-2.5 flex origin-top flex-col items-center gap-2.5 rounded-full bg-bg/70 px-1.5 py-3 backdrop-blur-md"
           >
             <span ref={ladderRef} className="flex flex-col gap-1">
               {BELTS.map((belt, i) => (
@@ -152,7 +155,7 @@ export default function BeltSignature() {
               ))}
             </span>
             <span className="flex items-center gap-1.5 font-display text-xs font-bold whitespace-nowrap [writing-mode:vertical-rl]">
-              <span ref={nameRef}>{BELTS[0].name}</span>
+              <span ref={nameRef}>{names[0]}</span>
               <span className="belt-oss text-[var(--accent-2)]">Oss.</span>
             </span>
           </span>

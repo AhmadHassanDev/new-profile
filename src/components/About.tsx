@@ -2,14 +2,16 @@
 
 import Link from "next/link";
 import { useEffect, useRef } from "react";
+import { disciplineLabel, siteFor } from "@/content";
 import { DISCIPLINE_COLOR, PROCESS } from "@/content/site";
+import { localePath } from "@/i18n/lang";
+import { useLang } from "@/i18n/LangProvider";
+import { ui } from "@/i18n/ui";
 import { freshCanvas } from "@/lib/canvas";
 import { lowPower } from "@/lib/motion";
 
 type Scene = import("./process/ProcessScene").ProcessScene;
 
-const INTRO = "I'm Ahmed. An Egyptian designer who codes, and a developer who designs. Keep scrolling and watch me work.";
-const INTRO_WORDS = INTRO.split(" ");
 
 // When each block of copy is on screen, along the section's scroll (0..1). Matches the 3D stages.
 const WINDOWS: [number, number][] = [
@@ -29,6 +31,11 @@ const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
  * pinned while you scroll through it; scroll position drives both the scene and the copy.
  */
 export default function About() {
+  const lang = useLang();
+  const t = ui(lang).about;
+  const INTRO_WORDS = t.intro.split(" ");
+  // Same steps, same order, in this language (colours stay keyed by the English name)
+  const steps = siteFor(lang).PROCESS;
   const sectionRef = useRef<HTMLElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const introRef = useRef<HTMLParagraphElement>(null);
@@ -161,7 +168,7 @@ export default function About() {
       <div className="sticky top-0 h-[100svh] overflow-hidden">
         {/* The 3D gets its own zone: right of the copy on wide screens, above it on tall ones.
             Its edges fade into the page so the scene never meets the text. */}
-        <div className="process-zone absolute portrait:inset-x-0 portrait:top-28 portrait:h-[44%] md:portrait:top-36 landscape:inset-y-0 landscape:right-0 landscape:left-[38%]">
+        <div className="process-zone absolute portrait:inset-x-0 portrait:top-28 portrait:h-[44%] md:portrait:top-36 landscape:inset-y-0 landscape:start-[38%] landscape:end-0">
           <div
             aria-hidden
             className="absolute top-1/2 left-1/2 h-[70%] w-[70%] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-20 blur-[100px]"
@@ -178,11 +185,11 @@ export default function About() {
         <div className="absolute inset-x-0 top-24 flex items-center justify-between gap-6 px-4 md:top-28 md:px-10">
           {/* Heads the section in the outline, so the stage h3s don't sit under "Selected work"; visible from sm up */}
           <h2 id="about-title" className="sr-only text-sm font-semibold text-muted sm:not-sr-only">
-            About me
+            {t.heading}
           </h2>
           <div className="w-full sm:w-auto">
             <ol className="flex justify-between gap-6 text-xs font-semibold text-muted sm:justify-end sm:text-sm">
-              {PROCESS.map((step, i) => (
+              {steps.map((step, i) => (
                 <li
                   key={step.verb}
                   ref={(el) => {
@@ -197,13 +204,13 @@ export default function About() {
               ))}
             </ol>
             <span className="mt-3 block h-px w-full overflow-hidden bg-line">
-              <span ref={barRef} className="block h-full w-full origin-left scale-x-0" style={{ background: "var(--spectrum)" }} />
+              <span ref={barRef} className="block h-full w-full origin-left scale-x-0 rtl:origin-right" style={{ background: "var(--spectrum)" }} />
             </span>
           </div>
         </div>
 
         {/* The copy: one block per stage, stacked in the same spot */}
-        <div data-story className="absolute inset-x-4 grid portrait:bottom-8 landscape:top-1/2 landscape:left-10 landscape:w-[min(34vw,560px)] landscape:-translate-y-1/2 md:inset-x-10 md:portrait:bottom-12">
+        <div data-story className="absolute inset-x-4 grid portrait:bottom-8 landscape:top-1/2 landscape:start-10 landscape:w-[min(34vw,560px)] landscape:-translate-y-1/2 md:inset-x-10 md:portrait:bottom-12">
           <div
             ref={(el) => {
               blockRefs.current[0] = el;
@@ -212,7 +219,7 @@ export default function About() {
           >
             <p
               ref={introRef}
-              className="font-display text-[7.4vw] leading-[1.06] font-semibold md:portrait:text-[5.6vw] landscape:text-[clamp(1.6rem,2.9vw,3.25rem)]"
+              className="font-display text-[length:calc((7.4vw)*var(--ds))] leading-[1.06] font-semibold md:portrait:text-[length:calc((5.6vw)*var(--ds))] landscape:text-[length:calc((clamp(1.6rem,2.9vw,3.25rem))*var(--ds))]"
               style={{ "--n": INTRO_WORDS.length } as React.CSSProperties}
             >
               {INTRO_WORDS.map((word, i) => (
@@ -227,11 +234,11 @@ export default function About() {
             </p>
             <p className="mt-8 flex items-center gap-3 text-sm font-semibold text-muted">
               <span aria-hidden className="scroll-cue relative block h-10 w-px overflow-hidden bg-line" />
-              Scroll
+              {t.scroll}
             </p>
           </div>
 
-          {PROCESS.map((step, i) => {
+          {steps.map((step, i) => {
             const color = STEP_COLORS[i];
             return (
               <div
@@ -246,9 +253,9 @@ export default function About() {
                     0{i + 1}
                   </span>
                   <span aria-hidden className="h-px w-10" style={{ background: color }} />
-                  {step.name}
+                  {disciplineLabel(lang, step.name)}
                 </p>
-                <h3 className="mt-3 font-display text-[12.5vw] leading-[0.86] font-bold uppercase md:mt-4 md:portrait:text-[10.5vw] landscape:text-[clamp(2.5rem,4.6vw,6rem)]">
+                <h3 className="mt-3 font-display text-[length:calc((12.5vw)*var(--ds))] leading-[0.86] font-bold uppercase md:mt-4 md:portrait:text-[length:calc((10.5vw)*var(--ds))] landscape:text-[length:calc((clamp(2.5rem,4.6vw,6rem))*var(--ds))]">
                   {step.verb}
                   <span style={{ color }}>.</span>
                 </h3>
@@ -275,24 +282,25 @@ export default function About() {
             }}
             className="[grid-area:1/1] portrait:self-end landscape:self-center opacity-0 will-change-transform"
           >
-            <h3 className="font-display text-[12.5vw] leading-[0.86] font-bold uppercase md:portrait:text-[10.5vw] landscape:text-[clamp(2.5rem,4.6vw,6rem)]">
-              <span className="text-spectrum animate-shimmer">Shipped.</span>
+            <h3 className="font-display text-[length:calc((12.5vw)*var(--ds))] leading-[0.86] font-bold uppercase md:portrait:text-[length:calc((10.5vw)*var(--ds))] landscape:text-[length:calc((clamp(2.5rem,4.6vw,6rem))*var(--ds))]">
+              <span className="text-spectrum animate-shimmer">{t.shipped}</span>
             </h3>
             <p className="mt-4 max-w-md font-display text-lg leading-tight font-semibold md:mt-5 md:text-2xl">
-              Six years. 60+ clients. 5+ regions. <span className="text-muted">One person, end to end.</span>
+              {t.facts}
+              <span className="text-muted">{t.factsTail}</span>
             </p>
             <Link
-              href="/about"
-              data-cursor="Hi"
-              className="group mt-8 inline-flex items-center gap-3 rounded-full bg-ink py-2 pr-2 pl-6 text-base font-semibold text-bg transition-transform duration-300 hover:scale-[1.04]"
+              href={localePath(lang, "/about")}
+              data-cursor={t.cursor}
+              className="group mt-8 inline-flex items-center gap-3 rounded-full bg-ink py-2 pe-2 ps-6 text-base font-semibold text-bg transition-transform duration-300 hover:scale-[1.04]"
             >
-              More about me
+              {t.more}
               <span
                 aria-hidden
-                className="grid h-10 w-10 place-items-center rounded-full text-ink transition-transform duration-500 group-hover:rotate-[-45deg]"
+                className="grid h-10 w-10 place-items-center rounded-full text-ink transition-transform duration-500 group-hover:rotate-[-45deg] rtl:group-hover:rotate-[45deg]"
                 style={{ background: "var(--spectrum)" }}
               >
-                →
+                <span className="arrow">→</span>
               </span>
             </Link>
           </div>

@@ -2,9 +2,8 @@
 
 import Link from "next/link";
 import { Fragment, useEffect, useRef } from "react";
-
-const LINES = ["Let's make", "it real."];
-const LABEL = "Say hello";
+import { useLang } from "@/i18n/LangProvider";
+import { ui } from "@/i18n/ui";
 
 // Each letter's twin takes its own spot along the spectrum: cyan → violet → coral
 const STOPS = [
@@ -20,7 +19,13 @@ function spectrumAt(t: number) {
   return `rgb(${r} ${g} ${b})`;
 }
 
-/** A letter with two faces (optionally coloured); hovering the button flips it to the second. */
+/**
+ * What flips: each letter, or in Arabic each word (its letters join, so splitting them would break the script).
+ * Spaces stay their own units either way.
+ */
+const units = (text: string) => (/[\u0600-\u06FF]/.test(text) ? text.split(/( )/).filter(Boolean) : [...text]);
+
+/** A letter (or an Arabic word) with two faces (optionally coloured); hovering the button flips it to the second. */
 function Roll({ letter, index, face, twin }: { letter: string; index: number; face?: string; twin?: string }) {
   const char = letter === " " ? "\u00a0" : letter;
   return (
@@ -41,9 +46,16 @@ function Roll({ letter, index, face, twin }: { letter: string; index: number; fa
  * side your cursor came in (and drains toward where it leaves), and leans toward the cursor.
  */
 export default function MakeItReal({ href, children }: { href: string; children?: React.ReactNode }) {
+  const t = ui(useLang()).makeItReal;
+  const LINES = [t.top, t.bottom];
+  const LABEL = t.cta;
   const ctaRef = useRef<HTMLAnchorElement>(null);
   const arrowRef = useRef<HTMLSpanElement>(null);
-  const total = LINES.join("").length;
+  // Every unit that gets an index: the letters (or Arabic words) plus the space between each word
+  const total = LINES.reduce((n, line) => {
+    const words = line.split(" ");
+    return n + words.reduce((m, word) => m + units(word).length, 0) + words.length - 1;
+  }, 0);
 
   useEffect(() => {
     const cta = ctaRef.current;
@@ -85,7 +97,7 @@ export default function MakeItReal({ href, children }: { href: string; children?
   let count = 0;
   return (
     <div className="make-real">
-      <h2 aria-label={LINES.join(" ")} className="font-display text-[11.5vw] leading-[0.85] font-bold uppercase md:text-[10vw]">
+      <h2 aria-label={LINES.join(" ")} className="font-display text-[length:calc((11.5vw)*var(--ds))] leading-[0.85] font-bold uppercase md:text-[length:calc((10vw)*var(--ds))]">
         {LINES.map((line, row) => (
           <span key={line} aria-hidden className="block">
             {/* Word by word, so a narrow screen wraps between words, never inside one */}
@@ -98,7 +110,7 @@ export default function MakeItReal({ href, children }: { href: string; children?
                   </>
                 )}
                 <span className="whitespace-nowrap">
-                  {[...word].map((letter) => {
+                  {units(word).map((letter) => {
                     const index = count++;
                     // The second line rests in the spectrum and flips to white; the first does the opposite
                     const tint = spectrumAt(index / (total - 1));
@@ -119,7 +131,7 @@ export default function MakeItReal({ href, children }: { href: string; children?
         <Link
           ref={ctaRef}
           href={href}
-          className="cta group relative inline-flex w-fit items-center gap-5 overflow-hidden rounded-full bg-ink py-3 pr-3 pl-9 text-xl font-semibold text-bg transition-transform duration-300 ease-out md:py-4 md:pr-4 md:pl-11 md:text-2xl"
+          className="cta group relative inline-flex w-fit items-center gap-5 overflow-hidden rounded-full bg-ink py-3 pe-3 ps-9 text-xl font-semibold text-bg transition-transform duration-300 ease-out md:py-4 md:pe-4 md:ps-11 md:text-2xl"
         >
           {/* Floods in from where the cursor entered */}
           <span aria-hidden className="cta-fill absolute inset-0" style={{ background: "var(--spectrum)" }} />
@@ -127,7 +139,7 @@ export default function MakeItReal({ href, children }: { href: string; children?
             <span className="sr-only">{LABEL}</span>
             {/* Taller letter frames than the headline's, so the y's tail stays hidden mid-flip */}
             <span aria-hidden className="inline-flex" style={{ "--roll": "1.35em" } as React.CSSProperties}>
-              {[...LABEL].map((letter, i) => (
+              {units(LABEL).map((letter, i) => (
                 <Roll key={i} letter={letter} index={i} />
               ))}
             </span>
@@ -137,7 +149,7 @@ export default function MakeItReal({ href, children }: { href: string; children?
             aria-hidden
             className="cta-arrow relative grid size-14 place-items-center rounded-full bg-bg text-2xl text-ink transition-transform duration-500 ease-out md:size-16"
           >
-            ↗
+            <span className="arrow">↗</span>
           </span>
         </Link>
         {children}

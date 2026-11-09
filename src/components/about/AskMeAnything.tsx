@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useLang } from "@/i18n/LangProvider";
+import { ui } from "@/i18n/ui";
 
 type Reaction = "nod" | "wink" | "laugh" | "doubletake";
 
@@ -68,12 +70,78 @@ const QUESTIONS: { q: string; a: string; react: Reaction }[] = [
   },
 ];
 
+/** The same questions in Egyptian Arabic, same order, same reactions */
+const QUESTIONS_AR: { q: string; a: string; react: Reaction }[] = [
+  {
+    q: "دخلت مجال التصميم إزاي؟",
+    a: "حبيت التصميم والكود الإبداعي من قبل الجامعة، ومن ساعتها موقفتش. كل كورس وكل تيوتوريال كنت بلاقيه. وبعد شهادة علوم حاسب، لسه مكمّل ولسه بتعلم.",
+    react: "nod",
+  },
+  {
+    q: "مصمم ولا مطوّر؟",
+    a: "الاتنين، وبقصد. بعمل البحث والتصميم والبناء بنفسي، فمفيش حاجة بتضيع في التسليم. اللي بتوافق عليه في Figma هو بالظبط اللي بينزل.",
+    react: "wink",
+  },
+  {
+    q: "Figma الأول ولا الكود؟",
+    a: "Figma الأول، دايماً. أحب أحل المشاكل الصعبة وهي لسه رخيصة في التغيير. ولما التصميم يبقى مظبوط، ببنيه زي ما هو بالظبط، لحد آخر بكسل.",
+    react: "nod",
+  },
+  {
+    q: "بتشتغل إزاي؟",
+    a: "بحث، تصميم، بناء. الأول بعرف الناس محتاجة إيه فعلاً ورأيهم في الموجود. بعدين بصمم النسخة اللي هيختاروها، وببنيها بسرعة وتنزل لايف.",
+    react: "nod",
+  },
+  {
+    q: "بتبني بإيه؟",
+    a: "Figma للتصميم. React وNext.js لمعظم الشغل، ومعاهم Tailwind أو Vue أو Node.js أو Flutter لما المشروع يحتاج. وإني أتعلم فريم ورك جديد ده نص المتعة.",
+    react: "nod",
+  },
+  {
+    q: "اشتغلت مع مين؟",
+    a: "أكتر من 60 عميل في أكتر من 5 مناطق: جهات حكومية، صناديق، وكالات وستارت أبس. كبير أو صغير، الطلب دايماً واحد: نعمل حاجة الناس تحب تستخدمها.",
+    react: "wink",
+  },
+  {
+    q: "ليه البحث مهم أوي كده؟",
+    a: "الفريلانس علمني بالطريقة الصعبة. المنتج بينجح بس لما يتخطط حوالين المستخدمين، مش حوالين اللي إحنا فاكرين إنهم عايزينه. البحث هو اللي بيبطّلك تخمين.",
+    react: "doubletake",
+  },
+  {
+    q: "ليه Arsenal؟",
+    a: "الـInvincibles، موسم 2003–04. موسم كامل من غير خسارة، واتعلقت بيهم للأبد. من ساعتها والموضوع رولر كوستر، بس أنا أرسنالي لآخر نفس.",
+    react: "laugh",
+  },
+  {
+    q: "كتاب تنصح بيه؟",
+    a: "Atomic Habits. تغييرات صغيرة كل يوم بتعمل منك واحد تاني. ده اللي بدأ موضوع «نسخة أحسن مني» كله: كتاب جديد، مهارة جديدة، هواية جديدة.",
+    react: "nod",
+  },
+  {
+    q: "بتعمل إيه بعيد عن الشغل؟",
+    a: "جيمنج غالباً، وده بحث في السر برضه. الألعاب الحلوة درس في إزاي الإنتراكشن المفروض يتحس. وبعدها كورة، كتب، وأي حاجة بتعلمها الشهر ده.",
+    react: "laugh",
+  },
+  {
+    q: "أكتر مشروع بتحبه؟",
+    a: "أي مشروع شغال عليه دلوقتي. النهارده هو SlyDive: نقلته من موقع WordPress قديم لـNext.js، ووصل لـ92 على الموبايل في PageSpeed.",
+    react: "wink",
+  },
+  {
+    q: "ينفع نشتغل سوا؟",
+    a: "أكيد، يا ريت. لاندينج بيدجز، تطبيقات ويب، تطبيقات موبايل، براندنج أو بحث. احكيلي عنه في صفحة «كلمني» وهرجعلك.",
+    react: "wink",
+  },
+];
+
 /**
  * Ask me anything: pick a question and the avatar answers it, in its speech line beside the page (see
  * AboutGuide) with a reaction to match. On phones, where the avatar sits in a corner, the answer shows
  * here under the questions.
  */
 export default function AskMeAnything() {
+  const lang = useLang();
+  const questions = lang === "ar" ? QUESTIONS_AR : QUESTIONS;
   const [asked, setAsked] = useState<number | null>(null);
   const answerRef = useRef<HTMLParagraphElement>(null);
 
@@ -86,14 +154,14 @@ export default function AskMeAnything() {
 
   const ask = (i: number) => {
     setAsked(i);
-    const { a, react } = QUESTIONS[i];
+    const { a, react } = questions[i];
     window.dispatchEvent(new CustomEvent("avatar:say", { detail: { say: a, react } }));
   };
 
   return (
     <div className="mt-12">
       <ul className="flex flex-wrap gap-3">
-        {QUESTIONS.map((question, i) => (
+        {questions.map((question, i) => (
           <li key={question.q}>
             <button
               type="button"
@@ -111,9 +179,9 @@ export default function AskMeAnything() {
       {/* Read out for screen readers, shown on phones */}
       {/* Always in the page (empty until asked), so the first answer is announced too */}
       <p ref={answerRef} aria-live="polite" className={`mt-8 scroll-mb-32 rounded-[24px] text-xl leading-snug font-medium lg:sr-only ${asked === null ? "sr-only" : "bg-surface/70 px-6 py-5 backdrop-blur-xl"}`}>
-        {asked !== null ? QUESTIONS[asked].a : ""}
+        {asked !== null ? questions[asked].a : ""}
       </p>
-      <p className="mt-8 hidden text-sm text-muted lg:block">Pick one. I&apos;ll answer on the left.</p>
+      <p className="mt-8 hidden text-sm text-muted lg:block">{ui(lang).aboutPage.pick}</p>
     </div>
   );
 }

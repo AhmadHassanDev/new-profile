@@ -1,23 +1,27 @@
 import Image from "next/image";
-import { CONTACT, SOCIALS } from "@/content/site";
+import { siteFor } from "@/content";
+import { localePath, type Lang } from "@/i18n/lang";
+import { ui } from "@/i18n/ui";
 import { CookieSettingsLink } from "./CookieBanner";
 import MakeItReal from "./MakeItReal";
 import SocialIcon from "./SocialIcon";
 
 /** The closing call to action and footer. `minimal` keeps just the bottom bar (the contact page is the CTA). */
-export default function Contact({ minimal = false }: { minimal?: boolean }) {
+export default function Contact({ minimal = false, lang = "en" }: { minimal?: boolean; lang?: Lang }) {
+  const t = ui(lang).footer;
+  const { CONTACT, SOCIALS } = siteFor(lang);
   const bar = (
     <div className="flex items-center justify-between border-t border-line pt-6 text-sm text-muted">
       <Image src="/logo.svg" alt="" width={40} height={31} />
       <span className="flex flex-col items-center gap-1 text-center sm:flex-row sm:gap-3">
-        <span>© 2019–2026 Ahmed Hassan</span>
+        <span>{t.copyright}</span>
         <span aria-hidden className="hidden sm:inline">
           ·
         </span>
         <CookieSettingsLink className="cursor-pointer transition-colors hover:text-ink" />
       </span>
       <a href="#top" className="transition-colors hover:text-ink">
-        Back to top ↑
+        {t.top}
       </a>
     </div>
   );
@@ -34,8 +38,8 @@ export default function Contact({ minimal = false }: { minimal?: boolean }) {
       </div>
 
       <div className="relative">
-        <p className="mb-8 text-sm font-semibold text-muted">Got a product in mind?</p>
-        <MakeItReal href="/contact">
+        <p className="mb-8 text-sm font-semibold text-muted">{t.prompt}</p>
+        <MakeItReal href={localePath(lang, "/contact")}>
           <ul className="flex flex-wrap gap-3">
             {[...SOCIALS, { label: "WhatsApp", href: `https://wa.me/${CONTACT.whatsapp.number}` }].map((s) => (
               <li key={s.label}>

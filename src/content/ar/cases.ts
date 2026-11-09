@@ -1,0 +1,687 @@
+import type * as EN from "../cases";
+
+/**
+ * The Arabic (Egyptian) counterpart of ../cases, drop-in interchangeable with it.
+ *
+ * Fields that code uses as keys stay in English, byte-identical to ../cases: chapter `discipline`
+ * (see DISCIPLINE_AR in ./site), pipeline `tool` and fact `tools` (logo lookups), and source labels.
+ */
+
+export type { Block, Source, Screen, CaseStudy } from "../cases";
+
+export const CASES: typeof EN.CASES = [
+  {
+    slug: "pmg",
+    accent: ["#4e7f7a", "#5cc78d"],
+    signature: "pulse",
+    site: "https://pmghealthcare.co.uk/",
+    facts: [
+      { label: "العميل", value: "PMG Healthcare، لندن", logo: { src: "/logos/pmg.svg", width: 512, height: 169 } },
+      { label: "الدور", value: "بحث وتصميم وتطوير" },
+      { label: "نطاق الشغل", value: "موقع و CMS" },
+      { label: "الستاك", value: "Figma · Next.js · Sanity · Vercel", tools: ["Figma", "Next.js", "Sanity", "Vercel"] },
+    ],
+    blocks: [
+      {
+        kind: "feature",
+        text: "الاستشاريين بياخدوا فلوسهم عشان يعالجوا المرضى، مش عشان يجروا ورا الفواتير. PMG بتشيل عنهم الشغل ده، وموقعها لازم يكسب ثقة الاستشاري في أول كام ثانية.",
+        src: "/work/pmg.webp",
+        alt: "الصفحة الرئيسية لـPMG Healthcare على لابتوب",
+      },
+      {
+        kind: "chapter",
+        discipline: "UX research",
+        title: "البحث",
+        body: "العيادات الخاصة في بريطانيا عمرها ما كانت مشغولة كده: PHIN سجّلت رقم قياسي، تقريبًا 13,400 استشاري شغال في 2025. وورا كل واحد فيهم نفس الورق: المواعيد، والكودينج على جدول CCSD المشترك بين شركات التأمين، والفواتير لـBupa و AXA Health و Aviva و Vitality والمرضى اللي بيدفعوا من جيبهم، وبعدها الجري ورا التحصيل. Healthcode لوحدها عالجت 11.8 مليون فاتورة رعاية صحية خاصة في 2025.\n\nPMG بتمسك الجانب ده من العيادة: التشغيل، والفواتير والتحصيل، والكودينج، وتفريغ التقارير، والتسجيل مع السفارات للمرضى الدوليين اللي على حساب بلادهم، والماركتنج، والضرايب والحسابات. الجمهور استشاري بيقرر يأمّن دخله مع مين، فالموقع كان لازم يجاوب على تلات أسئلة بسرعة: PMG هتشيل عنه إيه، الفلوس بتروح فين، وبكام.",
+        findings: [
+          { value: "13.4 ألف", label: "استشاري في القطاع الخاص في بريطانيا" },
+          { value: "£5.7 مليار", label: "العيادات والدكاترة الخاصين" },
+          { value: "11.8 مليون", label: "فاتورة خاصة في 2025" },
+          { value: "£337 مليون", label: "علاج على حساب السفارات، لندن" },
+        ],
+        sources: [
+          { label: "PHIN", href: "https://www.phin.org.uk/news/private-market-update-june-2026-uk" },
+          {
+            label: "LaingBuisson",
+            href: "https://www.laingbuisson.com/press-releases/private-healthcare-growth-weakens-as-the-market-is-hit-by-individual-cutting-back-on-out-of-pocket-spending-on-healthcare/",
+          },
+          { label: "Healthcode via COVER", href: "https://www.covermagazine.co.uk/news/4524599/record-q4-pmi-healthcode" },
+          {
+            label: "LaingBuisson, London",
+            href: "https://www.laingbuisson.com/press-releases/new-report-shows-rising-demand-for-private-healthcare-in-central-london-market-over-2-billion/",
+          },
+          { label: "CCSD", href: "https://www.ccsd.org.uk/" },
+        ],
+      },
+      { kind: "statement", text: "متطلبش من الاستشاريين يثقوا فيك. وريهم كل دفعة بتروح فين." },
+      {
+        kind: "chapter",
+        discipline: "UI design",
+        title: "اتصمم على Figma",
+        body: "التصميم بيجمع باليتة هادية من الأخضر السيج والأوف وايت مع المينت بتاع PMG لكل CTA: شكل طبي من غير ما يبقى بارد. كل خدمة بتظهر وهي شغالة بدل ما تتوصف: جدول فواتير فيه المتحصّل والمتأخر، حالة كودينج متراجعة على جدول شركة التأمين، وضمان سفارة متوافق عليه قبل أول ميعاد.\n\nسكشن الثقة بيرسم طريق الفلوس: المريض أو شركة التأمين بيدفعوا على حساب الاستشاري على طول، و PMG عمرها ما بتبقى في نص سكة الدفع. تمن خدمات تحت ميجا منيو واحد، كل واحدة ليها بانل خاص بيها، عشان الاستشاري يروح على طول للجزء اللي محتاج فيه مساعدة.",
+      },
+      {
+        kind: "screens",
+        title: "الصفحات",
+        screens: [
+          { label: "الرئيسية", src: "/work/pmg/home.webp", width: 1200, height: 6994 },
+          { label: "الخدمات", src: "/work/pmg/services.webp", width: 1200, height: 2669 },
+          { label: "من نحن", src: "/work/pmg/about.webp", width: 1200, height: 5010 },
+          { label: "تواصل معانا", src: "/work/pmg/contact.webp", width: 1200, height: 2696 },
+        ],
+      },
+      {
+        kind: "chapter",
+        discipline: "Front-end",
+        title: "اتبنى بـNext.js، وشغال على Sanity",
+        body: "الموقع مبني بـNext.js والمحتوى بتاعه على Sanity CMS، عشان فريق PMG يقدر يحدّث الخدمات والصفحات من غير ما يلمس كود. الصفحات متحضّرة مسبقًا وبتتقدم من الـedge بتاع Vercel، فبتفتح بسرعة من أي مكان الاستشاري يفتحها منه.",
+      },
+      {
+        kind: "pipeline",
+        title: "من Figma للايف",
+        steps: [
+          { tool: "Figma", does: "تصميم وبروتوتايب" },
+          { tool: "Next.js", does: "تطوير الواجهات الأمامية" },
+          { tool: "Sanity", does: "إدارة المحتوى" },
+          { tool: "Vercel", does: "النشر" },
+        ],
+      },
+      {
+        kind: "results",
+        title: "النتايج",
+        body: "اتبنى عشان يبقى سريع وسهل الوصول من أول يوم. الموقع اللايف جايب أعلى الدرجات في اختبار Lighthouse بتاع Google على الموبايل والديسكتوب:",
+        items: [
+          { value: "95", label: "الأداء على الموبايل" },
+          { value: "100", label: "الأداء على الديسكتوب" },
+          { value: "100", label: "إمكانية الوصول" },
+          { value: "100", label: "SEO" },
+        ],
+        measuredWith: {
+          name: "Google PageSpeed Insights",
+          logo: "/logos/lighthouse.svg",
+          detail: "اختبار Lighthouse 13.6، موبايل وديسكتوب",
+        },
+      },
+    ],
+  },
+  {
+    slug: "london-dbs",
+    accent: ["#0077b6", "#9ae3d1"],
+    signature: "spiral",
+    site: "https://www.london-dbs.com/",
+    facts: [
+      { label: "العميل", value: "London DBS", logo: { src: "/logos/london-dbs.svg", width: 1343, height: 314 } },
+      { label: "الدور", value: "براند وبحث وتصميم وتنفيذ" },
+      { label: "نطاق الشغل", value: "براند وموقع و CMS" },
+      { label: "الستاك", value: "Figma · Next.js · Sanity · Vercel", tools: ["Figma", "Next.js", "Sanity", "Vercel"] },
+    ],
+    blocks: [
+      {
+        kind: "feature",
+        text: "التحفيز العميق للمخ عملية في المخ، والناس اللي بتفكر فيها خايفة. London DBS كانت محتاجة براند وموقع يحسسوك إنهم أول كلام هادي: مين الفريق، الـDBS تقدر تعمل إيه، وإيه اللي هيحصل بعد كده بالظبط.",
+        src: "/work/london-dbs.webp",
+        alt: "الصفحة الرئيسية لـLondon DBS على لابتوب",
+      },
+      {
+        kind: "chapter",
+        discipline: "UX research",
+        title: "البحث",
+        body: "London DBS عيادة متخصصة في التحفيز العميق للمخ، بيقودها جراح المخ والأعصاب أ.د. إيرليك بيريرا وطبيبة المخ والأعصاب أ.د. فرانشيسكا مورجانتي. بتعالج اضطرابات الحركة، وأهمها مرض باركنسون والرعشة الأساسية والديستونيا، وبتشوف المرضى في St George's على الـNHS وفي ست مستشفيات خاصة في لندن.\n\nزوارها مرضى، وفي أحيان كتير أهاليهم اللي بيدوّروا بالنيابة عنهم: ناس عايشين مع حالة الأدوية مجابتش معاها نتيجة، وبيفكروا في عملية. أول حاجة محتاجينها هي الثقة: مين اللي هيعمل العملية، الـDBS تنفع لحالتهم ولا لأ، والخطوات عاملة إزاي فعلًا.",
+        findings: [
+          { value: "80%", label: "التحسن المعتاد في رعشة الإيد" },
+          { value: "7", label: "مستشفيات في لندن، NHS وخاص" },
+          { value: "3", label: "اضطرابات حركة بتتعالج" },
+          { value: "2 مم", label: "فتحات الجمجمة في العملية" },
+        ],
+        sources: [{ label: "London DBS", href: "https://www.london-dbs.com/" }],
+      },
+      {
+        kind: "chapter",
+        discipline: "UX research",
+        title: "البنشمارك",
+        body: "Melbourne DBS، من أقدم عيادات الـDBS وأقواها حضورًا أونلاين، كانت البنشمارك، جنب مواقع عيادات تانية. الهيكل عندها مظبوط: صفحة لكل حالة، الخطوات متقسمة واحدة واحدة، والأبحاث والفريق كله ورا الشغل، و London DBS حافظت على العمود الفقري ده.\n\nاللي كان ناقصها الدفا والإيقاع: صفحات رمادي، حيطان طويلة من الكلام، استشاريين مبيظهروش غير تحت خالص، وجملة في الآخر بتقول للزوار إنهم محتاجين تحويل من دكتور GP الأول. London DBS بترد على كل ده: المؤسسين بالاسم والصورة في أول شاشة، الأزرق والمينت بتوع العيادة بدل الرمادي، الخطوات في أربع خطوات قصيرة، المخاطر في بوب أبس بدل الفقرات، والرسالة العكس في الآخر: مش محتاج تحويل.",
+      },
+      {
+        kind: "screens",
+        title: "البنشمارك: Melbourne DBS",
+        screens: [
+          { label: "الرئيسية", src: "/work/london-dbs/benchmark-home.webp", width: 1200, height: 5274 },
+          { label: "عن الـDBS", src: "/work/london-dbs/benchmark-about.webp", width: 1200, height: 2684 },
+          { label: "مرض باركنسون", src: "/work/london-dbs/benchmark-parkinsons.webp", width: 1200, height: 2401 },
+          { label: "الفريق", src: "/work/london-dbs/benchmark-team.webp", width: 1200, height: 2857 },
+        ],
+      },
+      {
+        kind: "chapter",
+        discipline: "Branding",
+        title: "البراند",
+        body: "البداية كانت مود بورد من أشعة الرنين والإلكترودات والإضاءة الطبية الهادية، وبعدها تلات راوندات من اللوجوهات. الأول جرّب علامة التصويب بتاعة الأشعة فوق خلية مخ، ونص مخ، وراس جواها نبض. التاني إدّى المخ شحنة، على شكل برق. التالت حط المخ على خط نبض، والنسخة الأتقل منه بقت اللوجو: باين إنه عن المخ والأعصاب من أول نظرة، وثابت مش دراماتيكي.\n\nالووردمارك بيحط London DBS جنب «Deep brain stimulation» مكتوبة كاملة، عشان محدش يضطر يعرف الاختصار. الباليتة أزرق طبي مع مينت هادي وأبيض دافي على خلفية قريبة من الأسود، متختارة عشان تبان متطورة وحنينة في نفس الوقت، والخطوط بتجمع القطعات العريضة من Helvetica Neue للعناوين مع SF Pro للقراية.",
+      },
+      {
+        kind: "gallery",
+        title: "من المود بورد للوجو",
+        items: [
+          { label: "المود بورد", detail: "أشعة، إلكترودات، إضاءة طبية", src: "/work/london-dbs/brand-moodboard.webp", width: 1600, height: 900 },
+          { label: "الراوند 1", detail: "تلات اتجاهات", src: "/work/london-dbs/brand-round-1.webp", width: 1600, height: 900 },
+          { label: "الراوند 2", detail: "مخ فيه شحنة", src: "/work/london-dbs/brand-round-2.webp", width: 1600, height: 900 },
+          { label: "الراوند 3", detail: "المخ على خط نبض", src: "/work/london-dbs/brand-mark.webp", width: 1600, height: 900 },
+          { label: "اللوك أب", detail: "مع الاسم مكتوب كامل", src: "/work/london-dbs/brand-lockup.webp", width: 1600, height: 900 },
+          { label: "نسخ الألوان", detail: "للفاتح والغامق", src: "/work/london-dbs/brand-alt.webp", width: 1600, height: 900 },
+          { label: "الألوان", detail: "أزرق، مينت، أبيض دافي", src: "/work/london-dbs/brand-colours.webp", width: 1600, height: 900 },
+          { label: "الخطوط", detail: "Helvetica Neue و SF Pro", src: "/work/london-dbs/brand-type.webp", width: 1600, height: 900 },
+          { label: "في الاستخدام", detail: "يافطات، بالطوهات، تغليف", src: "/work/london-dbs/brand-usage.webp", width: 1600, height: 900 },
+        ],
+      },
+      { kind: "statement", text: "الهدوء الأول، والشطارة بعدين. المريض لازم يحس إن حد واخد باله منه قبل ما ينبهر." },
+      {
+        kind: "chapter",
+        discipline: "UI design",
+        title: "اتصمم على Figma",
+        body: "الموقع ماشي ورا أسئلة المريض بالترتيب. الصفحة الرئيسية بتعرّفك بالمؤسسين بالاسم والصورة، والحالات اللي الـDBS بتعالجها، والأربع خطوات من أول استشارة لحد التعافي، وليه عيادة مبتعملش غير DBS حاجة مختلفة. كل حالة ليها صفحتها، مكتوبة للشخص اللي عايش معاها.\n\nصفحة «عن العيادة» بتمشي في الخطوات بالتفصيل، والمخاطر والأعراض الجانبية على بعد ضغطة في بوب أبس واضحة: صريحة، بس عمرها ما بتبقى حيطة تحذيرات. صفحة الفريق فيها مؤهلات كل استشاري، والأبحاث والميديا بتخلي شغل العيادة دايمًا متجدد، وصفحة التواصل بتقول من الأول أهم حاجة: مش محتاج تحويل من GP، ودي مستشفيات الـNHS والمستشفيات الخاصة اللي هتتشاف فيها.",
+      },
+      {
+        kind: "screens",
+        title: "الصفحات",
+        screens: [
+          { label: "الرئيسية", src: "/work/london-dbs/home.webp", width: 1200, height: 6053 },
+          { label: "عن العيادة", src: "/work/london-dbs/about.webp", width: 1200, height: 3585 },
+          { label: "الفريق", src: "/work/london-dbs/team.webp", width: 1200, height: 2911 },
+          { label: "الحالات", src: "/work/london-dbs/conditions.webp", width: 1200, height: 2073 },
+          { label: "صفحة حالة", src: "/work/london-dbs/condition.webp", width: 1200, height: 1684 },
+          { label: "الميديا", src: "/work/london-dbs/media.webp", width: 1200, height: 2129 },
+          { label: "تواصل معانا", src: "/work/london-dbs/contact.webp", width: 1200, height: 1669 },
+        ],
+      },
+      {
+        kind: "chapter",
+        discipline: "Front-end",
+        title: "اتبنى بـNext.js، وشغال على Sanity",
+        body: "بنيت الموقع بـNext.js والمحتوى على Sanity CMS، عشان العيادة تقدر تنشر الأخبار وظهورها في الميديا والأبحاث، وتحدّث الفريق والحالات، من غير ما تلمس كود. الصفحات متحضّرة مسبقًا وبتتقدم من الـedge بتاع Vercel، ومعاها الـmetadata اللي محركات البحث محتاجاها عشان اللي بيدوّر على DBS في لندن يلاقيها.",
+      },
+      {
+        kind: "phones",
+        title: "لايف، على الموبايل",
+        screens: [
+          { label: "الرئيسية", src: "/work/london-dbs/phone/home.webp", width: 786, height: 1704 },
+          { label: "عن العيادة", src: "/work/london-dbs/phone/about.webp", width: 786, height: 1704 },
+          { label: "الفريق", src: "/work/london-dbs/phone/team.webp", width: 786, height: 1704 },
+          { label: "الحالات", src: "/work/london-dbs/phone/conditions.webp", width: 786, height: 1704 },
+          { label: "الأخبار والميديا", src: "/work/london-dbs/phone/news.webp", width: 786, height: 1704 },
+          { label: "تواصل معانا", src: "/work/london-dbs/phone/contact.webp", width: 786, height: 1704 },
+        ],
+      },
+      {
+        kind: "pipeline",
+        title: "من Figma للايف",
+        steps: [
+          { tool: "Figma", does: "البراند والتصميم" },
+          { tool: "Next.js", does: "تطوير الواجهات الأمامية" },
+          { tool: "Sanity", does: "إدارة المحتوى" },
+          { tool: "Vercel", does: "النشر" },
+        ],
+      },
+      {
+        kind: "results",
+        title: "النتايج",
+        body: "لايف على london-dbs.com، من أول اسكتش للوجو لحد الموقع المنشور. في اختبار Lighthouse بتاع Google للموقع اللايف:",
+        items: [
+          { value: "93", label: "الأداء على الديسكتوب" },
+          { value: "96", label: "إمكانية الوصول على الموبايل" },
+          { value: "96", label: "أفضل الممارسات" },
+          { value: "1.4 ثانية", label: "ظهور أكبر عنصر على الديسكتوب" },
+        ],
+        measuredWith: {
+          name: "Google Lighthouse",
+          logo: "/logos/lighthouse.svg",
+          detail: "اختبار Lighthouse 13 للموقع اللايف",
+        },
+      },
+    ],
+  },
+  {
+    slug: "spark",
+    accent: ["#004ab5", "#d3fc64"],
+    signature: "spark",
+    site: "https://sparkplatform.app/",
+    facts: [
+      { label: "العميل", value: "Spark، مصر", logo: { src: "/logos/spark.svg", width: 172, height: 42 } },
+      { label: "الدور", value: "تصميم الواجهات" },
+      { label: "نطاق الشغل", value: "لاندينج بيدج، ديسكتوب وموبايل" },
+      { label: "الأدوات", value: "Figma", tools: ["Figma"] },
+    ],
+    blocks: [
+      {
+        kind: "feature",
+        text: "حجز ملعب بادل في مصر كان معناه مكالمات ورسايل وبوستات على Instagram. Spark بتحط كل ماتش وبطولة وتجربة في أبلكيشن واحد، واللاندينج بيدج بتاعته كان لازم تبيع ده في سكرول واحد، للاعيبة وللأماكن اللي وراهم.",
+        src: "/work/spark.webp",
+        alt: "لاندينج بيدج Spark على لابتوب",
+      },
+      {
+        kind: "chapter",
+        discipline: "UI design",
+        title: "البريف",
+        body: "Spark أبلكيشن حجز لأنشطة في كل مصر: البادل والكورة الأول، وبعدها التنس والإي سبورتس والإسكيب رومز والورش والرحلات، وكمان بطولات تشترك فيها وأماكن تحجزها في كام ضغطة. الفكرة بسيطة: كفاية تنطيط بين البوستات والرسايل واللينكات.\n\nالموقع بيكلم شخصين. اللاعب عايز يعرف يقدر يحجز إيه وفي قد إيه، وبعدين ينزّل الأبلكيشن. والمكان أو المنظّم أو الأكاديمية عايزين حجوزات أكتر وإدارة أقل. فالتصميم بقى صفحتين: اللاندينج بيدج للاعيبة، و«اشتغل معانا» للشركا.",
+        findings: [
+          { value: "250 ألف+", label: "حجز اتعمل" },
+          { value: "100 ألف+", label: "شخص بيستخدم Spark" },
+          { value: "100+", label: "نشاط متاح" },
+          { value: "2", label: "فئات جمهور، لاعيبة وشركا" },
+        ],
+        sources: [{ label: "Spark", href: "https://sparkplatform.app/" }],
+      },
+      { kind: "statement", text: "خلّي حجز المتعة سهل زي المتعة نفسها." },
+      {
+        kind: "chapter",
+        discipline: "UI design",
+        title: "اتصمم على Figma",
+        body: "الشكل طالع من طاقة Spark نفسها: الأزرق الملكي والليموني الكهربائي بتوعها، هيرو متدرج من المينت للسماوي، وكونفيتي مرسوم بالإيد بالكورال والتيل والليموني، زي الشرايط في الماتش. الهيرو بيعرض الأبلكيشن الحقيقي في تلات موبايلات، فالمنتج بيبيع نفسه قبل ما حد يقرا كلمة.\n\nبعدها الصفحة بتجاوب أسئلة اللاعب بالترتيب: بيشتغل إزاي في تلات خطوات (اكتشف، اختار، احجز)، فيه إيه تعمله (العب، جرّب، اعمل، اطلع)، ليه أحسن من الرايح جاي، والأرقام والشركا اللي وراه. «اشتغل معانا» بتاخد نفس اللغة للبيزنس: Spark لمين، ليه تشاركها، أربع خطوات وتبقى لايف، ونظرة على أبلكيشن الأدمن والداشبورد اللي الأماكن بتدير منهم حجوزاتها.",
+      },
+      {
+        kind: "screens",
+        title: "الصفحات",
+        screens: [
+          { label: "الرئيسية", src: "/work/spark/home.webp", width: 1200, height: 4009 },
+          { label: "اشتغل معانا", src: "/work/spark/partners.webp", width: 1200, height: 4755 },
+        ],
+      },
+      {
+        kind: "phones",
+        title: "على الموبايل",
+        screens: [
+          { label: "الرئيسية", src: "/work/spark/phone/home.webp", width: 393, height: 4485 },
+          { label: "اشتغل معانا", src: "/work/spark/phone/partners.webp", width: 393, height: 6918 },
+        ],
+      },
+      {
+        kind: "results",
+        title: "لايف",
+        body: "اتصمم على Figma للديسكتوب والموبايل، وبقى لايف دلوقتي على sparkplatform.app.",
+        items: [
+          { value: "2", label: "صفحات، للاعيبة وللشركا" },
+          { value: "3", label: "خطوات من التصفح للحجز" },
+          { value: "4", label: "مداخل: العب، جرّب، اعمل، اطلع" },
+          { value: "2", label: "تصميمات، ديسكتوب وموبايل" },
+        ],
+      },
+    ],
+  },
+  {
+    slug: "blacksprint",
+    accent: ["#5d6b22", "#def665"],
+    signature: "sprint",
+    site: "https://www.blacksprint.com/",
+    facts: [
+      { label: "العميل", value: "Blacksprint" },
+      { label: "الدور", value: "تصميم وتطوير" },
+      { label: "نطاق الشغل", value: "موقع" },
+      { label: "الستاك", value: "Figma · Next.js · Vercel", tools: ["Figma", "Next.js", "Vercel"] },
+    ],
+    blocks: [
+      {
+        kind: "feature",
+        text: "لا وكالة ولا VC: Blacksprint ستوديو منتجات بيبني ويموّل مشاريعه بنفسه. وموقعه كان لازم يثبت ده بأسرع طريقة ممكنة: يحط المشاريع دي وهي شغالة في أول شاشة.",
+        src: "/work/blacksprint.webp",
+        alt: "الصفحة الرئيسية لـBlacksprint على لابتوب",
+      },
+      {
+        kind: "chapter",
+        discipline: "UI design",
+        title: "البريف",
+        body: "Blacksprint هو ستوديو كريم نجيب. قضّى سنين بيبني في النايت لايف والمطاعم وتكنولوجيا الترفيه، والستوديو دلوقتي بيبني ويموّل منتجات خاصة بيه: EZeats لطلبات المطاعم، Techno & Chill لتذاكر الإيفنتات، ¡Salud! للنايت لايف في مونتريال وأوتاوا، RSRVIT للحجوزات، Go Book! لحجز الرياضة، و Cinemawy للسينمات.\n\nاللي بيكلمهم فاوندرز بيدوّروا على شريك وشركات بتدوّر على حد يبنيلها. مش محتاجين بيتش؛ محتاجين يشوفوا الشغل، وبيشتغل مع مين، وطريقة سريعة يبدأوا بيها كلام.",
+        findings: [
+          { value: "6", label: "مشاريع معروضة" },
+          { value: "10+", label: "سنين في بناء المشاريع" },
+          { value: "50+", label: "شريك وعميل" },
+          { value: "2", label: "دول، مصر وكندا" },
+        ],
+      },
+      {
+        kind: "directions",
+        title: "تلات اتجاهات",
+        body: "قبل ما الاختيار يتحسم، الصفحة الرئيسية راحت تلات سكك على Figma. كل واحدة بتسيب انطباع أول مختلف، واللي اتنفذت بتبدأ بالمنتجات نفسها.",
+        options: [
+          { label: "الفاوندر", idea: "قصة كريم الأول، ومشاريعه هي الدليل.", src: "/work/blacksprint/direction-founder.webp", width: 1200, height: 5280 },
+          { label: "السرعة", idea: "وعد جريء، «turning vision into velocity»، بلون دهبي دافي.", src: "/work/blacksprint/direction-velocity.webp", width: 1200, height: 5465 },
+          {
+            label: "مشاريع شغالة",
+            idea: "الأبلكيشنز نفسها في أول شاشة، بالليموني بتاع Blacksprint.",
+            src: "/work/blacksprint/home.webp",
+            width: 1200,
+            height: 4944,
+            chosen: true,
+          },
+        ],
+      },
+      { kind: "statement", text: "ابدأ بالمنتجات. شغل الستوديو هو أحسن شهادة ليه." },
+      {
+        kind: "chapter",
+        discipline: "UI design",
+        title: "اتصمم على Figma",
+        body: "خلفية قريبة من الأسود، مع الليموني الكهربائي بتاع Blacksprint لكل هايلايت وكل CTA. الهيرو بيرص أبلكيشنز المشاريع نفسها في موبايلات، وباقي الصفحة بيكسب الثقة بالترتيب: مين وراه، الأرقام، كل مشروع بألوانه، الشركا اللي بيشتغلوا معاهم، والستوديو بيقدم إيه.\n\nكل مشروع خد شوكيس لأبلكيشنه بألوانه هو، فعلى صفحة المشاريع كل منتج بيتقري كبراند، مش صورة صغيرة: بيعمل إيه، شغال فين، اتطلق إمتى، ودور Blacksprint فيه.",
+      },
+      {
+        kind: "gallery",
+        title: "المشاريع",
+        items: [
+          { label: "EZeats", detail: "تكنولوجيا مطاعم · مصر", src: "/work/blacksprint/venture-ezeats.webp", width: 1600, height: 960 },
+          { label: "Techno & Chill", detail: "تذاكر · إيفنتات", src: "/work/blacksprint/venture-technochill.webp", width: 1600, height: 960 },
+          { label: "¡Salud!", detail: "نايت لايف · كندا", src: "/work/blacksprint/venture-salud.webp", width: 1600, height: 960 },
+          { label: "RSRVIT", detail: "حجوزات · مصر", src: "/work/blacksprint/venture-rsrvit.webp", width: 1600, height: 960 },
+          { label: "Go Book!", detail: "حجز رياضة", src: "/work/blacksprint/venture-gobook.webp", width: 1600, height: 960 },
+          { label: "Cinemawy", detail: "سينما وطلب أكل", src: "/work/blacksprint/venture-cinemawy.webp", width: 1600, height: 960 },
+        ],
+      },
+      {
+        kind: "screens",
+        title: "الصفحات",
+        screens: [
+          { label: "الرئيسية", src: "/work/blacksprint/home.webp", width: 1200, height: 4944 },
+          { label: "المشاريع", src: "/work/blacksprint/ventures.webp", width: 1200, height: 4429 },
+        ],
+      },
+      {
+        kind: "chapter",
+        discipline: "Front-end",
+        title: "اتبنى بـNext.js",
+        body: "بنيت الموقع بـNext.js ونزّلته على Vercel، ومن غير CMS المرة دي: صفحتين نادرًا ما بيتغيروا، فالمحتوى عايش في الكود وكل صفحة متحضّرة مسبقًا. الموشن شايل سرعة البراند: لودر بيعدّ لفوق، موبايلات المشاريع بتتزحلق في الهيرو، قصة الفاوندر بتنوّر كلمة كلمة وإنت بتسكرول، والخدمات بتترص فوق بعض ككروت.",
+      },
+      {
+        kind: "phones",
+        title: "على الموبايل",
+        screens: [
+          { label: "الرئيسية", src: "/work/blacksprint/phone/home.webp", width: 786, height: 1704 },
+          { label: "المشاريع", src: "/work/blacksprint/phone/ventures.webp", width: 786, height: 1704 },
+        ],
+      },
+      {
+        kind: "pipeline",
+        title: "من Figma للايف",
+        steps: [
+          { tool: "Figma", does: "تصميم وبروتوتايب" },
+          { tool: "Next.js", does: "تطوير الواجهات الأمامية" },
+          { tool: "Vercel", does: "النشر" },
+        ],
+      },
+      {
+        kind: "results",
+        title: "النتايج",
+        body: "لايف على blacksprint.com، ونضيف في الحتت المهمة: الموقع اللايف واخد الدرجة الكاملة في اختبار Lighthouse بتاع Google في أفضل الممارسات و SEO، وشغال من غير ما يعطّل البراوزر.",
+        items: [
+          { value: "100", label: "أفضل الممارسات" },
+          { value: "100", label: "SEO" },
+          { value: "100", label: "إمكانية الوصول على الديسكتوب" },
+          { value: "0 ms", label: "وقت التعطيل على الديسكتوب" },
+        ],
+        measuredWith: {
+          name: "Google Lighthouse",
+          logo: "/logos/lighthouse.svg",
+          detail: "اختبار Lighthouse 13 للموقع اللايف",
+        },
+      },
+    ],
+  },
+  {
+    slug: "bliphub",
+    accent: ["#3557e8", "#6ee35f"],
+    signature: "blip",
+    facts: [
+      { label: "العميل", value: "Bliphub", logo: { src: "/logos/bliphub.svg", width: 984, height: 230 } },
+      { label: "الدور", value: "بحث وتصميم واجهات" },
+      { label: "نطاق الشغل", value: "تصميم موقع" },
+      { label: "الأدوات", value: "Figma", tools: ["Figma"] },
+    ],
+    blocks: [
+      {
+        kind: "feature",
+        text: "موقع الوكالة هو أول بيتش ليها: قبل ما البراند يقرا كلمة، الصفحة نفسها لازم تثبت إن Bliphub تقدر تعمل حاجة الناس توقف السكرول عشانها.",
+        src: "/work/bliphub.webp",
+        alt: "الصفحة الرئيسية لـBliphub على لابتوب وموبايل",
+      },
+      {
+        kind: "chapter",
+        discipline: "UX research",
+        title: "البحث",
+        body: "عملاء Bliphub براندات في مصر والمنطقة: فاشون، ويلنس، أكل، مجوهرات، طاقة شمسية، رياضة. جمهورهم عايش على السوشيال ميديا، فيه 51.6 مليون مستخدم سوشيال ميديا في مصر لوحدها، وميزانياتهم ماشية وراهم هناك. الإنفاق على الإعلانات الديجيتال في الشرق الأوسط وشمال أفريقيا وصل 8.2 مليار دولار في 2025، بزيادة 17.8% في سنة، ومصر كانت الأسرع نموًا في المنطقة.\n\nالريتش ممكن يتشترى، بس الثقة لأ: الناس بتثق في ترشيحات اللي يعرفوهم أكتر من أي إعلان. والفجوة دي هي اللي Bliphub بتبيعها، بـUGC وكونتنت وإنتاج حاسس إنه إنساني، وشراء ميديا يوصّله. فالموقع كان لازم يوري الشغل قبل الكلام: كامبينز حقيقية، الخدمة اللي ورا كل واحدة، وحققت إيه.",
+        findings: [
+          { value: "51.6 مليون", label: "مستخدم سوشيال ميديا في مصر" },
+          { value: "$8.2 مليار", label: "إنفاق الإعلانات الديجيتال في MENA، 2025" },
+          { value: "23.1%", label: "نمو الإعلانات في مصر، الأسرع في المنطقة" },
+          { value: "88%", label: "بيثقوا في كلام الناس أكتر حاجة" },
+        ],
+        sources: [
+          { label: "DataReportal", href: "https://datareportal.com/reports/digital-2026-egypt" },
+          { label: "IAB MENA via Campaign Middle East", href: "https://campaignme.com/digital-ad-spend-in-mena-reaches-8b-in-2025-iab-report-reveals/" },
+          {
+            label: "Nielsen via Research Live",
+            href: "https://www.research-live.com/article/news/nielsen-study-reveals-top-attributes-for-successful-adverts-/id/5093662",
+          },
+        ],
+      },
+      { kind: "statement", text: "ابدأ بالشغل. وسيب الأرقام تتكلم." },
+      {
+        kind: "chapter",
+        discipline: "UI design",
+        title: "اتصمم على Figma",
+        body: "الشكل طالع من البراند على طول: نيفي غامق بيدوب في التيل، أشكال ليكويد جلاس طايرة ورا الكلام، والبيكسل الليموني بتاع اللوجو باين على كل رقم وكل CTA. بيبان ستوديو عنده ذوق، مش تمبلت.\n\nسبع خدمات في ليستة واحدة مترقمة بتفتح مكانها، ولكل واحدة شيت في صفحة الخدمات. البورتفوليو بيعلّم كل كامبين بالخدمة اللي وراها، وكل صفحة مشروع بتبدأ بالنتايج قبل الجاليري، فالبراند يشوف الشغل حقق إيه، وبعدين شكله كان عامل إزاي. بعدها العملا والبروسيس وآراء العملا، وكل صفحة بتقفل بنفس الدعوة: جاهز نعمل حاجة جامدة بجد؟",
+      },
+      {
+        kind: "screens",
+        title: "الصفحات",
+        screens: [
+          { label: "الرئيسية", src: "/work/bliphub/home.webp", width: 1200, height: 6547 },
+          { label: "من نحن", src: "/work/bliphub/about.webp", width: 1200, height: 4068 },
+          { label: "الخدمات", src: "/work/bliphub/services.webp", width: 1200, height: 2477 },
+          { label: "البورتفوليو", src: "/work/bliphub/projects.webp", width: 1200, height: 3865 },
+          { label: "مشروع", src: "/work/bliphub/project.webp", width: 1200, height: 3444 },
+          { label: "تواصل معانا", src: "/work/bliphub/contact.webp", width: 1200, height: 1872 },
+        ],
+      },
+      {
+        kind: "phones",
+        title: "على الموبايل",
+        screens: [
+          { label: "الرئيسية", src: "/work/bliphub/phone/home.webp", width: 393, height: 7379 },
+          { label: "من نحن", src: "/work/bliphub/phone/about.webp", width: 393, height: 4469 },
+          { label: "الخدمات", src: "/work/bliphub/phone/services.webp", width: 393, height: 3349 },
+          { label: "البورتفوليو", src: "/work/bliphub/phone/projects.webp", width: 393, height: 3913 },
+          { label: "مشروع", src: "/work/bliphub/phone/project.webp", width: 393, height: 3265 },
+          { label: "تواصل معانا", src: "/work/bliphub/phone/contact.webp", width: 393, height: 2399 },
+        ],
+      },
+      {
+        kind: "results",
+        title: "التسليم",
+        body: "الشغل خلص بملف Figma كامل وجاهز للتنفيذ: كل صفحة على الديسكتوب والموبايل، مع شيتات الخدمات وتمبلت مشروع الفريق يملاه لكل كامبين جديدة.",
+        items: [
+          { value: "6", label: "صفحات على الديسكتوب" },
+          { value: "6", label: "تصميمات للموبايل" },
+          { value: "7", label: "خدمات، لكل واحدة شيت" },
+          { value: "1", label: "تمبلت لكل كامبين" },
+        ],
+      },
+    ],
+  },
+  {
+    slug: "anubis",
+    accent: ["#8f121d", "#e5323f"],
+    signature: "belt",
+    facts: [
+      { label: "العميل", value: "Anubis Martial Arts، مصر", logo: { src: "/logos/anubis.svg", width: 199, height: 329 } },
+      { label: "الدور", value: "بحث وتصميم واجهات" },
+      { label: "نطاق الشغل", value: "تطبيق موبايل" },
+      { label: "الأدوات", value: "Figma", tools: ["Figma"] },
+    ],
+    blocks: [
+      {
+        kind: "feature",
+        text: "الأعضاء بيتمرنوا جامد وعايزين يشوفوا ده: حضروا إيه، فاضل إيه في الباكدج، والكلاس الجاي إمتى. Anubis كانت محتاجة أبلكيشن واحد يوريهم ده، ويشيل الشغل الإداري من على الريسبشن.",
+        src: "/work/anubis.webp",
+        alt: "الشاشة الرئيسية لأبلكيشن Anubis على موبايل",
+      },
+      {
+        kind: "chapter",
+        discipline: "UX research",
+        title: "البحث",
+        body: "أكاديمية Anubis Martial Arts بتدرّب جوجيتسو برازيلي وسابميشن جرابلنج و MMA ومواي تاي في مصر. الهيد كوتش بتاعها، محمد عمر، واخد الحزام الأسود على إيد بطل العالم Roberto \"Cyborg\" Abreu، وساعد في بناء مشهد الـBJJ في مصر.\n\nورا الماتات، الحضور والباكدجات وطلبات التدريب البرايفت والميرش كانوا كلهم ماشيين بالإيد أو متفرقين على شاتات كتير، فالأعضاء مكانوش عارفين هما فين، والأكاديمية كانت بتعمل نفس الشغل مرتين. عملت بنشمارك لخمس أبلكيشنز فيتنس وجيم، شفت بيعملوا إيه صح وإيه اللي فايتهم، وبعدين رسمت رحلة العضو والفلوز الأهم: الحجز، والتشيك إن، ومتابعة التقدم.",
+        findings: [
+          { value: "5", label: "أبلكيشنز فيتنس اتعملها بنشمارك" },
+          { value: "4", label: "مهام اتجمعت في أبلكيشن واحد" },
+        ],
+      },
+      {
+        kind: "timeline",
+        title: "ست أسابيع، من البحث للتسليم",
+        body: "مشوار واحد منظم من أول بنشمارك لحد ملفات يقدر ديفلوبر ينفذ منها، وكل أسبوع بيخلص بحاجة الأكاديمية تقدر تشوفها.",
+        unit: "أسبوع",
+        steps: [
+          { title: "البحث والبنشمارك", items: ["بنشمارك المنافسين", "مقارنة الفيتشرز", "ملاحظات الفرص"] },
+          { title: "تعريف الـUX", items: ["خرايط رحلة العضو", "فلوز التجربة الأساسية"] },
+          { title: "الوايرفريمز والهيكل", items: ["سايت ماب الأبلكيشن", "وايرفريمز لكل فلو"] },
+          { title: "الديزاين سيستم", items: ["الألوان والخطوط والمسافات", "مكتبة كومبوننتس"] },
+          { title: "تصميم هاي فيديليتي", items: ["كل شاشة وكل حالة", "اللياوتس النهائية"] },
+          { title: "البروتوتايب والتسليم", items: ["بروتوتايب تفاعلي", "ملفات جاهزة للتنفيذ"] },
+        ],
+      },
+      { kind: "statement", text: "كل عضو لازم يشوف تقدمه، مش يضطر يسأل عليه." },
+      {
+        kind: "evolution",
+        title: "من الوايرفريم للشكل النهائي",
+        body: "كل فلو اتحسم بالرمادي الأول: اللياوت والترتيب والتنقل، قبل أي لون. اسحب على الموبايل عشان تشوف كل شاشة بقت إيه.",
+        pairs: [
+          { label: "تسجيل الدخول", wire: "/work/anubis/wire-login.webp", final: "/work/anubis/login.webp" },
+          { label: "التحقق", wire: "/work/anubis/wire-otp.webp", final: "/work/anubis/otp.webp" },
+          { label: "بياناتك", wire: "/work/anubis/wire-details.webp", final: "/work/anubis/details.webp" },
+          { label: "صورتك", wire: "/work/anubis/wire-photo.webp", final: "/work/anubis/photo.webp" },
+          { label: "الرئيسية", wire: "/work/anubis/wire-home.webp", final: "/work/anubis/home.webp" },
+          { label: "البروفايل", wire: "/work/anubis/wire-profile.webp", final: "/work/anubis/profile.webp" },
+        ],
+      },
+      {
+        kind: "chapter",
+        discipline: "UI design",
+        title: "اتصمم على Figma",
+        body: "الأبلكيشن عايش بألوان الأكاديمية: قريب من الأسود، مع أحمر Anubis لكل أكشن، والقطعات العريضة من Helvetica Neue مدّية العناوين وقفة مقاتل. الشاشة الرئيسية بتجاوب على تلات أسئلة العضو من نظرة: فاضل قد إيه في الباكدج، الكلاس الجاي إيه ومع أنهي كوتش، وإيه كمان موجود الأسبوع ده.\n\nالتشيك إن QR كود في نص التاب بار، على بعد ضغطة من أي مكان. الأحزمة بتتفتح كإنجازات، رياضة رياضة، فالتقدم بيبان على الماتات وفي الأبلكيشن. الميرش تقدر تتفرج عليه وتسأل عنه، بس مش تشتريه: الدفع اتشال عن قصد، عشان أول إصدار يفضل مركّز على تشغيل الأكاديمية. كل شاشة مبنية من مكتبة كومبوننتس واحدة، بفاريانتس لكل حالة.",
+      },
+      {
+        kind: "phones",
+        title: "الأبلكيشن",
+        screens: [
+          { label: "الأونبوردنج", src: "/work/anubis/phone/onboarding.webp", width: 393, height: 911 },
+          { label: "تسجيل الدخول", src: "/work/anubis/phone/login.webp", width: 393, height: 911 },
+          { label: "الرئيسية", src: "/work/anubis/phone/home.webp", width: 393, height: 1920 },
+          { label: "السيشنز", src: "/work/anubis/phone/sessions.webp", width: 393, height: 911 },
+          { label: "الكاليندر", src: "/work/anubis/phone/calendar-month.webp", width: 393, height: 911 },
+          { label: "السيشن", src: "/work/anubis/phone/session.webp", width: 393, height: 911 },
+          { label: "الباكدجات", src: "/work/anubis/phone/packages-list.webp", width: 393, height: 911 },
+          { label: "الباكدج", src: "/work/anubis/phone/package.webp", width: 393, height: 911 },
+          { label: "الكوتش", src: "/work/anubis/phone/coach.webp", width: 393, height: 911 },
+          { label: "الإنجازات", src: "/work/anubis/phone/achievements.webp", width: 393, height: 911 },
+          { label: "الميرش", src: "/work/anubis/phone/merch.webp", width: 393, height: 911 },
+          { label: "البروفايل", src: "/work/anubis/phone/profile.webp", width: 393, height: 911 },
+        ],
+      },
+      {
+        kind: "results",
+        title: "التسليم",
+        body: "بعد ست أسابيع من أول بنشمارك، الأكاديمية كان معاها بروتوتايب تفاعلي وملفات جاهزة للتنفيذ: كل شاشة وكل حالة، من التسجيل لحد حساب متوقف.",
+        items: [
+          { value: "46", label: "شاشة، متصممة من الأول للآخر" },
+          { value: "6", label: "أسابيع، من البحث للتسليم" },
+          { value: "1", label: "مكتبة كومبوننتس" },
+          { value: "1", label: "بروتوتايب تفاعلي" },
+        ],
+      },
+      { kind: "statement", text: "حدود المشروع قرار تصميم كمان. شيل الدفع خلّى أول إصدار أركز وأقوى." },
+    ],
+  },
+  {
+    slug: "slydive",
+    accent: ["#a742b5", "#33c1a4"],
+    signature: "dive",
+    site: "https://slydive-six.vercel.app/",
+    facts: [
+      { label: "العميل", value: "SlyDive، دهب", logo: { src: "/logos/slydive.svg", width: 389, height: 215 } },
+      { label: "الدور", value: "تصميم وتطوير" },
+      { label: "نطاق الشغل", value: "ريديزاين موقع" },
+      { label: "الستاك", value: "Figma · Next.js · Sanity · Vercel", tools: ["Figma", "Next.js", "Sanity", "Vercel"] },
+    ],
+    blocks: [
+      {
+        kind: "feature",
+        text: "موقع الدايف سنتر لازم يحسسك إنك في المية: مفتوح، منوّر، وسهل تتحرك فيه، من أول كورس لحد رحلة المركب الجاية.",
+        src: "/work/slydive.webp",
+        alt: "الصفحة الرئيسية الجديدة لـSlyDive على لابتوب",
+      },
+      {
+        kind: "chapter",
+        discipline: "UX research",
+        title: "البحث",
+        body: "دهب من أكتر مدن الغطس زحمة على البحر الأحمر، فيها عشرات السنترات على نفس الحتة من الساحل، وأغلبهم PADI. وبالنسبة للغطاس اللي جاي زيارة، الموقع غالبًا هو المكان اللي بيتحسم فيه الاختيار.\n\nSlyDive سنتر PADI 5 Star IDC في المشربة. بيقدم كورسات سكوبا وفري دايفنج وسنوركلينج، وغطسات للحفاظ على البيئة، وإسعافات أولية EFR من الكلاس رووم والمركب بتوعه. والجايدز اللي بتقولك تختار سنتر في دهب إزاي بتكرر نفس التلات حاجات: أسعار واضحة، حجز مفيهوش لخبطة، وأمان تقدر تشوفه. والريديزاين مبني حواليهم.",
+        findings: [
+          { value: "5★", label: "سنتر PADI IDC" },
+          { value: "6", label: "مدربين PADI" },
+          { value: "3", label: "لغات للتدريس" },
+          { value: "31", label: "موقع غطس قريب" },
+        ],
+        sources: [
+          { label: "PADI", href: "https://travel.padi.com/dive-center/egypt/sly-dive/" },
+          { label: "DivePlannerPro", href: "https://www.diveplannerpro.com/dive-centers/eg/eg-sly-dive/sites" },
+          { label: "Circle Divers", href: "https://www.circledivers.com/blog/best-dive-center-dahab" },
+        ],
+      },
+      {
+        kind: "chapter",
+        discipline: "UI design",
+        title: "اتصمم على Figma",
+        body: "الريديزاين بدأ على Figma: لياوت نضيف ومنوّر بيخلّي التصوير تحت المية هو اللي يقود، والبنفسجي والتيل بتوع SlyDive شايلين البراند من الهيرو لكل CTA.",
+      },
+      {
+        kind: "screens",
+        title: "الصفحات",
+        screens: [
+          { label: "الرئيسية", src: "/work/slydive/landing.webp", width: 1200, height: 3983 },
+          { label: "الرحلات", src: "/work/slydive/trips.webp", width: 1200, height: 1840 },
+          { label: "تفاصيل الرحلة", src: "/work/slydive/trip-details.webp", width: 1200, height: 3229 },
+          { label: "الكورسات", src: "/work/slydive/courses.webp", width: 1200, height: 2156 },
+          { label: "تفاصيل الكورس", src: "/work/slydive/course-detail.webp", width: 1200, height: 2723 },
+          { label: "الأسعار", src: "/work/slydive/pricing.webp", width: 1200, height: 2119 },
+          { label: "من نحن", src: "/work/slydive/about.webp", width: 1200, height: 3724 },
+        ],
+      },
+      {
+        kind: "chapter",
+        discipline: "Front-end",
+        title: "اتبنى بـNext.js، وشغال على Sanity",
+        body: "الموقع مبني بـNext.js والمحتوى على Sanity CMS، عشان الفريق يقدر يحدّث الرحلات والكورسات والأسعار من غير ما يلمس كود.",
+      },
+      {
+        kind: "pipeline",
+        title: "من Figma للايف",
+        steps: [
+          { tool: "Figma", does: "تصميم وبروتوتايب" },
+          { tool: "Next.js", does: "تطوير الواجهات الأمامية" },
+          { tool: "Sanity", does: "إدارة المحتوى" },
+          { tool: "Vercel", does: "النشر" },
+        ],
+      },
+      {
+        kind: "results",
+        title: "النتايج",
+        body: "الموقع القديم كان شغال على WordPress 6.2، وشايله Elementor و Slider Revolution و WooCommerce. نقله لـNext.js على Vercel، والمحتوى على Sanity، خلّاه أسرع وأنضف وأسهل في التحديث. ده القديم قصاد الجديد:",
+        items: [
+          { value: "92", before: "45", change: "+47", label: "الأداء على الموبايل" },
+          { value: "93", before: "66", change: "+27", label: "الأداء على الديسكتوب" },
+          { value: "100", before: "73", change: "+27", label: "أفضل الممارسات" },
+          { value: "10 ms", before: "530 ms", change: "−98%", label: "وقت التعطيل على الموبايل" },
+        ],
+        measuredWith: {
+          name: "Google PageSpeed Insights",
+          logo: "/logos/lighthouse.svg",
+          detail: "اختبار Lighthouse 13.6، موبايل وديسكتوب",
+        },
+      },
+    ],
+  },
+];
+
+export const caseFor: typeof EN.caseFor = (slug: string) => CASES.find((c) => c.slug === slug);

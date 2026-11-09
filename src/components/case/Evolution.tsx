@@ -1,5 +1,7 @@
 "use client";
 
+import { useLang } from "@/i18n/LangProvider";
+import { ui } from "@/i18n/ui";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { fitLetters } from "@/lib/fit";
@@ -16,6 +18,7 @@ const HEIGHT = 1704;
  * comes into view the split sweeps across once, so it's clear there are two layers to compare.
  */
 export default function Evolution({ title, body, pairs }: { title: string; body?: string; pairs: Pair[] }) {
+  const t = ui(useLang()).caseStudy;
   const [active, setActive] = useState(0);
   const [split, setSplit] = useState(50);
   const phoneRef = useRef<HTMLDivElement>(null);
@@ -61,7 +64,7 @@ export default function Evolution({ title, body, pairs }: { title: string; body?
           {title}
         </h2>
         {body ? <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted md:text-xl">{body}</p> : null}
-        <div role="group" aria-label="Screens" className="mt-8 flex flex-wrap gap-2">
+        <div role="group" aria-label={t.screens} className="mt-8 flex flex-wrap gap-2">
           {pairs.map((pair, i) => (
             <button
               key={pair.label}
@@ -106,10 +109,10 @@ export default function Evolution({ title, body, pairs }: { title: string; body?
               </span>
             </span>
             <span aria-hidden className="pointer-events-none absolute bottom-4 left-4 rounded-full bg-black/60 px-3 py-1 text-xs font-semibold text-white backdrop-blur-md">
-              Wireframe
+              {t.wireframe}
             </span>
             <span aria-hidden className="pointer-events-none absolute right-4 bottom-4 rounded-full bg-[var(--accent-2)] px-3 py-1 text-xs font-semibold text-white">
-              Final
+              {t.final}
             </span>
 
             <input

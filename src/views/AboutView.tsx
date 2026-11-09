@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import AboutGuide from "@/components/about/AboutGuide";
 import AskMeAnything from "@/components/about/AskMeAnything";
 import AvatarFrame from "@/components/about/AvatarFrame";
@@ -10,30 +9,34 @@ import JsonLd from "@/components/JsonLd";
 import Nav from "@/components/Nav";
 import ScrollWords from "@/components/ScrollWords";
 import SocialIcon from "@/components/SocialIcon";
-import { CV, DISCIPLINE_COLOR, PASSIONS, PROCESS, QUOTE, STORY } from "@/content/site";
+import { siteFor } from "@/content";
+import { DISCIPLINE_COLOR } from "@/content/site";
+import type { Lang } from "@/i18n/lang";
+import { ui } from "@/i18n/ui";
 import { fitLetters } from "@/lib/fit";
-import { breadcrumbs, PERSON_ID, pageMetadata, webPage } from "@/lib/seo";
+import { breadcrumbs, nameIn, PERSON_ID, webPage } from "@/lib/seo";
 
-const DESCRIPTION =
-  "Ahmed Hassan is an Egyptian designer and front-end developer: a computer science graduate who researches, designs and builds digital products.";
-
-export const metadata: Metadata = pageMetadata({ title: "About", description: DESCRIPTION, path: "/about" });
+export const ABOUT_DESCRIPTION = {
+  en: "Ahmed Hassan is an Egyptian designer and front-end developer: a computer science graduate who researches, designs and builds digital products.",
+  ar: "أحمد حسن مصمم ومطوّر فرونت إند مصري، خريج علوم حاسب، بيفهم المستخدم وبيصمم وبيبني المنتجات الرقمية بنفسه.",
+};
 
 // The person itself is described once, in the root layout; this page is its profile
-const JSON_LD = [
+const jsonLd = (lang: Lang) => [
   {
-    ...webPage("ProfilePage", { path: "/about", name: "About — Ahmed Hassan", description: DESCRIPTION }),
+    ...webPage("ProfilePage", { path: "/about", name: `${ui(lang).nav.about} — ${nameIn(lang)}`, description: ABOUT_DESCRIPTION[lang], lang }),
     mainEntity: { "@id": PERSON_ID },
   },
-  breadcrumbs([{ name: "About", path: "/about" }]),
+  breadcrumbs([{ name: ui(lang).nav.about, path: "/about" }], lang),
 ];
 
-const FACTS = [
-  { value: "6+", label: "Years" },
-  { value: "60+", label: "Clients" },
-  { value: "5+", label: "Regions" },
-  { value: "’21", label: "CS, MIU" },
-];
+const FACT_VALUES = ["6+", "60+", "5+", "’21"];
+
+// The word in the quote that lights up violet
+const QUOTE_HIGHLIGHT: Record<Lang, string> = { en: "impossible", ar: "مستحيل" };
+
+// Arabic quotes with guillemets
+const QUOTE_MARKS: Record<Lang, [string, string]> = { en: ["“", "”"], ar: ["«", "»"] };
 
 const STORY_COLORS = ["var(--cyan)", "var(--violet)", "var(--coral)", "var(--ink)"];
 
@@ -55,12 +58,14 @@ function Chapter({
   title,
   say,
   react,
+  lang,
   children,
 }: {
   id: string;
   title: string;
   say: string;
   react: "nod" | "wink" | "laugh" | "doubletake";
+  lang: Lang;
   children: React.ReactNode;
 }) {
   return (
@@ -73,15 +78,17 @@ function Chapter({
       data-react={react}
       className="py-20 md:py-28"
     >
-      <p className="mb-6 text-lg font-medium text-muted lg:hidden">“{say}”</p>
+      <p className="mb-6 text-lg font-medium text-muted lg:hidden">{QUOTE_MARKS[lang][0]}{say}{QUOTE_MARKS[lang][1]}</p>
       {children}
     </section>
   );
 }
 
-/** The quote, curly-quoted, with one word in violet */
-function quoteSegments(text: string, highlight: string) {
-  const [before, after] = `“${text.replace("'", "’")}”`.split(highlight);
+/** The quote, curly-quoted, with one word in violet (the whole quote plain if the word isn't in it) */
+function quoteSegments(text: string, highlight: string, lang: Lang) {
+  const quoted = lang === "ar" ? `«${text}»` : `“${text.replace("'", "’")}”`;
+  if (!quoted.includes(highlight)) return [{ text: quoted }];
+  const [before, after] = quoted.split(highlight);
   return [{ text: before.trim() }, { text: highlight, color: "var(--violet)" }, { text: after.trim() }];
 }
 
@@ -97,10 +104,13 @@ function ChapterTitle({ id, top, bottom }: { id: string; top: string; bottom: st
   );
 }
 
-export default function AboutPage() {
+export default function AboutView({ lang }: { lang: Lang }) {
+  const { CV, PASSIONS, PROCESS, QUOTE, STORY } = siteFor(lang);
+  const t = ui(lang).aboutPage;
+  const c = t.chapters;
   return (
     <>
-      <JsonLd graph={JSON_LD} />
+      <JsonLd graph={jsonLd(lang)} />
       <Cursor />
       <Nav />
       <main id="top">
@@ -110,12 +120,12 @@ export default function AboutPage() {
         <section className="hero-recede relative flex min-h-[100svh] flex-col overflow-hidden px-4 pt-32 pb-20 md:px-10 md:pb-28 lg:sticky lg:top-0 lg:h-[100svh] lg:pb-12">
           <div
             aria-hidden
-            className="pointer-events-none absolute -top-1/4 -right-1/4 h-[90vmax] w-[90vmax] rounded-full opacity-25 blur-[140px]"
+            className="pointer-events-none absolute -top-1/4 -end-1/4 h-[90vmax] w-[90vmax] rounded-full opacity-25 blur-[140px]"
             style={{ background: "var(--spectrum)" }}
           />
           <span
             aria-hidden
-            className="text-spectrum animate-shimmer pointer-events-none absolute -top-[8vh] right-[2vw] hidden font-display text-[120vh] leading-none font-bold opacity-[0.08] md:block"
+            className="text-spectrum animate-shimmer pointer-events-none absolute -top-[8vh] end-[2vw] hidden font-display text-[length:calc((120vh)*var(--ds))] leading-none font-bold opacity-[0.08] md:block"
           >
             /
           </span>
@@ -124,14 +134,14 @@ export default function AboutPage() {
           {/* Darkens as the page rises over it */}
           <div aria-hidden className="hero-dim pointer-events-none absolute inset-0 z-10 bg-bg" />
 
-          <Kicker>About</Kicker>
+          <Kicker>{t.kicker}</Kicker>
           <h1 className="relative mt-8 font-display leading-[0.84] font-bold uppercase">
-            <span className="hero-split-left reveal block text-[17vw] md:text-[13vw] lg:text-[10vw]">
-              <span className="animate-rise block">Hi, I&apos;m</span>
+            <span className="hero-split-left reveal block text-[length:calc((17vw)*var(--ds))] md:text-[length:calc((13vw)*var(--ds))] lg:text-[length:calc((10vw)*var(--ds))]">
+              <span className="animate-rise block">{t.hi}</span>
             </span>
-            <span className="hero-split-right reveal block text-[17vw] md:text-[13vw] lg:text-[10vw]">
+            <span className="hero-split-right reveal block text-[length:calc((17vw)*var(--ds))] md:text-[length:calc((13vw)*var(--ds))] lg:text-[length:calc((10vw)*var(--ds))]">
               <span className="text-spectrum animate-shimmer animate-rise block" style={{ animationDelay: "110ms" }}>
-                Ahmed.
+                {t.name}
               </span>
             </span>
           </h1>
@@ -140,35 +150,33 @@ export default function AboutPage() {
           <div
             data-avatar-slot="hero"
             aria-hidden
-            className="relative mx-auto -mt-2 aspect-[4/5] w-[min(84vw,26rem)] lg:absolute lg:top-[9vh] lg:right-[4vw] lg:mt-0 lg:w-[min(34vw,52vh)]"
+            className="relative mx-auto -mt-2 aspect-[4/5] w-[min(84vw,26rem)] lg:absolute lg:end-[4vw] lg:top-[9vh] lg:mt-0 lg:w-[min(34vw,52vh)]"
           />
 
           <div className="relative mt-auto grid gap-10 pt-16 lg:grid-cols-12 lg:items-end">
             <div className="lg:col-span-5">
               <p className="max-w-xl text-xl leading-snug font-medium text-muted md:text-2xl">
-                Egyptian designer and front-end developer.{" "}
-                <span className="text-ink">
-                  I research what people need, design what they&apos;ll choose, and build it myself.
-                </span>
+                {t.lead}
+                <span className="text-ink">{t.leadTail}</span>
               </p>
               {/* The whole career on two pages, for anyone hiring */}
               <a
                 href={CV.href}
                 download={CV.file}
-                className="group mt-8 inline-flex items-center gap-3 rounded-full bg-ink py-3 pr-6 pl-3 font-semibold text-bg transition-transform duration-300 hover:scale-[1.03]"
+                className="group mt-8 inline-flex items-center gap-3 rounded-full bg-ink py-3 pe-6 ps-3 font-semibold text-bg transition-transform duration-300 hover:scale-[1.03]"
               >
                 <span className="grid size-9 place-items-center rounded-full" style={{ background: "var(--spectrum)" }}>
                   <SocialIcon name="Download" className="size-4 transition-transform duration-300 group-hover:translate-y-0.5" />
                 </span>
-                Download my CV
+                {t.downloadCv}
                 <span className="text-sm font-medium opacity-60">{CV.note}</span>
               </a>
             </div>
-            <dl className="grid grid-cols-4 lg:col-span-7">
-              {FACTS.map((fact, i) => (
-                <div key={fact.label} className={`@container flex flex-col-reverse gap-1 ${i > 0 ? "border-l border-line pl-3 md:pl-5 lg:pl-8" : ""}`}>
-                  <dt className="text-xs font-medium text-muted md:text-sm">{fact.label}</dt>
-                  <dd className="font-display text-[min(1.5rem,40cqw)] leading-none font-bold md:text-[min(2.25rem,40cqw)] lg:text-[min(3rem,40cqw)]">{fact.value}</dd>
+            <dl className="grid grid-cols-4 md:flex lg:col-span-7 lg:justify-end">
+              {t.facts.map((label, i) => (
+                <div key={label} className={`@container flex flex-col-reverse gap-1 md:[container-type:normal] md:pe-10 md:last:pe-0 lg:pe-14 ${i > 0 ? "border-s border-line ps-3 md:ps-10 lg:ps-14" : ""}`}>
+                  <dt className="text-xs font-medium text-muted md:text-sm">{label}</dt>
+                  <dd dir="ltr" className="rtl:text-right font-display text-[length:calc((min(1.5rem,40cqw))*var(--ds))] leading-none font-bold md:text-[length:calc((min(2.25rem,40cqw))*var(--ds))] lg:text-[length:calc((min(3rem,40cqw))*var(--ds))]">{FACT_VALUES[i]}</dd>
                 </div>
               ))}
             </dl>
@@ -180,8 +188,8 @@ export default function AboutPage() {
         <div className="relative z-10 -mt-10 rounded-t-[40px] bg-bg px-4 pt-6 shadow-[0_-40px_80px_-30px_rgb(0_0_0/0.9)] md:-mt-16 md:rounded-t-[64px] md:px-10 lg:mt-0 lg:grid lg:grid-cols-12 lg:gap-10">
           <AboutGuide />
           <div className="lg:col-span-8">
-            <Chapter id="story" title="The story" say="Here's how it started." react="nod">
-              <ChapterTitle id="story" top="The short" bottom="version" />
+            <Chapter id="story" title={c.story.title} say={c.story.say} react="nod" lang={lang}>
+              <ChapterTitle id="story" top={c.story.top} bottom={c.story.bottom} />
               <ol className="mt-12">
                 {STORY.map((step, i) => (
                   <li
@@ -201,8 +209,8 @@ export default function AboutPage() {
               </ol>
             </Chapter>
 
-            <Chapter id="work" title="How I work" say="What I actually do." react="wink">
-              <ChapterTitle id="work" top="How I" bottom="work" />
+            <Chapter id="work" title={c.work.title} say={c.work.say} react="wink" lang={lang}>
+              <ChapterTitle id="work" top={c.work.top} bottom={c.work.bottom} />
               <div className="mt-12">
                 {PROCESS.map((step) => {
                   const color = DISCIPLINE_COLOR[step.name];
@@ -233,8 +241,8 @@ export default function AboutPage() {
               </div>
             </Chapter>
 
-            <Chapter id="clock" title="Off the clock" say="Gooner for life." react="laugh">
-              <ChapterTitle id="clock" top="Off the" bottom="clock" />
+            <Chapter id="clock" title={c.clock.title} say={c.clock.say} react="laugh" lang={lang}>
+              <ChapterTitle id="clock" top={c.clock.top} bottom={c.clock.bottom} />
               <ul className="mt-16 grid gap-4 md:grid-cols-2">
                 {PASSIONS.map((passion, i) => (
                   <PassionCard key={passion.title} index={i} {...passion} />
@@ -242,20 +250,20 @@ export default function AboutPage() {
               </ul>
             </Chapter>
 
-            <Chapter id="ask" title="Ask me anything" say="Go on, ask me something." react="nod">
-              <ChapterTitle id="ask" top="Ask me" bottom="anything" />
+            <Chapter id="ask" title={c.ask.title} say={c.ask.say} react="nod" lang={lang}>
+              <ChapterTitle id="ask" top={c.ask.top} bottom={c.ask.bottom} />
               <AskMeAnything />
             </Chapter>
 
-            <Chapter id="quote" title="Words I go by" say="The one I keep coming back to." react="nod">
+            <Chapter id="quote" title={c.quote.title} say={c.quote.say} react="nod" lang={lang}>
               <h2 id="quote-title" className="sr-only">
-                Words I go by
+                {c.quote.title}
               </h2>
               <figure>
                 <blockquote>
                   <ScrollWords
-                    className="font-display text-[11vw] leading-[0.92] font-bold uppercase md:text-[5.6vw]"
-                    segments={quoteSegments(QUOTE.text, "impossible")}
+                    className="font-display text-[length:calc((11vw)*var(--ds))] leading-[0.92] font-bold uppercase md:text-[length:calc((5.6vw)*var(--ds))]"
+                    segments={quoteSegments(QUOTE.text, QUOTE_HIGHLIGHT[lang], lang)}
                   />
                 </blockquote>
                 <figcaption className="mt-8 flex items-center gap-3 text-lg font-medium text-muted">
@@ -273,7 +281,7 @@ export default function AboutPage() {
         <div data-avatar-slot="dock" aria-hidden className="pointer-events-none fixed right-4 bottom-4 aspect-[4/5] w-[84px] lg:hidden" />
         <AvatarFrame />
       </main>
-      <Contact />
+      <Contact lang={lang} />
     </>
   );
 }
