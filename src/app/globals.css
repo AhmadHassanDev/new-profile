@@ -945,3 +945,35 @@ html.lenis body {
 [dir="rtl"] .arrow {
   transform: scaleX(-1);
 }
+
+/* 404: a design canvas. Dot grid fading out at the edges; the frame glows in the spectrum once the 404 is fixed */
+.lost-canvas::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(rgb(255 255 255 / 0.1) 1px, transparent 1.2px);
+  background-size: 22px 22px;
+  background-position: center;
+  mask-image: radial-gradient(ellipse 85% 80% at 50% 50%, #000 55%, transparent 100%);
+}
+.lost-shipped {
+  background-color: color-mix(in oklab, var(--surface) 88%, var(--violet));
+  box-shadow:
+    0 0 0 1px var(--violet),
+    0 40px 140px -30px color-mix(in oklab, var(--violet) 60%, transparent),
+    0 0 90px -20px color-mix(in oklab, var(--cyan) 45%, transparent);
+}
+.lost-layer:focus-visible > span {
+  outline: 1px dashed var(--violet);
+  outline-offset: 6px;
+}
+html.has-cursor .lost-layer {
+  cursor: none;
+}
+html:not(.has-cursor) .lost-layer {
+  cursor: grab;
+}
+html:not(.has-cursor) .lost-layer:active {
+  cursor: grabbing;
+}

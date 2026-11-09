@@ -16,7 +16,7 @@ type ShapeDef = {
 
 // The process, one shape per word in that word's colour, then the logo with all three lit.
 const SHAPES: ShapeDef[] = [
-  { id: "galaxy", build: shapes.galaxy, facing: true, tint: "#09c7fb", word: 0 },
+  { id: "atom", build: shapes.atom, facing: false, tint: "#09c7fb", word: 0 },
   { id: "supershape", build: shapes.supershape, facing: false, tint: "#c471ed", word: 1 },
   { id: "gyroid", build: shapes.gyroid, facing: false, tint: "#f64f59", word: 2 },
   { id: "mark", build: shapes.mark, facing: true, tint: null, word: null },

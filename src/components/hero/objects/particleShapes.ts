@@ -16,13 +16,6 @@ function fill(count: number, pick: () => Point) {
   return out;
 }
 
-function rotate(points: Float32Array, x: number, y: number, z: number) {
-  const m = new THREE.Matrix4().makeRotationFromEuler(new THREE.Euler(x, y, z));
-  const v = new THREE.Vector3();
-  for (let i = 0; i < points.length; i += 3) v.fromArray(points, i).applyMatrix4(m).toArray(points, i);
-  return points;
-}
-
 /** Weighted choice between sub-generators. */
 function mix(count: number, parts: [number, () => Point][]) {
   const total = parts.reduce((s, [w]) => s + w, 0);
@@ -44,23 +37,58 @@ function sampleMesh(geometry: THREE.BufferGeometry, count: number) {
   return out;
 }
 
-/** A barred spiral galaxy: glowing bulge, four dusty arms and a scatter of halo stars. */
-export function galaxy(count: number) {
-  const points = mix(count, [
-    [16, () => [gauss() * 0.32, gauss() * 0.14, gauss() * 0.32]],
-    [74, () => {
-      const arm = Math.floor(Math.random() * 4);
-      const r = 0.25 + Math.pow(Math.random(), 0.8) * 2.3;
-      const a = arm * (TAU / 4) + Math.log(r + 0.2) * 2.6 + gauss() * (0.12 + 0.08 / r);
-      const spread = 0.06 + r * 0.05;
-      return [Math.cos(a) * r + gauss() * spread, gauss() * 0.06 * (1.6 - r / 2.6), Math.sin(a) * r + gauss() * spread];
+/**
+ * An atom: a packed nucleus inside four orbits tilted to the corners of a tetrahedron, each carrying its electron.
+ * Whichever way it turns, at least three orbits read as open ellipses, so it never flattens into a line.
+ */
+export function atom(count: number) {
+  const v = new THREE.Vector3();
+  const ball = (r: number): Point => {
+    v.randomDirection().multiplyScalar(r * Math.cbrt(Math.random()));
+    return [v.x, v.y, v.z];
+  };
+  // Nucleons: one in the middle, a dozen packed around it
+  const nucleons = [[0, 0, 0] as Point].concat(
+    Array.from({ length: 12 }, (_, i) => {
+      const y = 1 - (2 * (i + 0.5)) / 12;
+      const a = i * Math.PI * (3 - Math.sqrt(5));
+      const r = Math.sqrt(1 - y * y);
+      return [Math.cos(a) * r * 0.24, y * 0.24, Math.sin(a) * r * 0.24] as Point;
+    }),
+  );
+  const orbits = [
+    [1, 1, 1],
+    [1, -1, -1],
+    [-1, 1, -1],
+    [-1, -1, 1],
+  ].map(([x, y, z], i) => {
+    const n = new THREE.Vector3(x, y, z).normalize();
+    const u = new THREE.Vector3().crossVectors(n, new THREE.Vector3(0, 1, 0.3)).normalize();
+    const w = new THREE.Vector3().crossVectors(n, u);
+    return { u, w, electron: i * 1.7 + 0.4 };
+  });
+  const onOrbit = (o: (typeof orbits)[number], a: number, r: number, spread: number): Point => {
+    const p = o.u.clone().multiplyScalar(Math.cos(a) * r).addScaledVector(o.w, Math.sin(a) * r);
+    return [p.x + gauss() * spread, p.y + gauss() * spread, p.z + gauss() * spread];
+  };
+  return mix(count, [
+    [20, () => {
+      const [x, y, z] = nucleons[Math.floor(Math.random() * nucleons.length)];
+      const [dx, dy, dz] = ball(0.13);
+      return [x + dx, y + dy, z + dz];
     }],
-    [10, () => {
-      const v = new THREE.Vector3().randomDirection().multiplyScalar(0.6 + Math.random() * 2);
-      return [v.x, v.y * 0.35, v.z];
+    [62, () => onOrbit(orbits[Math.floor(Math.random() * 4)], rand(0, TAU), 1.9, 0.022)],
+    [11, () => {
+      const o = orbits[Math.floor(Math.random() * 4)];
+      const [x, y, z] = onOrbit(o, o.electron, 1.9, 0);
+      const [dx, dy, dz] = ball(0.11);
+      return [x + dx, y + dy, z + dz];
+    }],
+    [7, () => {
+      v.randomDirection().multiplyScalar(0.45 + Math.random() * 1.6);
+      return [v.x, v.y, v.z];
     }],
   ]);
-  return rotate(points, 1.05, 0, -0.42);
 }
 
 /** A 3D superformula: an organic, many-petalled crystal. */
