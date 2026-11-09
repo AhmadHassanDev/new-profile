@@ -851,3 +851,18 @@ html.lenis body {
     animation: none;
   }
 }
+
+/* The consent banner's cookie when there's no 3D: a gentle float (resting with reduced motion or no GPU) */
+.cookie-float {
+  animation: cookie-float 3.2s ease-in-out infinite;
+}
+@keyframes cookie-float {
+  0%, 100% { transform: translateY(0) rotate(-8deg); }
+  50% { transform: translateY(-8px) rotate(6deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cookie-float { animation: none; }
+}
+:root[data-low-power] .cookie-float {
+  animation: none;
+}
