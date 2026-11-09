@@ -72,7 +72,7 @@ export default function Evolution({ title, body, pairs }: { title: string; body?
               aria-pressed={i === active}
               onClick={() => setActive(i)}
               className={`rounded-full px-4 py-2 text-sm font-semibold transition-colors duration-300 ${
-                i === active ? "bg-[var(--accent-2)] text-white" : "bg-surface/70 text-muted hover:text-ink"
+                i === active ? "bg-[var(--accent-2)] text-[var(--accent-ink)]" : "bg-surface/70 text-muted hover:text-ink"
               }`}
             >
               {pair.label}
@@ -111,7 +111,7 @@ export default function Evolution({ title, body, pairs }: { title: string; body?
             <span aria-hidden className="pointer-events-none absolute bottom-4 left-4 rounded-full bg-black/60 px-3 py-1 text-xs font-semibold text-white backdrop-blur-md">
               {t.wireframe}
             </span>
-            <span aria-hidden className="pointer-events-none absolute right-4 bottom-4 rounded-full bg-[var(--accent-2)] px-3 py-1 text-xs font-semibold text-white">
+            <span aria-hidden className="pointer-events-none absolute right-4 bottom-4 rounded-full bg-[var(--accent-2)] px-3 py-1 text-xs font-semibold text-[var(--accent-ink)]">
               {t.final}
             </span>
 

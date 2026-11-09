@@ -374,7 +374,7 @@ function Directions({ title, body, options, t }: Omit<Extract<Block, { kind: "di
                 className="screen-page block h-auto w-full"
               />
               {option.chosen ? (
-                <span className="absolute end-3 top-3 rounded-full bg-[var(--accent-2)] px-3 py-1 text-xs font-bold text-[#0b0b0b]">{t.shipped}</span>
+                <span className="absolute end-3 top-3 rounded-full bg-[var(--accent-2)] px-3 py-1 text-xs font-bold text-[var(--accent-ink)]">{t.shipped}</span>
               ) : null}
             </div>
             <p className="mt-5 px-1 font-display text-xs font-semibold tracking-wide text-muted uppercase">{t.direction} {String(i + 1).padStart(2, "0")}</p>

@@ -82,6 +82,16 @@ function caseJsonLd(project: Project, lang: Lang) {
 
 // The frame (nav, footer) renders straight away; the case itself reads the URL, so it streams in
 // behind a boundary and page-to-page navigation stays instant.
+
+/** Text that reads on the accent: near-black on a light accent (ORBS cyan, Spark lime), white on a dark one (Anubis red) */
+function inkOn(hex: string) {
+  const [r, g, b] = [1, 3, 5].map((i) => {
+    const c = parseInt(hex.slice(i, i + 2), 16) / 255;
+    return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+  });
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b > 0.3 ? "#0a0a0d" : "#ffffff";
+}
+
 export default function CaseView({ lang, params }: Props) {
   return (
     <>
@@ -113,7 +123,7 @@ async function CaseStudy({ lang, params }: Props) {
       // On wide screens the right margin is kept clear for a signature's side instruments (e.g. the dive gauge;
       // the belt's upright rank card and the sprint's stopwatch need a little more)
       className={`case relative isolate ${study.signature === "spiral" ? "md:pr-28" : study.signature === "belt" ? "md:pr-20" : study.signature === "sprint" || study.signature === "spark" || study.signature === "orbit" ? "md:pr-24" : study.signature ? "md:pr-14" : ""}`}
-      style={{ "--accent": study.accent[0], "--accent-2": study.accent[1] } as React.CSSProperties}
+      style={{ "--accent": study.accent[0], "--accent-2": study.accent[1], "--accent-ink": inkOn(study.accent[1]) } as React.CSSProperties}
     >
       <JsonLd graph={caseJsonLd(project, lang)} />
       {study.signature === "dive" ? (

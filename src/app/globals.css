@@ -586,7 +586,7 @@ body:has(.nav-bar[data-tucked="true"]) .below-nav {
 }
 .sprint-card[data-finished] .sprint-clock {
   background: var(--accent-2);
-  color: #0b0b0b;
+  color: var(--accent-ink);
 }
 
 /* Spark: a floodlit night in Spark's blue. The lights come up as you read (--booking runs 0 to 1); each
