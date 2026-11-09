@@ -7,6 +7,7 @@ import BeltSignature from "@/components/case/BeltSignature";
 import BlipSignature from "@/components/case/BlipSignature";
 import CaseBlocks from "@/components/case/CaseBlocks";
 import DiveSignature from "@/components/case/DiveSignature";
+import OrbitSignature from "@/components/case/OrbitSignature";
 import PulseSignature from "@/components/case/PulseSignature";
 import SparkSignature from "@/components/case/SparkSignature";
 import SpiralSignature from "@/components/case/SpiralSignature";
@@ -111,7 +112,7 @@ async function CaseStudy({ lang, params }: Props) {
       id="top"
       // On wide screens the right margin is kept clear for a signature's side instruments (e.g. the dive gauge;
       // the belt's upright rank card and the sprint's stopwatch need a little more)
-      className={`case relative isolate ${study.signature === "spiral" ? "md:pr-28" : study.signature === "belt" ? "md:pr-20" : study.signature === "sprint" || study.signature === "spark" ? "md:pr-24" : study.signature ? "md:pr-14" : ""}`}
+      className={`case relative isolate ${study.signature === "spiral" ? "md:pr-28" : study.signature === "belt" ? "md:pr-20" : study.signature === "sprint" || study.signature === "spark" || study.signature === "orbit" ? "md:pr-24" : study.signature ? "md:pr-14" : ""}`}
       style={{ "--accent": study.accent[0], "--accent-2": study.accent[1] } as React.CSSProperties}
     >
       <JsonLd graph={caseJsonLd(project, lang)} />
@@ -129,6 +130,8 @@ async function CaseStudy({ lang, params }: Props) {
         <SparkSignature />
       ) : study.signature === "spiral" ? (
         <SpiralSignature />
+      ) : study.signature === "orbit" ? (
+        <OrbitSignature />
       ) : null}
 
       {/* Opener */}

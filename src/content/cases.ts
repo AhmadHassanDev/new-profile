@@ -44,6 +44,8 @@ export type Block =
   | { kind: "gallery"; title: string; body?: string; items: { label: string; detail?: string; src: string; width: number; height: number }[] }
   /** The same pages on phones, each in a handset that scrolls on hover */
   | { kind: "phones"; title: string; screens: Screen[] }
+  /** Clickable prototypes as Figma draws them: screens, the hotspot wired on each, and noodles to the next */
+  | { kind: "prototypes"; title?: string; flows: PrototypeFlow[] }
   /**
    * Outcomes as big numbers, each optionally against where it started; with no items yet, three empty
    * slots hold the space. `body` tells the story behind them and `sources` back them up.
@@ -63,6 +65,17 @@ export type Source = { label: string; href: string };
 
 export type Screen = { label: string; src?: string; width?: number; height?: number };
 
+/**
+ * One prototype's path, screen by screen. `tap` is the hotspot (x, y, width, height on the 393×852 frame)
+ * that opens the next screen; with `loop`, the last one leads back to the first.
+ */
+export type PrototypeFlow = {
+  label: string;
+  detail: string;
+  loop?: boolean;
+  screens: { label: string; src: string; tap?: [number, number, number, number] }[];
+};
+
 export type CaseStudy = {
   slug: string;
   /** Two colours from the project's own brand; they tint the whole page */
@@ -70,7 +83,7 @@ export type CaseStudy = {
   /** The live site, for projects that shipped as a website */
   site?: string;
   /** A bespoke interaction, loaded on this page only */
-  signature?: "dive" | "pulse" | "blip" | "belt" | "sprint" | "spark" | "spiral";
+  signature?: "dive" | "pulse" | "blip" | "belt" | "sprint" | "spark" | "spiral" | "orbit";
   /** Quick facts; a fact can show a logo (the client's) or a row of tool logos instead of plain text */
   facts: { label: string; value: string; logo?: { src: string; width: number; height: number }; tools?: string[] }[];
   blocks: Block[];
@@ -566,6 +579,177 @@ export const CASES: CaseStudy[] = [
           { value: "1", label: "Template for every campaign" },
         ],
       },
+    ],
+  },
+  {
+    slug: "orbs",
+    accent: ["#0b6470", "#01ffff"],
+    signature: "orbit",
+    facts: [
+      { label: "Client", value: "ORBS, Riyadh", logo: { src: "/logos/rbs.svg", width: 833, height: 162 } },
+      { label: "Role", value: "Research & UI design" },
+      { label: "Scope", value: "Mobile app, patient & doctor" },
+      { label: "Tools", value: "Figma", tools: ["Figma"] },
+    ],
+    blocks: [
+      {
+        kind: "feature",
+        text: "Most emergencies need a doctor, not a hospital. ORBS puts an emergency consultant on a video call at any hour, and needed one app for both ends of that call: the worried patient, and the doctor answering.",
+        src: "/work/orbs-cover.webp",
+        alt: "The ORBS app on three phones: the home screen in English and in Arabic, and a video call",
+      },
+      {
+        kind: "chapter",
+        discipline: "UX research",
+        title: "Research",
+        body: "ORBS is a Riyadh medical company, licensed by the Saudi Ministry of Health, that runs remote emergency care: adult and paediatric emergency consultants available around the clock, for everything that doesn't need a trip to hospital, from fevers and infections to infant colic and high blood pressure.\n\nThat's two people with very different jobs on one call. The patient, often a parent, needs to reach a doctor fast and know what it costs before anything happens. The doctor needs to know who they're about to see. I mapped both journeys end to end, from the splash screen to logging out. They share sign-up, verification and settings, then split: the patient requests a consultation, answers the triage questions, pays and joins the call; the doctor accepts it, reads the patient's history, writes the consultation and any follow-up.",
+        findings: [
+          { value: "2", label: "Journeys, patient and doctor" },
+          { value: "24/7", label: "Emergency consultants on call" },
+          { value: "4", label: "Versions of every screen" },
+        ],
+        sources: [{ label: "About ORBS", href: "https://orbs.sa/en/about" }],
+      },
+      {
+        kind: "image",
+        src: "/work/orbs/journeys.webp",
+        alt: "The patient and doctor user journeys, every screen and branch from the splash screen to logout",
+        caption: "The two journeys: one shared front door, then the patient's path to a call and the doctor's path to a written consultation.",
+        width: 2400,
+        height: 1114,
+      },
+      {
+        kind: "timeline",
+        title: "Two months, journeys to handoff",
+        body: "Both apps ran side by side, so every decision on the patient's side was checked against the doctor's.",
+        unit: "Week",
+        steps: [
+          { title: "Discovery", items: ["ORBS's services", "Patient and doctor roles"] },
+          { title: "User journeys", items: ["Patient journey", "Doctor journey"] },
+          { title: "Patient wireframes", items: ["46 patient screens", "Triage and payment flow"] },
+          { title: "Doctor wireframes", items: ["42 doctor screens", "Accept, write, follow up"] },
+          { title: "Visual language", items: ["Colour, type and components", "Light mode"] },
+          { title: "High fidelity", items: ["Every screen and state", "Dark mode"] },
+          { title: "Arabic", items: ["Right-to-left layouts", "Arabic, light and dark"] },
+          { title: "Handoff", items: ["Suggested features", "Dev-ready files"] },
+        ],
+      },
+      { kind: "statement", text: "In an emergency, every extra screen is a wait. The shortest way to a doctor is the product." },
+      {
+        kind: "evolution",
+        title: "From wireframe to final",
+        body: "Every flow was settled in grey first, both sides of the call, before a single colour. Drag across the phone to see what each screen became.",
+        pairs: [
+          { label: "Home", wire: "/work/orbs/wire-home.webp", final: "/work/orbs/home.webp" },
+          { label: "Triage", wire: "/work/orbs/wire-request.webp", final: "/work/orbs/triage.webp" },
+          { label: "Price", wire: "/work/orbs/wire-pricing.webp", final: "/work/orbs/pricing.webp" },
+          { label: "The call", wire: "/work/orbs/wire-call.webp", final: "/work/orbs/call.webp" },
+          { label: "Rating", wire: "/work/orbs/wire-rating.webp", final: "/work/orbs/rating.webp" },
+          { label: "Consultation", wire: "/work/orbs/wire-details.webp", final: "/work/orbs/details.webp" },
+        ],
+      },
+      {
+        kind: "chapter",
+        discipline: "UI design",
+        title: "Designed in Figma",
+        body: "The app wears ORBS's own colours: an electric cyan for everything you can act on, against near-black, with the brand's brushstrokes moving through the cards. The home screen leads with one thing, a button to request a consultation now, with your consultations and follow-ups counted underneath.\n\nThe path to a doctor is short and honest. Triage questions come first, so the consultant knows what they're walking into before the call connects, and the price, 50 SAR, is confirmed before anything is charged through the Noon payment gateway. The call itself keeps everything under a thumb: camera, microphone, chat and hang up. Afterwards the patient rates the doctor, and every consultation, its write-up and its follow-ups stay in one history.\n\nOn the other end, the doctor's app opens on the consultations waiting to be accepted, with the patient's history one tap away and a write-up and follow-up form for when the call ends. Every screen exists four times: light and dark, English and Arabic, with the Arabic mirrored right to left rather than translated in place.",
+      },
+      {
+        kind: "phones",
+        title: "The patient app",
+        screens: [
+          { label: "Splash", src: "/work/orbs/phone/splash.webp", width: 393, height: 852 },
+          { label: "Onboarding", src: "/work/orbs/phone/onboarding.webp", width: 393, height: 852 },
+          { label: "Home", src: "/work/orbs/phone/home.webp", width: 393, height: 852 },
+          { label: "Triage", src: "/work/orbs/phone/triage.webp", width: 393, height: 852 },
+          { label: "Price", src: "/work/orbs/phone/pricing.webp", width: 393, height: 852 },
+          { label: "The call", src: "/work/orbs/phone/call.webp", width: 393, height: 852 },
+          { label: "Rating", src: "/work/orbs/phone/rating.webp", width: 393, height: 852 },
+          { label: "Consultations", src: "/work/orbs/phone/consultations.webp", width: 393, height: 852 },
+          { label: "Consultation", src: "/work/orbs/phone/details.webp", width: 393, height: 852 },
+          { label: "Doctors", src: "/work/orbs/phone/doctors.webp", width: 393, height: 852 },
+          { label: "Doctor", src: "/work/orbs/phone/doctor-profile.webp", width: 393, height: 852 },
+        ],
+      },
+      {
+        kind: "phones",
+        title: "Light, dark, English, Arabic",
+        screens: [
+          { label: "Home, dark", src: "/work/orbs/phone/dark-home.webp", width: 393, height: 852 },
+          { label: "Home, Arabic", src: "/work/orbs/phone/ar-home.webp", width: 393, height: 852 },
+          { label: "Home, Arabic dark", src: "/work/orbs/phone/ar-dark-home.webp", width: 393, height: 852 },
+          { label: "Triage, dark", src: "/work/orbs/phone/dark-triage.webp", width: 393, height: 852 },
+          { label: "The call, dark", src: "/work/orbs/phone/dark-call.webp", width: 393, height: 852 },
+          { label: "The call, Arabic", src: "/work/orbs/phone/ar-dark-call.webp", width: 393, height: 852 },
+        ],
+      },
+      {
+        kind: "phones",
+        title: "The doctor app",
+        screens: [
+          { label: "Home", src: "/work/orbs/phone/doc-home.webp", width: 393, height: 852 },
+          { label: "Waiting", src: "/work/orbs/phone/doc-accept.webp", width: 393, height: 852 },
+          { label: "Consultations", src: "/work/orbs/phone/doc-write.webp", width: 393, height: 852 },
+        ],
+      },
+      {
+        kind: "chapter",
+        discipline: "UI design",
+        title: "Two clickable prototypes",
+        body: "Both sides of the call were wired into clickable prototypes, so ORBS could tap through each journey on a phone before a line of code was written. The patient's runs in Arabic, in light mode, from the splash screen through triage, payment and the call to rating the doctor. The doctor's runs in English, in dark mode, from signing in to accepting a consultation and writing it up.",
+        findings: [
+          { value: "2", label: "Prototypes, patient and doctor" },
+          { value: "91", label: "Screens linked" },
+          { value: "246", label: "Interactions wired" },
+        ],
+      },
+      {
+        kind: "prototypes",
+        flows: [
+          {
+            label: "Patient prototype",
+            detail: "Arabic · light mode · 48 screens · 143 interactions",
+            loop: true,
+            screens: [
+              { label: "Home", src: "/work/orbs/proto/p-home.webp", tap: [20, 90, 351, 160] },
+              { label: "Triage questions", src: "/work/orbs/proto/p-triage.webp", tap: [20, 769, 351, 45] },
+              { label: "Noon payment", src: "/work/orbs/proto/p-pay.webp", tap: [0, 0, 393, 852] },
+              { label: "Waiting room", src: "/work/orbs/proto/p-wait.webp", tap: [0, 0, 393, 852] },
+              { label: "On call", src: "/work/orbs/proto/p-call.webp", tap: [20, 773, 55, 55] },
+              { label: "Rate your doctor", src: "/work/orbs/proto/p-rate.webp", tap: [202, 492, 149, 41] },
+            ],
+          },
+          {
+            label: "Doctor prototype",
+            detail: "English · dark mode · 43 screens · 103 interactions",
+            screens: [
+              { label: "Home", src: "/work/orbs/proto/d-home.webp", tap: [20, 90, 351, 160] },
+              { label: "Accept consultations", src: "/work/orbs/proto/d-accept.webp", tap: [233, 142, 129, 32] },
+              { label: "On call", src: "/work/orbs/proto/d-call.webp", tap: [223, 40, 141, 36] },
+              { label: "Patient profile", src: "/work/orbs/proto/d-prompt.webp", tap: [36, 513, 323, 45] },
+              { label: "Patient's consultations", src: "/work/orbs/proto/d-write.webp" },
+            ],
+          },
+        ],
+      },
+      {
+        kind: "chapter",
+        discipline: "UX research",
+        title: "Beyond the brief",
+        body: "The handoff came with three suggestions for what's next, each from a gap in the journeys. Categories, so doctors can list themselves under a speciality and patients can choose from each. Medical articles, to give patients a reason to open the app between emergencies and add to its credibility. And a minimal shop, so a patient can buy the medicine they were just prescribed without leaving the app.",
+      },
+      {
+        kind: "results",
+        title: "Handed over",
+        body: "Two months after the first journey map, ORBS had both apps designed end to end, every screen and state in light and dark, English and Arabic, ready for development.",
+        items: [
+          { value: "348", label: "High-fidelity screens" },
+          { value: "88", label: "Wireframes, patient and doctor" },
+          { value: "4", label: "Versions of every screen" },
+          { value: "2", label: "Months, journeys to handoff" },
+        ],
+      },
+      { kind: "statement", text: "Design both ends of the call. The patient's answers are the doctor's first read." },
     ],
   },
   {

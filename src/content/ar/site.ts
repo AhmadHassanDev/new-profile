@@ -32,6 +32,7 @@ export const KIND_AR: Record<string, string> = {
   "Website · Venture studio": "موقع · ستوديو مشاريع",
   "Website · Marketing agency": "موقع · وكالة ماركتنج",
   "Mobile app · Martial arts": "تطبيق موبايل · فنون قتالية",
+  "Mobile app · Healthcare": "تطبيق موبايل · رعاية صحية",
   "Landing page · Fintech": "لاندينج بيدج · فينتك",
   "Landing page · Food & beverage": "لاندينج بيدج · أكل ومشروبات",
   "Mobile app · Fintech": "تطبيق موبايل · فينتك",
@@ -116,6 +117,16 @@ const ALL_PROJECTS: Project[] = [
       "تصميم موقع Bliphub، وكالة ديجيتال كرييتيف متكاملة: UGC، سوشيال ميديا، كونتنت، إنتاج وشراء ميديا، براندينج واستشارات.",
     disciplines: ["UX research", "UI design"],
     cover: "/work/bliphub.webp",
+  },
+  {
+    slug: "orbs",
+    name: "ORBS",
+    kind: "Mobile app · Healthcare",
+    year: "2025",
+    summary:
+      "أبلكيشن تيليهيلث بالعربي والإنجليزي لـORBS في الرياض: المريض يوصل لاستشاري طوارئ في مكالمة فيديو، والدكتور يستقبل كل استشارة ويكتبها ويتابعها.",
+    disciplines: ["UX research", "UI design"],
+    cover: "/work/orbs-cover.webp",
   },
   {
     slug: "anubis",

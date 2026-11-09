@@ -94,6 +94,16 @@ const ALL_PROJECTS: Project[] = [
     cover: "/work/bliphub.webp",
   },
   {
+    slug: "orbs",
+    name: "ORBS",
+    kind: "Mobile app · Healthcare",
+    year: "2025",
+    summary:
+      "A bilingual telehealth app for ORBS in Riyadh: patients reach an emergency consultant on a video call, and doctors take, write up and follow up on every consultation.",
+    disciplines: ["UX research", "UI design"],
+    cover: "/work/orbs-cover.webp",
+  },
+  {
     slug: "anubis",
     name: "Anubis",
     kind: "Mobile app · Martial arts",

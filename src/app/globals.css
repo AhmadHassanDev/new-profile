@@ -977,3 +977,91 @@ html:not(.has-cursor) .lost-layer {
 html:not(.has-cursor) .lost-layer:active {
   cursor: grabbing;
 }
+
+/* ORBS's signature: the consultation's stops in the margin */
+.orbit-dot {
+  background: var(--bg);
+  box-shadow: inset 0 0 0 2px rgb(1 255 255 / 0.3);
+  transition: background-color 0.3s, box-shadow 0.3s, scale 0.3s;
+}
+.orbit-dot[data-state="done"] {
+  background: var(--accent-2);
+  box-shadow: none;
+}
+.orbit-dot[data-state="now"] {
+  background: var(--accent-2);
+  box-shadow: 0 0 0 5px rgb(1 255 255 / 0.2);
+  scale: 1.15;
+}
+.orbit-card[data-stage="3"] .orbit-led {
+  background: #ff4d5e;
+  animation: orbit-live 1.2s ease-in-out infinite;
+}
+@keyframes orbit-live {
+  50% { opacity: 0.35; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .orbit-card[data-stage="3"] .orbit-led { animation: none; }
+}
+
+/* Prototypes: a Figma-like canvas, noodles from each wired hotspot, and a tap walking the flow */
+.proto-canvas {
+  background-image: radial-gradient(rgb(255 255 255 / 0.07) 1px, transparent 1.2px);
+  background-size: 20px 20px;
+}
+.proto-noodle {
+  stroke: rgb(1 255 255 / 0.26);
+  stroke-width: 1.6;
+  transition: stroke 0.3s;
+}
+.proto-noodle-on .proto-noodle {
+  stroke: rgb(1 255 255 / 0.55);
+}
+.proto-draw {
+  stroke: var(--accent-2);
+  stroke-width: 2.4;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  filter: drop-shadow(0 0 6px rgb(1 255 255 / 0.6));
+  animation: proto-draw 0.7s 0.18s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+}
+@keyframes proto-draw {
+  to { stroke-dashoffset: 0; }
+}
+.proto-end {
+  fill: var(--accent-2);
+}
+.proto-arrow {
+  stroke: rgb(1 255 255 / 0.65);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.proto-dot {
+  fill: #fff;
+  filter: drop-shadow(0 0 8px var(--accent-2));
+}
+.proto-hotspot {
+  border: 1.5px solid rgb(1 255 255 / 0.75);
+  background: rgb(1 255 255 / 0.1);
+}
+/* When the whole screen is the hotspot, an outline is enough */
+.proto-hotspot-whole {
+  border: 1.5px solid rgb(1 255 255 / 0.55);
+  border-radius: 18px;
+}
+.proto-tap {
+  animation: proto-tap 0.6s ease-out;
+}
+.proto-hotspot-whole.proto-tap {
+  animation: proto-tap-whole 0.6s ease-out;
+}
+@keyframes proto-tap-whole {
+  0% { box-shadow: inset 0 0 0 0 rgb(1 255 255 / 0.5); }
+  40% { box-shadow: inset 0 0 0 6px rgb(1 255 255 / 0.35); }
+  100% { box-shadow: inset 0 0 0 0 rgb(1 255 255 / 0); }
+}
+@keyframes proto-tap {
+  0% { box-shadow: 0 0 0 0 rgb(1 255 255 / 0.7); background: rgb(1 255 255 / 0.45); }
+  100% { box-shadow: 0 0 0 14px rgb(1 255 255 / 0); background: rgb(1 255 255 / 0.1); }
+}

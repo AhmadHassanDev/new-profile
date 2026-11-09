@@ -3,6 +3,7 @@ import type { Block, Screen, Source } from "@/content/cases";
 import Evolution from "./Evolution";
 import Pipeline from "./Pipeline";
 import { fitLetters } from "@/lib/fit";
+import Prototypes from "./Prototypes";
 import Timeline from "./Timeline";
 import { COVER_HEIGHT, COVER_WIDTH, DISCIPLINE_COLOR } from "@/content/site";
 import type { Lang } from "@/i18n/lang";
@@ -450,6 +451,8 @@ export default function CaseBlocks({ blocks, lang = "en" }: { blocks: Block[]; l
             return <Gallery key={i} title={block.title} body={block.body} items={block.items} />;
           case "phones":
             return <Phones key={i} title={block.title} screens={block.screens} t={t} />;
+          case "prototypes":
+            return <Prototypes key={i} title={block.title} flows={block.flows} />;
         }
       })}
     </>
