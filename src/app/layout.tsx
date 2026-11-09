@@ -3,6 +3,7 @@ import { Figtree, Unbounded } from "next/font/google";
 import { Suspense } from "react";
 import { LOW_POWER_CHECK } from "@/lib/motion";
 import Analytics from "@/components/Analytics";
+import CookieBanner from "@/components/CookieBanner";
 import JsonLd from "@/components/JsonLd";
 import SmoothScroll from "@/components/SmoothScroll";
 import { JOB_TITLE, KNOWS_ABOUT, NAME, OPEN_GRAPH, PERSON, SITE_DESCRIPTION, SITE_TITLE, SITE_URL, WEBSITE } from "@/lib/seo";
@@ -72,6 +73,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         {children}
         {/* Tag Manager loads on the live site only, so local dev and Vercel previews don't count as visits */}
         <Analytics load={process.env.VERCEL_ENV === "production"} />
+        <CookieBanner />
       </body>
     </html>
   );

@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { CONTACT, SOCIALS } from "@/content/site";
+import { CookieSettingsLink } from "./CookieBanner";
 import MakeItReal from "./MakeItReal";
 import SocialIcon from "./SocialIcon";
 
@@ -8,7 +9,13 @@ export default function Contact({ minimal = false }: { minimal?: boolean }) {
   const bar = (
     <div className="flex items-center justify-between border-t border-line pt-6 text-sm text-muted">
       <Image src="/logo.svg" alt="" width={40} height={31} />
-      <span>© 2019–2026 Ahmed Hassan</span>
+      <span className="flex flex-col items-center gap-1 text-center sm:flex-row sm:gap-3">
+        <span>© 2019–2026 Ahmed Hassan</span>
+        <span aria-hidden className="hidden sm:inline">
+          ·
+        </span>
+        <CookieSettingsLink className="cursor-pointer transition-colors hover:text-ink" />
+      </span>
       <a href="#top" className="transition-colors hover:text-ink">
         Back to top ↑
       </a>

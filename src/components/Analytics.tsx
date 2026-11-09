@@ -3,12 +3,12 @@
 import Script from "next/script";
 import { useEffect } from "react";
 import { SOCIALS } from "@/content/site";
-import { GTM_ID, track } from "@/lib/analytics";
+import { CONSENT_DEFAULTS, GTM_ID, track } from "@/lib/analytics";
 
 const SOCIAL_HOSTS = new Map(SOCIALS.map((s) => [new URL(s.href).hostname.replace(/^www\./, ""), s.label]));
 
 /**
- * Loads the Tag Manager container and reports the clicks that matter for leads, from one listener on the page
+ * Sets the consent defaults, loads the Tag Manager container and reports the clicks that matter for leads, from one listener on the page
  * instead of a handler on every link: email and WhatsApp, the CV, the socials and any other link out.
  */
 export default function Analytics({ load }: { load: boolean }) {
@@ -33,11 +33,13 @@ export default function Analytics({ load }: { load: boolean }) {
     return () => document.removeEventListener("click", onClick, true);
   }, []);
 
-  // Events still land in the dataLayer without the container (in dev and previews), where nothing reads them
-  if (!load) return null;
+  // The consent defaults go first in the same script, so they're always in the dataLayer before the container reads it.
+  // Without the container (dev and previews) events and consent still land in the dataLayer, where nothing reads them.
   return (
     <Script id="gtm" strategy="afterInteractive">
-      {`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','${GTM_ID}');`}
+      {CONSENT_DEFAULTS + (load ? GTM_SNIPPET : "")}
     </Script>
   );
 }
+
+const GTM_SNIPPET = `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','${GTM_ID}');`;
