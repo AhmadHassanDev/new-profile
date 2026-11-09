@@ -92,7 +92,11 @@ export default function LostCanvas() {
       fh: fr.height,
       sizes,
       slots,
-      pin: { x: kr.left - cr.left + 16, y: kr.top - cr.top + 16 },
+      // The pin sits at the comment's start corner: top left, or top right in Arabic
+      pin: {
+        x: getComputedStyle(k).direction === "rtl" ? kr.right - cr.left - 16 : kr.left - cr.left + 16,
+        y: kr.top - cr.top + 16,
+      },
     });
   }, []);
 
