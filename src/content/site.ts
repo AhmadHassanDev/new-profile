@@ -262,6 +262,7 @@ export const CLIENTS: Client[] = [
 export const SOCIALS = [
   { label: "LinkedIn", handle: "Ahmed Hassan", note: "Career & experience", href: "https://www.linkedin.com/in/ahmed-hassan-30550b1b6/" },
   { label: "Behance", handle: "ahdev", note: "Case studies & visuals", href: "https://www.behance.net/ahdev" },
+  { label: "Dribbble", handle: "AhmadHassanDev", note: "Shots & UI details", href: "https://dribbble.com/AhmadHassanDev" },
   { label: "GitHub", handle: "AhmadHassanDev", note: "Code & side projects", href: "https://github.com/AhmadHassanDev" },
   { label: "Instagram", handle: "@ahmedhdev", note: "Behind the scenes", href: "https://www.instagram.com/ahmedhdev/" },
 ];

@@ -11,7 +11,7 @@ import { CONTACT, SOCIALS } from "@/content/site";
 import { absoluteUrl, breadcrumbs, PERSON_ID, pageMetadata, webPage } from "@/lib/seo";
 import { fitLetters } from "@/lib/fit";
 
-const DESCRIPTION = "Start a project with Ahmed Hassan: send a message, WhatsApp, email, or find him on LinkedIn, Behance, GitHub and Instagram.";
+const DESCRIPTION = "Start a project with Ahmed Hassan: send a message, WhatsApp, email, or find him on LinkedIn, Behance, Dribbble, GitHub and Instagram.";
 
 export const metadata: Metadata = pageMetadata({ title: "Contact", description: DESCRIPTION, path: "/contact" });
 
@@ -37,9 +37,21 @@ const JSON_LD = [
 const BRAND: Record<string, { fill: string; text: string }> = {
   LinkedIn: { fill: "#0a66c2", text: "#ffffff" },
   Behance: { fill: "#1769ff", text: "#ffffff" },
+  // Dribbble's pink (#ea4c89) holds only 3.6:1 under white; this deeper pink from the same hue holds 5.1:1
+  Dribbble: { fill: "#c8326f", text: "#ffffff" },
   GitHub: { fill: "#edecf2", text: "#0a0a0d" },
   Instagram: { fill: "linear-gradient(135deg, #c2410c, #c1306b 35%, #833ab4 70%, #4f5bd5)", text: "#ffffff" },
 };
+
+// Five tiles, with no row left half empty: one row of five on wide screens, three over two on laptops (the two
+// widen and keep the same height), and two, two and one full-width tile on tablets. Phones stack them.
+const TILE = [
+  { li: "lg:col-span-2 xl:col-span-1", a: "aspect-[16/9] sm:aspect-[4/3]" },
+  { li: "lg:col-span-2 xl:col-span-1", a: "aspect-[16/9] sm:aspect-[4/3]" },
+  { li: "lg:col-span-2 xl:col-span-1", a: "aspect-[16/9] sm:aspect-[4/3]" },
+  { li: "lg:col-span-3 xl:col-span-1", a: "aspect-[16/9] sm:aspect-[4/3] lg:aspect-[2/1] xl:aspect-[4/3]" },
+  { li: "sm:col-span-2 lg:col-span-3 xl:col-span-1", a: "aspect-[16/9] sm:aspect-[8/3] lg:aspect-[2/1] xl:aspect-[4/3]" },
+];
 
 export default function ContactPage() {
   return (
@@ -74,14 +86,14 @@ export default function ContactPage() {
             <br />
             <span className="text-spectrum animate-shimmer">online</span>
           </h2>
-          <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            {SOCIALS.map((social) => (
-              <li key={social.label}>
+          <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-6 xl:grid-cols-5">
+            {SOCIALS.map((social, i) => (
+              <li key={social.label} className={TILE[i]?.li}>
                 <a
                   href={social.href}
                   target="_blank"
                   rel="noreferrer"
-                  className="social-tile group relative flex aspect-[16/9] flex-col sm:aspect-[4/3] justify-between overflow-hidden rounded-[28px] bg-surface/50 p-6 backdrop-blur-xl transition-colors duration-500 md:p-8"
+                  className={`social-tile group relative flex flex-col justify-between overflow-hidden rounded-[28px] bg-surface/50 p-6 backdrop-blur-xl transition-colors duration-500 md:p-8 ${TILE[i]?.a}`}
                   style={{ "--brand": BRAND[social.label].fill, "--on-brand": BRAND[social.label].text } as React.CSSProperties}
                 >
                   <span aria-hidden className="direct-flood absolute inset-0 [background:var(--brand)]" />
