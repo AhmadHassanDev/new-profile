@@ -16,7 +16,7 @@ export default function WorkLink({
   return (
     <Link
       href={localePath(lang, href)}
-      className="group pointer-events-auto inline-flex items-center gap-3 rounded-full bg-ink py-2 pe-2 ps-6 text-base font-semibold text-bg transition-transform duration-300 hover:scale-[1.04]"
+      className="group pointer-events-auto inline-flex w-fit items-center gap-3 rounded-full bg-ink py-2 pe-2 ps-6 text-base font-semibold text-bg transition-transform duration-300 hover:scale-[1.04]"
     >
       {children}
       <span
