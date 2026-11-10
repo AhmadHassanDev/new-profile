@@ -81,7 +81,7 @@ const ALL_PROJECTS: Project[] = [
     summary:
       "Website design and build for Blacksprint, Kareem Naguib's product studio, showing its ventures in motion: EZeats, Techno & Chill, ¡Salud!, RSRVIT and more.",
     disciplines: ["UI design", "Front-end"],
-    cover: "/work/blacksprint.webp",
+    cover: "/work/blacksprint-cover.webp",
   },
   {
     slug: "bliphub",

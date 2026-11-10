@@ -400,8 +400,8 @@ export const CASES: CaseStudy[] = [
       {
         kind: "feature",
         text: "Not an agency, not a VC: Blacksprint is a product studio that builds and backs its own ventures. Its site had to prove that the fastest way possible, by putting those ventures in motion on the first screen.",
-        src: "/work/blacksprint.webp",
-        alt: "The Blacksprint homepage on a laptop",
+        src: "/work/blacksprint-cover.webp",
+        alt: "The Blacksprint homepage on a tablet, between two phones showing the mobile home and ventures pages",
       },
       {
         kind: "chapter",

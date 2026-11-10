@@ -106,7 +106,7 @@ const ALL_PROJECTS: Project[] = [
     summary:
       "تصميم وتنفيذ موقع Blacksprint، ستوديو المنتجات بتاع كريم نجيب، وبيعرض مشاريعه وهي شغالة: EZeats و Techno & Chill و ¡Salud! و RSRVIT وغيرهم.",
     disciplines: ["UI design", "Front-end"],
-    cover: "/work/blacksprint.webp",
+    cover: "/work/blacksprint-cover.webp",
   },
   {
     slug: "bliphub",

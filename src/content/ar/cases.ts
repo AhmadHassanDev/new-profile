@@ -320,8 +320,8 @@ export const CASES: typeof EN.CASES = [
       {
         kind: "feature",
         text: "لا وكالة ولا VC: Blacksprint ستوديو منتجات بيبني ويموّل مشاريعه بنفسه. وموقعه كان لازم يثبت ده بأسرع طريقة ممكنة: يحط المشاريع دي وهي شغالة في أول شاشة.",
-        src: "/work/blacksprint.webp",
-        alt: "الصفحة الرئيسية لـBlacksprint على لابتوب",
+        src: "/work/blacksprint-cover.webp",
+        alt: "الصفحة الرئيسية لـBlacksprint على تابلت، وجنبها موبايلين عليهم الرئيسية وصفحة المشاريع",
       },
       {
         kind: "chapter",
