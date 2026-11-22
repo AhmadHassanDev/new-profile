@@ -14,3 +14,9 @@ export const smoothstep = (a: number, b: number, x: number) => smooth((x - a) / 
 
 /** Moves `from` toward `to` at `rate` per second, the same however long the frame took */
 export const damp = (from: number, to: number, rate: number, dt: number) => from + (to - from) * (1 - Math.exp(-rate * dt));
+
+/** Hands the main thread back for a moment (input, paint), so long setup work runs in short tasks instead of one long one */
+export function yieldToMain(): Promise<void> {
+  const scheduler = (globalThis as { scheduler?: { yield?: () => Promise<void> } }).scheduler;
+  return scheduler?.yield ? scheduler.yield() : new Promise((resolve) => setTimeout(resolve, 0));
+}

@@ -7,8 +7,14 @@ import { CONSENT_DEFAULTS, GTM_ID, track } from "@/lib/analytics";
 
 const SOCIAL_HOSTS = new Map(SOCIALS.map((s) => [new URL(s.href).hostname.replace(/^www\./, ""), s.label]));
 
+// Tag Manager waits for the visitor's first touch, key or scroll, or this long after the page has loaded, whichever comes
+// first: its 180 KB never competes with the first paint and hydration. A visit that leaves sooner without touching anything
+// isn't counted.
+const GTM_DELAY_MS = 4000;
+const FIRST_INPUT = ["pointerdown", "keydown", "touchstart", "scroll", "wheel"] as const;
+
 /**
- * Sets the consent defaults, loads the Tag Manager container and reports the clicks that matter for leads, from one listener on the page
+ * Sets the consent defaults, loads the Tag Manager container (see GTM_DELAY_MS) and reports the clicks that matter for leads, from one listener on the page
  * instead of a handler on every link: email and WhatsApp, the CV, the socials and any other link out.
  */
 export default function Analytics({ load }: { load: boolean }) {
@@ -33,11 +39,32 @@ export default function Analytics({ load }: { load: boolean }) {
     return () => document.removeEventListener("click", onClick, true);
   }, []);
 
-  // The consent defaults go first in the same script, so they're always in the dataLayer before the container reads it.
-  // Without the container (dev and previews) events and consent still land in the dataLayer, where nothing reads them.
+  useEffect(() => {
+    if (!load) return;
+    let timer = 0;
+    const inject = () => {
+      stop();
+      const script = document.createElement("script");
+      script.text = GTM_SNIPPET;
+      document.head.appendChild(script);
+    };
+    const onLoad = () => (timer = window.setTimeout(inject, GTM_DELAY_MS));
+    const stop = () => {
+      window.clearTimeout(timer);
+      window.removeEventListener("load", onLoad);
+      FIRST_INPUT.forEach((type) => window.removeEventListener(type, inject));
+    };
+    FIRST_INPUT.forEach((type) => window.addEventListener(type, inject, { once: true, passive: true }));
+    if (document.readyState === "complete") onLoad();
+    else window.addEventListener("load", onLoad, { once: true });
+    return stop;
+  }, [load]);
+
+  // The consent defaults go in straight away, so they're always in the dataLayer before the container reads it. Without
+  // the container (dev and previews) events and consent still land in the dataLayer, where nothing reads them.
   return (
-    <Script id="gtm" strategy="afterInteractive">
-      {CONSENT_DEFAULTS + (load ? GTM_SNIPPET : "")}
+    <Script id="gtm-consent" strategy="afterInteractive">
+      {CONSENT_DEFAULTS}
     </Script>
   );
 }

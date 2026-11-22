@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import About from "@/components/About";
 import Clients from "@/components/Clients";
 import Contact from "@/components/Contact";
@@ -47,13 +48,27 @@ export default function HomeView({ lang }: { lang: Lang }) {
       <Nav />
       <main id="top">
         <Hero />
-        <Clients />
-        <Marquee lang={lang} />
-        <Work action={<WorkLink href="/work" lang={lang}>{ui(lang).common.allWork}</WorkLink>} />
-        <About />
-        <Services />
+        {/* Each section below the fold is its own boundary, so the page hydrates in short tasks, hero first, instead
+            of one long one. Nothing in them waits on data: the HTML is all there from the start. */}
+        <Suspense fallback={null}>
+          <Clients />
+        </Suspense>
+        <Suspense fallback={null}>
+          <Marquee lang={lang} />
+        </Suspense>
+        <Suspense fallback={null}>
+          <Work action={<WorkLink href="/work" lang={lang}>{ui(lang).common.allWork}</WorkLink>} />
+        </Suspense>
+        <Suspense fallback={null}>
+          <About />
+        </Suspense>
+        <Suspense fallback={null}>
+          <Services />
+        </Suspense>
       </main>
-      <Contact lang={lang} />
+      <Suspense fallback={null}>
+        <Contact lang={lang} />
+      </Suspense>
     </>
   );
 }

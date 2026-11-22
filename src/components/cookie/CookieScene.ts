@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
-import { clamp01, damp, smooth } from "@/lib/math";
+import { clamp01, damp, smooth, yieldToMain } from "@/lib/math";
 
 /**
  * The cookie on the consent banner: a sculpted chocolate-chip cookie (public/models/cookie.glb, one cookie taken from a
@@ -101,8 +101,10 @@ function addBite(geo: THREE.BufferGeometry, place: (x: number, y: number, z: num
   after.dispose();
 }
 
-/** The dough's grain, made once per load: a bump map for its rough surface, and (kept light) a colour map that darkens the crevices */
-function grainTexture(size = 512) {
+/** The dough's grain, made once per load: a bump map for its rough surface, and (kept light) a colour map that darkens the crevices.
+ *  A quarter of a million pixels of layered noise: worked through a few rows at a time, handing the page back in between,
+ *  so it never blocks for long. */
+async function grainTexture(size = 512) {
   const canvas = document.createElement("canvas");
   canvas.width = canvas.height = size;
   const ctx = canvas.getContext("2d")!;
@@ -111,6 +113,7 @@ function grainTexture(size = 512) {
   // shifted so the noise's grid never lines up into a weave.
   const cos = Math.cos(0.9), sin = Math.sin(0.9);
   for (let y = 0; y < size; y++) {
+    if (y > 0 && y % 16 === 0) await yieldToMain();
     for (let x = 0; x < size; x++) {
       let px = (x / size) * 34, py = (y / size) * 34, n = 0, amp = 0.5, total = 0;
       for (let o = 0; o < 5; o++) {
@@ -150,16 +153,21 @@ export class CookieScene {
   private biteAt = -1;
   private dropAt = -1;
 
-  /** Loads the model, then builds the scene around it */
+  /** Loads the model and makes the grain, builds the scene around them, then gets it ready to draw: each step its own
+   *  short task, so the banner showing up never stalls the page */
   static async create(canvas: HTMLCanvasElement, reduced: boolean) {
-    const gltf = await new GLTFLoader().loadAsync(MODEL);
-    return new CookieScene(canvas, reduced, gltf.scene);
+    const [gltf, grain] = await Promise.all([new GLTFLoader().loadAsync(MODEL), grainTexture()]);
+    await yieldToMain();
+    const scene = new CookieScene(canvas, reduced, gltf.scene, grain);
+    await scene.prepare();
+    return scene;
   }
 
   private constructor(
     private canvas: HTMLCanvasElement,
     private reduced: boolean,
     model: THREE.Object3D,
+    grain: THREE.CanvasTexture,
   ) {
     this.renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, powerPreference: "low-power" });
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -170,12 +178,7 @@ export class CookieScene {
     this.camera.position.set(0, 0.35, 5.6);
     this.camera.lookAt(0, 0, 0);
 
-    // A soft studio for the chocolate's gloss, a warm key from the front-left, and the brand on the rim
-    const pmrem = new THREE.PMREMGenerator(this.renderer);
-    const env = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
-    pmrem.dispose();
-    this.scene.environment = env;
-    this.scene.environmentIntensity = 0.35;
+    // A soft studio for the chocolate's gloss (see `prepare`), a warm key from the front-left, and the brand on the rim
     this.scene.add(new THREE.HemisphereLight("#fff4e2", "#2a1a12", 0.8));
     const key = new THREE.DirectionalLight("#fff0d8", 2.1);
     key.position.set(-2.5, 3.5, 4);
@@ -232,10 +235,9 @@ export class CookieScene {
     dough.setAttribute("color", new THREE.BufferAttribute(colors, 3));
     dough.setAttribute("uv", new THREE.BufferAttribute(uvs, 2));
 
-    const grain = grainTexture();
     const doughMat = new THREE.MeshStandardMaterial({ vertexColors: true, map: grain, roughness: 1, metalness: 0, bumpMap: grain, bumpScale: 1.8 });
     const chipMat = new THREE.MeshStandardMaterial({ color: "#3a1c0f", roughness: 0.28, metalness: 0 });
-    this.disposables.push(grain, doughMat, chipMat, env, this.crumbGeo, this.crumbMat, ...geos);
+    this.disposables.push(grain, doughMat, chipMat, this.crumbGeo, this.crumbMat, ...geos);
 
     for (const [g, m] of [[dough, doughMat], [chips, chipMat]] as const) {
       if (!g) continue;
@@ -249,6 +251,20 @@ export class CookieScene {
     this.cookie.rotation.x = 0.78;
     this.rig.add(this.cookie);
     this.scene.add(this.rig);
+  }
+
+  /** The studio lighting, then the shaders compiled in the background (where the browser can), so the first frame
+   *  doesn't stall the page */
+  private async prepare() {
+    await yieldToMain();
+    const pmrem = new THREE.PMREMGenerator(this.renderer);
+    const env = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+    pmrem.dispose();
+    this.disposables.push(env);
+    this.scene.environment = env;
+    this.scene.environmentIntensity = 0.35;
+    await yieldToMain();
+    await this.renderer.compileAsync(this.scene, this.camera);
   }
 
   resize() {
