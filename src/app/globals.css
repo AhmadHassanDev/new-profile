@@ -101,15 +101,20 @@ header,
 [data-intro-hide] {
   transition: opacity 0.9s ease 0.2s;
 }
-body:has(.site-loader:not(.is-exiting)) {
+:root:not([data-low-power]) body:has(.site-loader:not(.is-exiting)) {
   overflow: hidden;
 }
-body:has(.site-loader:not(.is-exiting)) :is(header, [data-intro-hide]) {
+:root:not([data-low-power]) body:has(.site-loader:not(.is-exiting)) :is(header, [data-intro-hide]) {
   opacity: 0;
 }
 /* Hold the hero's entrance until the loader starts to lift */
-body:has(.site-loader:not(.is-exiting)) .animate-rise {
+:root:not([data-low-power]) body:has(.site-loader:not(.is-exiting)) .animate-rise {
   animation-play-state: paused;
+}
+/* No GPU, no particles to play the intro (see src/lib/motion.ts): skip the loader from the first paint, so the hero
+   isn't held behind a bare counter */
+:root[data-low-power] .site-loader {
+  display: none;
 }
 
 /* No GPU (see src/lib/motion.ts): every frame of an endless animation is repainted in software and keeps

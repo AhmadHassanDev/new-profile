@@ -4,6 +4,7 @@ import { useLayoutEffect, useRef } from "react";
 import { siteFor } from "@/content";
 import { useLang } from "@/i18n/LangProvider";
 import { whenLoaderDone } from "@/lib/loader";
+import { lowPower } from "@/lib/motion";
 
 // Starts once the loader lifts and the headline has risen into place.
 const DELAY_MS = 900;
@@ -15,7 +16,8 @@ export default function Stats({ className = "" }: { className?: string }) {
   const numberRefs = useRef<(HTMLSpanElement | null)[]>([]);
 
   useLayoutEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    // Reduced motion, or no GPU (no loader hides the hero there, so the real numbers are already on screen): no count-up
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || lowPower()) return;
     const nodes = numberRefs.current;
     nodes.forEach((node) => node && (node.textContent = "0"));
 

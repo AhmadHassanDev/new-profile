@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useLang } from "@/i18n/LangProvider";
 import { ui } from "@/i18n/ui";
 import { isLoaderDone, LOADER_PROGRESS, markLoaderDone } from "@/lib/loader";
+import { lowPower } from "@/lib/motion";
 
 // The full show, for wide screens with a mouse: long enough to watch the logo gather, never holding the page hostage
 const FULL = { min: 2400, max: 6500, ease: 3.7 };
@@ -36,7 +37,8 @@ export default function Loader() {
 
   useEffect(() => {
     if (isLoaderDone()) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    // Reduced motion, or no GPU (the particles that play the intro never load): no show to wait for
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || lowPower()) {
       markLoaderDone();
       queueMicrotask(() => setPhase("gone"));
       return;
