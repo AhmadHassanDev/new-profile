@@ -108,7 +108,9 @@ export default function PassionCard({
       onPointerEnter={(e) => e.pointerType === "mouse" && toggle(true)}
       onPointerLeave={(e) => e.pointerType === "mouse" && toggle(false)}
       onPointerMove={onMove}
-      className="group relative flex min-h-[260px] flex-col p-6 transition-colors duration-500 data-[active]:text-bg md:min-h-[320px] md:p-8"
+      // Text turns dark as the flood reaches it (0.25 s wait, 0.25 s change), not before: the flood starts slow
+      // from the far corner, so text that darkens straight away sits dark on the dark card for a moment
+      className="group relative flex min-h-[260px] flex-col p-6 transition-colors duration-500 data-[active]:text-bg data-[active]:delay-250 data-[active]:duration-250 md:min-h-[320px] md:p-8"
       style={{ "--c": color } as React.CSSProperties}
     >
       <span aria-hidden className="absolute inset-0 overflow-hidden rounded-[32px] bg-surface">
@@ -122,7 +124,7 @@ export default function PassionCard({
         className="pointer-events-none absolute -top-[26%] -right-[6%] z-10 aspect-square w-[64%] max-w-[300px] md:drop-shadow-[0_28px_28px_rgb(0_0_0/0.35)] md:-top-[30%]"
       />
       <div className="relative flex items-center justify-between">
-        <span className="font-display text-sm font-semibold text-[var(--c)] transition-colors duration-500 group-data-[active]:text-bg">
+        <span className="font-display text-sm font-semibold text-[var(--c)] transition-colors duration-500 group-data-[active]:text-bg group-data-[active]:delay-250 group-data-[active]:duration-250">
           0{index + 1}
         </span>
         <span aria-hidden className="size-3 rounded-full bg-[var(--c)] transition-[transform,background-color] duration-500 group-data-[active]:scale-0" />
@@ -130,7 +132,7 @@ export default function PassionCard({
       <h3 className="relative mt-auto font-display text-[length:calc((13vw)*var(--ds))] leading-[0.9] font-bold uppercase md:text-[length:calc((clamp(2.25rem,3.7vw,4rem))*var(--ds))]">
         {title}
       </h3>
-      <p className="relative mt-4 max-w-md text-lg leading-snug text-muted transition-colors duration-500 group-data-[active]:text-bg">{body}</p>
+      <p className="relative mt-4 max-w-md text-lg leading-snug text-muted transition-colors duration-500 group-data-[active]:text-bg group-data-[active]:delay-250 group-data-[active]:duration-250">{body}</p>
     </li>
   );
 }
